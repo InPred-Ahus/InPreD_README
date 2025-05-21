@@ -52,6 +52,8 @@ insert.fig.toggle <- function(
 
 ## Connect to the Virtual Machines
 
+<br>
+
 1. In your browser, open the [VMWare Horizon](https://view.tsd.usit.no/portal/webclient/#/home) website. Log in with your *username* and *2FA* first, then VMWare will ask your *password* (Figure 1).
 
 ```{r figVMWare, echo=FALSE, results='asis'}
@@ -79,6 +81,22 @@ insert.fig.toggle(
 )
 
 ```
+
+<br>
+
+## Folder structure
+
+3. We will be working in the following directory: `/ess/p1150/data/durable`. Next, a list of folders that will be constantly used during the analysis.
+
+```{bash, echo=TRUE, eval = FALSE}
+cd /ess/p1150/data/durable
+```
+
+ <br>
+ 
+  - **`/ess/p1150/data/durable/file-import/p1150-member-group/`** : this is the folder where raw files are available. The files are usually uploaded every friday.
+  
+  - **`/ess/p1150/data/durable/file-export/`** : this is the folder where files can be exported outside the [TSD](https://selfservice.tsd.usit.no/) framework.
 
 
 
