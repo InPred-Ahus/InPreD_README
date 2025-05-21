@@ -1,0 +1,119 @@
+---
+title: "InPreD_README"
+author: "Jaime Abraham Castro-Mondragon"
+date: 'Last update: `r Sys.Date()`'
+output: 
+  html_document:
+    theme: cosmo
+    toc: yes
+    toc_float:
+      collapsed: false
+    self_contained: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+```
+
+
+```{r functions, include=FALSE}
+
+insert.fig.toggle <- function(
+  fig.id,        # Unique id for the div/button (e.g. "figVMWare")
+  button.label,  # Label for the button (e.g. "Toggle Figure 1")
+  img.src,       # Path to image (e.g. "fig/01_VMWare_login.png")
+  fig.width = "45%",  # Width style for image
+  fig.cap = "Caption text"  # Figure caption text
+) {
+  safe_fig_id <- gsub("'", "\\'", fig.id)
+  safe_button_label <- gsub("'", "\\'", button.label)
+  safe_img_src <- gsub("'", "\\'", img.src)
+  safe_fig_cap <- gsub("'", "\\'", fig.cap)
+  
+  cat(sprintf('
+<div style="margin-bottom: 10px; text-align: right;">
+  <button class="btn-toggle" onclick="toggleFigure(\'%s\')">%s</button>
+</div>
+<div id="%s" style="display:block; text-align: center; margin-bottom: 20px;">
+  <img src="%s" style="width:%s;" class="img-fluid"/>
+  <p><strong>%s.</strong> %s</p>
+</div>
+', safe_fig_id, safe_button_label, safe_fig_id, safe_img_src, fig.width, safe_button_label, safe_fig_cap))
+}
+
+```
+
+
+
+# Intro
+
+# Steps
+
+## Connect to the Virtual Machines
+
+1. In your browser, open the [VMWare Horizon](https://view.tsd.usit.no/portal/webclient/#/home) website. Log in with your *username* and *2FA* first, then VMWare will ask your *password* (Figure 1).
+
+```{r figVMWare, echo=FALSE, results='asis'}
+
+insert.fig.toggle(
+  fig.id = "figVMWare",
+  button.label = "Figure 1",
+  img.src = "fig/01_VMWare_login.png",
+  fig.width = "45%",
+  fig.cap = "Log in in the VMWare Horizon portal"
+)
+
+```
+
+2. Click on the *p1150-rhel8-01-pool* icon, this will open the Linux VM (Figure 2). The other icon (*p1150-win02-pool*) will open the Windows VM.
+
+```{r figVMs, echo=FALSE, results='asis'}
+
+insert.fig.toggle(
+  fig.id = "figVMs",
+  button.label = "Figure 2",
+  img.src = "fig/02_VMs.png",
+  fig.width = "45%",
+  fig.cap = "Available VMs"
+)
+
+```
+
+
+
+
+```{r toggle, echo=FALSE, results='asis'}
+
+cat('
+<style>
+.btn-toggle {
+  background-color: #0275d8;
+  border: none;
+  color: white;
+  padding: 8px 16px;
+  font-size: 14px;
+  border-radius: 12px;       /* Rounded corners */
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+}
+.btn-toggle:hover {
+  background-color: #025aa5;
+}
+</style>
+
+<script>
+function toggleFigure(id) {
+  var fig = document.getElementById(id);
+  if (fig.style.display === "none" || fig.style.display === "") {
+    fig.style.display = "block";
+  } else {
+    fig.style.display = "none";
+  }
+}
+</script>
+')
+```
+
+
