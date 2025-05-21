@@ -66,7 +66,7 @@ insert.fig.toggle(
 
 ```
 
-2. Click on the *p1150-rhel8-01-pool* icon, this will open the Linux VM (Figure 2). The other icon (*p1150-win02-pool*) will open the Windows VM.
+2. Click on the **p1150-rhel8-01-pool** icon, this will open the Linux VM (Figure 2). The other icon (*p1150-win02-pool*) will open the Windows VM.
 
 ```{r figVMs, echo=FALSE, results='asis'}
 
@@ -75,7 +75,7 @@ insert.fig.toggle(
   button.label = "Figure 2",
   img.src = "fig/02_VMs.png",
   fig.width = "45%",
-  fig.cap = "Available VMs"
+  fig.cap = "Available VMs. Left: Linux, Right: Windows"
 )
 
 ```
