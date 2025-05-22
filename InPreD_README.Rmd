@@ -114,21 +114,21 @@ cd /ess/p1150/data/durable
 <br>
 
   - **`TSO500_SampleSheets/`** : in this folder we should place the Sample sheet files (see Step X) generated in every sequence run. Every sequence run should have three associated files. 
-    - Original Samplesheet: `250515_info.csv`
-    - Original Samplesheet (required by TSOPPI): `250515_info_TSOPPI.csv`
-    - Curated Samplesheet: `250515_AAAAAAAA_BBBB_CCCCCCCCCC.csv`
+    - Original Samplesheet : `250515_info.csv`
+    - Original Samplesheet (required by TSOPPI) : `250515_info_TSOPPI.csv`
+    - Curated Samplesheet : `250515_AAAAAAAA_BBBB_CCCCCCCCCC.csv`
 
 <br>
 
   - **`/TSO500_pronto_metadata/`** : in this folder we should place the metadata tables (original and in a compressed version; see Step X). Every sequence run should have two associated files. 
-    - Original metadata: `PRONTO_metadata_250515.txt`
-    - Compressed table: `PRONTO_metadata_250515.7z`
+    - Original metadata : `PRONTO_metadata_250515.txt`
+    - Compressed table : `PRONTO_metadata_250515.7z`
 
 <br>
 
   - **`TSO500_sequences/`** : in this folder we should place the sequence files (see Step X) generated in every sequence run. Every sequence run should have two associated files. 
-    - Folder with sequences: `250515/`
-    - File with checksums: `250515.md5`
+    - Folder with sequences : `250515/`
+    - File with checksums : `250515.md5`
 
 <br>
 
@@ -136,8 +136,19 @@ cd /ess/p1150/data/durable
 
 <br>
 
+  - **`TSO500_analyses/`** : here we will find the results after running *LocalApp*. Every sequence run should have two associated folders, both having similar structure. 
+    - *LocalApp* results : `250515_AAAAAAAA_BBBB_CCCCCCCCCC_TSO500_LocalApp_analysis/`
+    - *LocalApp* raw reads results: `250515_AAAAAAAA_BBBB_CCCCCCCCCC_TSO500_LocalApp_analysis_fromRAW/`
+        - Results of Sample IDs are in individual folders : `results/${SAMPLE_ID}/`
+        - Table with sequencing metrics : `results/MetricsOutput.tsv`
 
+<br>
 
+  - **`TSO500_postprocessing/`** : here we will find the results after running *LocalApp* and *TSOPPI*, two folders per sequence run ID. 
+    - *LocalApp* : `250515_AAAAAAAA_BBBB_CCCCCCCCCC_TSO500_LocalApp_postprocessing_results/`
+    - *TSOPPI* : `250515_AAAAAAAA_BBBB_CCCCCCCCCC_TSO500_TSOPPI_v0.3.2_main_2022_06_07/`
+
+<br>
 
 ```{r toggle, echo=FALSE, results='asis'}
 
@@ -174,7 +185,7 @@ function toggleFigure(id) {
 
 
 <!-- sequences -->
-analysis
+<!-- analysis -->
 post-processing
 icnva
 export_for_interpretation
