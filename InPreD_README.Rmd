@@ -9,6 +9,7 @@ output:
     toc_float:
       collapsed: false
     self_contained: true
+    code_folding: show
 ---
 
 ```{r setup, include=FALSE}
@@ -45,10 +46,19 @@ insert.fig.toggle <- function(
 ```
 
 
+## Intro
 
-# Intro
+This document explains how to run the InPreD pipeline to detect CNAs, driver mutations, gene fusions and other mutations from a Illumina TS0500 panel. Every week we sequence a batch of max 8 samples (hereafter referred as *sequencing run*). 
 
-# Steps
+In this document we will use the following sequence run ID, we can easily identify by the first 6 digits corresponding to the data when the sequences were generated.
+
+```{bash, echo=TRUE, eval = FALSE}
+250515_AAAAAAAA_BBBB_CCCCCCCCCC
+```
+
+<!-- # Steps -->
+
+<br>
 
 ## Connect to the Virtual Machines
 
@@ -86,7 +96,8 @@ insert.fig.toggle(
 
 ## Folder structure
 
-3. We will be working in the following directory: `/ess/p1150/data/durable`. Next, a list of folders that will be constantly used during the analysis.
+3. We will be working in the following directory: `/ess/p1150/data/durable`. Next we have a list of folders that will be constantly used during the analysis, from now on, **the file paths are relative to the working directory**.
+
 
 ```{bash, echo=TRUE, eval = FALSE}
 cd /ess/p1150/data/durable
@@ -94,9 +105,36 @@ cd /ess/p1150/data/durable
 
  <br>
  
-  - **`/ess/p1150/data/durable/file-import/p1150-member-group/`** : this is the folder where raw files are available. The files are usually uploaded every friday.
+  - **`file-import/p1150-member-group/`** : this is the folder where raw files are available. The files are usually uploaded every friday.
   
-  - **`/ess/p1150/data/durable/file-export/`** : this is the folder where files can be exported outside the [TSD](https://selfservice.tsd.usit.no/) framework.
+<br>
+
+  - **`file-export/`** : this is the folder where files can be exported outside the [TSD](https://selfservice.tsd.usit.no/) framework.
+
+<br>
+
+  - **`TSO500_SampleSheets/`** : in this folder we should place the Sample sheet files (see Step X) generated in every sequence run. Every sequence run should have three associated files. 
+    - Original Samplesheet: `250515_info.csv`
+    - Original Samplesheet (required by TSOPPI): `250515_info_TSOPPI.csv`
+    - Curated Samplesheet: `250515_AAAAAAAA_BBBB_CCCCCCCCCC.csv`
+
+<br>
+
+  - **`/TSO500_pronto_metadata/`** : in this folder we should place the metadata tables (original and in a compressed version; see Step X). Every sequence run should have two associated files. 
+    - Original metadata: `PRONTO_metadata_250515.txt`
+    - Compressed table: `PRONTO_metadata_250515.7z`
+
+<br>
+
+  - **`TSO500_sequences/`** : in this folder we should place the sequence files (see Step X) generated in every sequence run. Every sequence run should have two associated files. 
+    - Folder with sequences: `250515/`
+    - File with checksums: `250515.md5`
+
+<br>
+
+  - **`/TSO500_scripts_and_logs/`** : in this folder we will place the log and error messages of each analysis launched in the pipeline. One folder per sequence run ID.
+
+<br>
 
 
 
@@ -135,3 +173,9 @@ function toggleFigure(id) {
 ```
 
 
+<!-- sequences -->
+analysis
+post-processing
+icnva
+export_for_interpretation
+software
