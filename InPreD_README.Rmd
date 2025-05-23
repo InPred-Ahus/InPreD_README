@@ -155,6 +155,34 @@ cd /ess/p1150/data/durable
 
 <br>
 
+  - **`TSO500_icnva/`** : here we will find the [*PureCN*](https://scfbm.biomedcentral.com/articles/10.1186/s13029-016-0060-z) results. One folder per sequence run ID, and one folder per sample ID.
+  
+    - `250515_AAAAAAAA_BBBB_CCCCCCCCCC/${SAMPLE_ID}_icnva/`
+        - `PureCN_results_default/` : *PureCN* results of each patient. Including the local optima solutions for ploidy/purity.
+        - `PureCN_results_custom/` : *PureCN* results of each patient.
+        - `${SAMPLE_ID}_NRC_plots.pdf` : Tumor vs Normal samples comparison plots.
+
+<br>
+
+  - **`TSO500_export_for_interpretation/`** : this is the folder where the results are stored before the interpretation of variants, mutations and fusions.
+  
+    - `RECENT_RUN/` : here we will find the 8 samples corresponding to the current sequencing run. The content is similar to `TSO500_icnva/`.
+    - `IPA001-IPA100` : there are many folders with a similar pattern in their name. After interpretation the `RECENT_RUN/` content must be moved to their corresponding folder.
+
+<br>
+
+  - **`software/`** : here we will find the bioinformatic analysis pipeline scripts and the soruce code for all the software required. 
+    - **`pipeline/v003_upgrading_pronto_to_1.2.0`**
+
+<br>
+
+4. Go to the pipeline folder, the analysis must be launched from this path.
+```{bash, echo=TRUE, eval = FALSE}
+cd software/pipeline/v003_upgrading_pronto_to_1.2.0
+```
+
+<br>
+
 ```{r toggle, echo=FALSE, results='asis'}
 
 cat('
@@ -188,10 +216,3 @@ function toggleFigure(id) {
 ')
 ```
 
-
-<!-- sequences -->
-<!-- analysis -->
-post-processing
-icnva
-export_for_interpretation
-software
