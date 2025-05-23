@@ -183,6 +183,25 @@ cd software/pipeline/v003_upgrading_pronto_to_1.2.0
 
 <br>
 
+## Prepare pipeline
+
+Before launching the pipeline we must verify if there is enough space in the disk and the size of the sequencing data.
+
+5. *Verify disk space availability*.
+
+  - Disk space 
+
+```{bash, echo=TRUE, eval = FALSE}
+
+# Check disk space
+df -h
+```
+
+
+<!-- # ---------- # -->
+<!-- # Extra code # -->
+<!-- # ---------- # -->
+
 ```{r toggle, echo=FALSE, results='asis'}
 
 cat('
@@ -215,4 +234,8 @@ function toggleFigure(id) {
 </script>
 ')
 ```
+
+
+To be added:
+- gpg --import /tsd/p1150/data/durable/gpg-keys/p1150-key1@tsd.usit.no-private-key.asc
 
