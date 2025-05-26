@@ -4,6 +4,7 @@ author: "Jaime Abraham Castro-Mondragon"
 date: 'Last update: `r Sys.Date()`'
 output: 
   html_document:
+    number_sections: true
     theme: cosmo
     toc: yes
     toc_float:
@@ -19,6 +20,23 @@ knitr::opts_chunk$set(echo = TRUE)
 
 
 ```{r functions, include=FALSE}
+
+# ------------------------------ #
+# Prepare ChecList section names #
+# ------------------------------ #
+
+# CheckList section names
+cl.sections <- vector()
+
+add.cl.section <- function(section.name, v) {
+  v <- c(section.name, v)
+  v
+}
+
+
+# ----------------------- #
+# Show/Hide figure botton #
+# ----------------------- #
 
 insert.fig.toggle <- function(
   fig.id,        # Unique id for the div/button (e.g. "figVMWare")
@@ -64,7 +82,7 @@ In this document we will use the following sequence run ID, we can easily identi
 
 <br>
 
-1. In your browser, open the [VMWare Horizon](https://view.tsd.usit.no/portal/webclient/#/home) website. Log in with your *username* and *2FA* first, then VMWare will ask your *password* (Figure 1).
+In your browser, open the [VMWare Horizon](https://view.tsd.usit.no/portal/webclient/#/home) website. Log in with your *username* and *2FA* first, then VMWare will ask your *password* (Figure 1).
 
 ```{r figVMWare, echo=FALSE, results='asis'}
 
@@ -96,7 +114,7 @@ insert.fig.toggle(
 
 ## Folder structure
 
-3. We will be working in the following directory: `/ess/p1150/data/durable`. Next we have a list of folders that will be constantly used during the analysis, from now on, **the file paths are relative to the working directory**.
+We will be working in the following directory: `/ess/p1150/data/durable`. Next we have a list of folders that will be constantly used during the analysis, from now on, **the file paths are relative to the working directory**.
 
 
 ```{bash, echo=TRUE, eval = FALSE}
@@ -105,8 +123,8 @@ cd /ess/p1150/data/durable
 
  <br>
  
-  - **`file-import/p1150-member-group/`** : this is the folder where raw files are available. The files are usually uploaded every friday.
-  
+  - **`file-import/p1150-member-group/tsd`** : this is the folder where raw files are available. The files are usually uploaded every friday.
+
 <br>
 
   - **`file-export/`** : this is the folder where files can be exported outside the [TSD](https://selfservice.tsd.usit.no/) framework.
@@ -187,16 +205,78 @@ cd software/pipeline/v003_upgrading_pronto_to_1.2.0
 
 Before launching the pipeline we must verify if there is enough space in the disk and the size of the sequencing data.
 
-5. *Verify disk space availability*.
+<br>
 
-  - Disk space 
+### Verify disk space availability.
+
+  - Disk space : we need at least 200GB of free space. If this is not the case, contact people involved in the project to release some space.
 
 ```{bash, echo=TRUE, eval = FALSE}
-
 # Check disk space
-df -h
+df -h /ess/p1150
 ```
 
+```{r, echo=FALSE, eval = TRUE}
+cl.sections <- add.cl.section("Verify disk space availability", cl.sections)
+```
+
+
+<br>
+
+### Verify size of sequencing run.
+
+  - Size of files from current sequence run: usually a sequencing run produces a folder with size varying from ~30-60 GB. If this number is outside this range, please contact the people involved in sequencing.
+
+```{bash, echo=TRUE, eval = FALSE}
+# Check size of sequencing results
+du -csh /ess/p1150/data/durable/file-import/p1150-member-group/tsd
+```
+
+<br>
+
+### Connect to hpc server.
+
+**NOTE**: we must be connected to this server to launch the pipeline. Data manipulation can be done outside.
+
+```{bash, echo=TRUE, eval = FALSE}
+# Connect to hpc
+ssh p1150-hpc-01
+```
+
+<br>
+
+### Pipeline run directoy.
+
+**NOTE**: the pipeline must be launched from this folder.
+
+```{bash, echo=TRUE, eval = FALSE}
+cd  /ess/p1150/data/durable/software/pipeline/v003_upgrading_pronto_to_1.2.0
+```
+
+<br>
+
+### Set up global variables.
+
+The following variables must be set up before launching the pipeline:
+
+  - Sequencing run ID = `RUN_ID`
+  - Input data type = `INPUT_DATA_TYPE`
+  - Sequencing run date = `RUN_DATE`
+  
+```{bash, echo=TRUE, eval = FALSE}
+RUN_ID="250515_AAAAAAAA_BBBB_CCCCCCCCCC"
+INPUT_DATA_TYPE="RAW"
+RUN_DATA="250515"
+```
+
+
+
+
+
+
+Sequencing data and all the metadata are now in TSD and LocalApp analysis will start in an hour or so.
+
+We will continue with TSOPPI and icnva on monday morning together with Jaime, so data for qc should be available shortly before Monday meeting or then around.
 
 <!-- # ---------- # -->
 <!-- # Extra code # -->
@@ -236,6 +316,9 @@ function toggleFigure(id) {
 ```
 
 
-To be added:
+## To be added:
 - gpg --import /tsd/p1150/data/durable/gpg-keys/p1150-key1@tsd.usit.no-private-key.asc
 
+```{r, echo=FALSE, eval = TRUE}
+print(cl.sections)
+```
