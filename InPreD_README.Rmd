@@ -16,24 +16,11 @@ output:
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 
+date.checklist <- substr(gsub(x = Sys.Date(), pattern = "-", ""), start = 3, 8)
 ```
 
 
 ```{r functions, include=FALSE}
-
-# ------------------------------ #
-# Prepare ChecList section names #
-# ------------------------------ #
-
-# CheckList section names
-cl.sections <- vector()
-
-add.cl.section <- function(section.name, v) {
-  v <- c(section.name, v)
-  v
-}
-
-
 # ----------------------- #
 # Show/Hide figure botton #
 # ----------------------- #
@@ -62,6 +49,46 @@ insert.fig.toggle <- function(
 }
 
 ```
+
+
+
+```{r checklist, include=FALSE}
+
+checklist.template.file <- "templates/InPreD_pipeline_Checklist.html"
+checklist.ready.file    <- paste0(date.checklist, "_InPreD_pipeline_Checklist.html")
+
+# ------------------------------- #
+# Prepare CheckList section names #
+# ------------------------------- #
+
+# CheckList section names
+cl.sections <- vector()
+
+add.cl.section <- function(section.name, v) {
+  v <- c(section.name, v)
+  v
+}
+
+
+# CheckList item
+generate_checklist_html <- function(checklist) {
+  html_items <- mapply(function(item, i) {
+    sprintf(
+      '<div class="checklist-item">\n  <input type="checkbox" id="item%d">\n  <label for="item%d">%d. %s</label>\n</div>',
+      i, i, i, item
+    )
+  }, checklist, seq_along(checklist), USE.NAMES = FALSE)
+  
+  paste(html_items, collapse = "\n")
+}
+
+
+## Copy template and read copy
+file.copy(from = checklist.template.file,
+          to   = checklist.ready.file)
+
+```
+
 
 
 ## Intro
@@ -207,7 +234,7 @@ Before launching the pipeline we must verify if there is enough space in the dis
 
 <br>
 
-### Verify disk space availability.
+### Verify disk space availability
 
   - Disk space : we need at least 200GB of free space. If this is not the case, contact people involved in the project to release some space.
 
@@ -220,16 +247,19 @@ df -h /ess/p1150
 cl.sections <- add.cl.section("Verify disk space availability", cl.sections)
 ```
 
-
 <br>
 
-### Verify size of sequencing run.
+### Verify size of sequencing run
 
   - Size of files from current sequence run: usually a sequencing run produces a folder with size varying from ~30-60 GB. If this number is outside this range, please contact the people involved in sequencing.
 
 ```{bash, echo=TRUE, eval = FALSE}
 # Check size of sequencing results
 du -csh /ess/p1150/data/durable/file-import/p1150-member-group/tsd
+```
+
+```{r, echo=FALSE, eval = TRUE}
+cl.sections <- add.cl.section("Verify size of sequencing run", cl.sections)
 ```
 
 <br>
@@ -316,9 +346,22 @@ function toggleFigure(id) {
 ```
 
 
+
+```{r fill_template, echo = FALSE, eval = TRUE}
+
+# Example usage
+# cl.sections <- c("Verify size of sequencing run", "Verify disk space availability")
+html.output <- generate_checklist_html(rev(cl.sections))
+
+template.to.fill   <- readLines(checklist.ready.file)
+template.to.fill <- gsub(x          = template.to.fill,
+                        pattern     = "--checklist_buttons--",
+                        replacement = html.output, ignore.case = T, perl = T)
+
+writeLines(text = template.to.fill, con = checklist.ready.file)
+```
+
+
 ## To be added:
 - gpg --import /tsd/p1150/data/durable/gpg-keys/p1150-key1@tsd.usit.no-private-key.asc
 
-```{r, echo=FALSE, eval = TRUE}
-print(cl.sections)
-```
