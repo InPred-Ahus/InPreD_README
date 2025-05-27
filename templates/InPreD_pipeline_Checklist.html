@@ -35,7 +35,7 @@
       border-radius: 20px;
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
       width: 100%;
-      max-width: 550px;
+      max-width: 600px;
       transition: all 0.3s ease;
     }
 
@@ -93,14 +93,95 @@
         padding: 1.5rem;
       }
     }
+
+.layout {
+  display: flex;
+  align-items: flex-start;
+  gap: 30px;
+  font-family: sans-serif;
+}
+
+.legend {
+  min-width: 150px;
+  font-family: sans-serif;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.color-box {
+  width: 16px;
+  height: 16px;
+  display: inline-block;
+  margin-right: 8px;
+  border-radius: 3px;
+}
+
+.color-box.prepare_pipeline {
+  background-color: #00acc1;
+}
+.color-box.setup {
+  background-color: #fb8c00;
+}
+.color-box.validation {
+  background-color: #8e24aa;
+}
+.color-box.reference {
+  background-color: #43a047;
+}
+.color-box.cleanup {
+  background-color: #e53935;
+}
+
+  .checklist-item {
+    padding: 10px;
+    margin: 5px 0;
+    border-radius: 5px;
+  }
+
+  .checklist-item.prepare_pipeline {
+    background-color: #e0f7fa; /* light cyan */
+    border-left: 4px solid #00acc1;
+  }
+  
+  .checklist-item.setup {
+    background-color: #fff3e0; /* light orange */
+    border-left: 4px solid #fb8c00;
+  }
+  
+  .checklist-item.validation {
+    background-color: #f3e5f5; /* light purple */
+    border-left: 4px solid #8e24aa;
+  }
+  
+  .checklist-item.reference {
+    background-color: #e8f5e9; /* light green */
+    border-left: 4px solid #43a047;
+  }
+  
+  .checklist-item.cleanup {
+    background-color: #fbe9e7; /* light red */
+    border-left: 4px solid #e53935;
+  }  
   </style>
 </head>
 <body>
 
+  <div class="legend">
+    <div class="legend-item"><span class="color-box prepare_pipeline"></span> Prepare Pipeline</div>
+    <div class="legend-item"><span class="color-box setup"></span> Setup</div>
+    <div class="legend-item"><span class="color-box validation"></span> Validation</div>
+    <div class="legend-item"><span class="color-box reference"></span> Reference</div>
+    <div class="legend-item"><span class="color-box cleanup"></span> Cleanup</div>
+  </div>
+  
   <div class="checklist-container">
+
     <h1>InPreD pipeline Checklist</h1>
-    <div class="subtitle">Run ID = --runID--</div>
-    
+    <div class="subtitle">Run ID = --runID--</div>  
     <div class="checklist">
 
     --checklist_buttons--
