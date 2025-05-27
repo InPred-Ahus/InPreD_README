@@ -351,15 +351,16 @@ function toggleFigure(id) {
 
 ```{r fill_template, echo = FALSE, eval = TRUE}
 
-#
+# Generate CheckList entries
 html.output <- generate_checklist_html(rev(cl.sections))
 
-# 
+
+# Placeholder list
 checklist.terms[['--runID--']] <- date.checklist
 checklist.terms[['--checklist_buttons--']] <- html.output
 
 
-
+# Fill CheckList template
 template.to.fill   <- readLines(checklist.ready.file)
 
 for (t in names(checklist.terms)) {
@@ -370,7 +371,7 @@ for (t in names(checklist.terms)) {
                            ignore.case = T, perl = T)
 } 
 
-
+# Export ready-to-use CheckList
 writeLines(text = template.to.fill, con = checklist.ready.file)
 ```
 
