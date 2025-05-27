@@ -50,6 +50,19 @@ insert.fig.toggle <- function(
 ', safe_fig_id, safe_button_label, safe_fig_id, safe_img_src, fig.width, safe_button_label, safe_fig_cap))
 }
 
+
+# ------------------------------ #
+# Checklist names and categories #
+# ------------------------------ #
+make_prepender <- function(prefix_name) {
+  function(label, v) {
+    c(label, v)
+  }
+}
+
+
+add.cl.section    <- make_prepender("section")
+add.cl.categories <- make_prepender("category")
 ```
 
 
@@ -64,22 +77,21 @@ checklist.ready.file    <- paste0(date.checklist, "_InPreD_pipeline_Checklist.ht
 # ------------------------------- #
 
 # CheckList section names
-cl.sections <- vector()
+cl.sections   <- vector()
+cl.categories <- vector()
 
-add.cl.section <- function(section.name, v) {
-  v <- c(section.name, v)
-  v
-}
-
-
-# CheckList item
-generate_checklist_html <- function(checklist) {
-  html_items <- mapply(function(item, i) {
+# Check List item
+generate_checklist_html <- function(checklist, categories) {
+  if (length(checklist) != length(categories)) {
+    stop("Checklist and categories must have the same length.")
+  }
+  
+  html_items <- mapply(function(item, i, category) {
     sprintf(
-      '<div class="checklist-item">\n  <input type="checkbox" id="item%d">\n  <label for="item%d">%d. %s</label>\n</div>',
-      i, i, i, item
+      '<div class="checklist-item %s">\n  <input type="checkbox" id="item%d">\n  <label for="item%d">%d. %s</label>\n</div>',
+      category, i, i, i, item
     )
-  }, checklist, seq_along(checklist), USE.NAMES = FALSE)
+  }, checklist, seq_along(checklist), categories, USE.NAMES = FALSE)
   
   paste(html_items, collapse = "\n")
 }
@@ -246,7 +258,8 @@ df -h /ess/p1150
 ```
 
 ```{r, echo=FALSE, eval = TRUE}
-cl.sections <- add.cl.section("Verify disk space availability", cl.sections)
+cl.sections   <- add.cl.section("Verify disk space availability", cl.sections)
+cl.categories <- add.cl.categories("prepare_pipeline", cl.categories)
 ```
 
 <br>
@@ -261,7 +274,8 @@ du -csh /ess/p1150/data/durable/file-import/p1150-member-group/tsd
 ```
 
 ```{r, echo=FALSE, eval = TRUE}
-cl.sections <- add.cl.section("Verify size of sequencing run", cl.sections)
+cl.sections   <- add.cl.section("Verify size of sequencing run", cl.sections)
+cl.categories <- add.cl.categories("prepare_pipeline", cl.categories)
 ```
 
 <br>
@@ -275,14 +289,24 @@ cl.sections <- add.cl.section("Verify size of sequencing run", cl.sections)
 ssh p1150-hpc-01
 ```
 
+```{r, echo=FALSE, eval = TRUE}
+cl.sections   <- add.cl.section("Connect to hpc server", cl.sections)
+cl.categories <- add.cl.categories("prepare_pipeline", cl.categories)
+```
+
 <br>
 
-### Pipeline run directoy.
+### Pipeline run directory.
 
 **NOTE**: the pipeline must be launched from this folder.
 
 ```{bash, echo=TRUE, eval = FALSE}
 cd  /ess/p1150/data/durable/software/pipeline/v003_upgrading_pronto_to_1.2.0
+```
+
+```{r, echo=FALSE, eval = TRUE}
+cl.sections   <- add.cl.section("Pipeline run directory", cl.sections)
+cl.categories <- add.cl.categories("prepare_pipeline", cl.categories)
 ```
 
 <br>
@@ -301,7 +325,57 @@ INPUT_DATA_TYPE="RAW"
 RUN_DATA="250515"
 ```
 
+```{r, echo=FALSE, eval = TRUE}
+cl.sections   <- add.cl.section("Set up  ${RUN_ID}", cl.sections)
+cl.categories <- add.cl.categories("setup", cl.categories)
 
+cl.sections   <- add.cl.section("Set up  ${INPUT_DATA_TYPE}", cl.sections)
+cl.categories <- add.cl.categories("setup", cl.categories)
+
+cl.sections   <- add.cl.section("Set up  ${RUN_DATA}", cl.sections)
+cl.categories <- add.cl.categories("setup", cl.categories)
+```
+
+<br>
+
+### Verify flags and source `config.sh`
+
+Verify the three following flags in the config file.
+  
+```{bash, echo=TRUE, eval = FALSE}
+
+# Default ';' but other separator (',', '-', '/') can be used
+SEPARATOR=";"
+
+DECRYPT_UNPACK_CHECKSUM="T"
+REMOVE_DECRYPTED_COMPRESSED_DATA="T"
+```
+
+<br>
+
+Then source the `config` file
+
+```{bash, echo=TRUE, eval = FALSE}
+
+source config.sh ${RUN_ID}
+```
+
+```{r, echo=FALSE, eval = TRUE}
+cl.sections   <- add.cl.section("config.sh : SEPARATOR", cl.sections)
+cl.categories <- add.cl.categories("setup", cl.categories)
+
+cl.sections   <- add.cl.section("config.sh : DECRYPT_UNPACK_CHECKSUM", cl.sections)
+cl.categories <- add.cl.categories("setup", cl.categories)
+
+cl.sections   <- add.cl.section("config.sh : REMOVE_DECRYPTED_COMPRESSED_DATA", cl.sections)
+cl.categories <- add.cl.categories("setup", cl.categories)
+
+cl.sections   <- add.cl.section("Source config.sh", cl.sections)
+cl.categories <- add.cl.categories("setup", cl.categories)
+
+```
+
+<br>
 
 
 
@@ -352,8 +426,10 @@ function toggleFigure(id) {
 ```{r fill_template, echo = FALSE, eval = TRUE}
 
 # Generate CheckList entries
-html.output <- generate_checklist_html(rev(cl.sections))
+html.output <- generate_checklist_html(checklist  = rev(cl.sections),
+                                       categories = rev(cl.categories))
 
+print(html.output)
 
 # Placeholder list
 checklist.terms[['--runID--']] <- date.checklist
