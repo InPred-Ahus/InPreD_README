@@ -17,6 +17,8 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 
 date.checklist <- substr(gsub(x = Sys.Date(), pattern = "-", ""), start = 3, 8)
+
+checklist.terms <- list()
 ```
 
 
@@ -349,14 +351,25 @@ function toggleFigure(id) {
 
 ```{r fill_template, echo = FALSE, eval = TRUE}
 
-# Example usage
-# cl.sections <- c("Verify size of sequencing run", "Verify disk space availability")
+#
 html.output <- generate_checklist_html(rev(cl.sections))
 
+# 
+checklist.terms[['--runID--']] <- date.checklist
+checklist.terms[['--checklist_buttons--']] <- html.output
+
+
+
 template.to.fill   <- readLines(checklist.ready.file)
-template.to.fill <- gsub(x          = template.to.fill,
-                        pattern     = "--checklist_buttons--",
-                        replacement = html.output, ignore.case = T, perl = T)
+
+for (t in names(checklist.terms)) {
+  
+  template.to.fill <- gsub(x          = template.to.fill,
+                           pattern     = t,
+                           replacement = checklist.terms[[t]],
+                           ignore.case = T, perl = T)
+} 
+
 
 writeLines(text = template.to.fill, con = checklist.ready.file)
 ```
