@@ -525,7 +525,11 @@ This analysis performs different analysis included in [TSOPPI](https://tsoppi.re
 
 <br>
 
-Continue from HERE
+TSOPPI:
+
+ - Update table manually, insert figure here
+ - Update ALL_RUN_IDs variable in script (see README)
+ - Launch it
 
 <br>
 <br>
