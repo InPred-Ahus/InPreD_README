@@ -20,7 +20,7 @@
 
     body {
       font-family: 'Roboto Mono', monospace;
-      background: linear-gradient(135deg, #e0f7fa, #e1bee7);
+      background: linear-gradient(135deg, #fff7fb, #9ecae1);
       margin: 0;
       padding: 2rem;
       display: flex;
@@ -128,14 +128,17 @@
 .color-box.setup {
   background-color: #fb8c00;
 }
-.color-box.move {
+.color-box.file_manip {
   background-color: #8e24aa;
 }
-.color-box.reference {
+.color-box.analysis {
   background-color: #43a047;
 }
 .color-box.important {
-  background-color: #e53935;
+  background-color: #a50f15;
+}
+.color-box.email {
+  background-color: #ffeda0;
 }
 
   .checklist-item {
@@ -154,20 +157,25 @@
     border-left: 4px solid #fb8c00;
   }
   
-  .checklist-item.move {
+  .checklist-item.file_manip {
     background-color: #f3e5f5; /* light purple */
     border-left: 4px solid #8e24aa;
   }
   
-  .checklist-item.reference {
+  .checklist-item.analysis {
     background-color: #e8f5e9; /* light green */
     border-left: 4px solid #43a047;
   }
   
   .checklist-item.important {
-    background-color: #fbe9e7; /* light red */
-    border-left: 4px solid #e53935;
+    background-color: #fb8072; /* light red */
+    border-left: 4px solid #a50f15;
   }  
+
+  .checklist-item.email {
+    background-color: #ffffcc; /* light cyan */
+    border-left: 4px solid #ffeda0;
+  }
   </style>
 </head>
 <body>
@@ -175,9 +183,11 @@
   <div class="legend">
     <div class="legend-item"><span class="color-box prepare_pipeline"></span> Prepare Pipeline</div>
     <div class="legend-item"><span class="color-box setup"></span> Setup</div>
-    <div class="legend-item"><span class="color-box move"></span> Move files</div>
-    <div class="legend-item"><span class="color-box reference"></span> Reference</div>
+    <div class="legend-item"><span class="color-box file_manip"></span> File manipulation</div>
+    <div class="legend-item"><span class="color-box analysis"></span> Launch analysis</div>
     <div class="legend-item"><span class="color-box important"></span> Important</div>
+    <div class="legend-item"><span class="color-box email"></span> Send Email</div>  
+
   </div>
   
   <div class="checklist-container">
