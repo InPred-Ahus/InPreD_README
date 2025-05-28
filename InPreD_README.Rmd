@@ -14,6 +14,8 @@ output:
 ---
 
 ```{r setup, include=FALSE}
+library(emo)
+
 knitr::opts_chunk$set(echo = TRUE)
 
 date.checklist <- substr(gsub(x = Sys.Date(), pattern = "-", ""), start = 3, 8)
@@ -318,6 +320,7 @@ The following variables must be set up before launching the pipeline:
   - Sequencing run ID = `RUN_ID`
   - Input data type = `INPUT_DATA_TYPE`
   - Sequencing run date = `RUN_DATE`
+  - Durable folder = `DURABLE_DIR`
   
 ```{bash, echo=TRUE, eval = FALSE}
 RUN_ID="250515_AAAAAAAA_BBBB_CCCCCCCCCC"
@@ -335,9 +338,40 @@ cl.categories <- add.cl.categories("setup", cl.categories)
 
 cl.sections   <- add.cl.section("Set up  ${RUN_DATA}", cl.sections)
 cl.categories <- add.cl.categories("setup", cl.categories)
+
+cl.sections   <- add.cl.section("Set up  ${DURABLE_DIR}", cl.sections)
+cl.categories <- add.cl.categories("setup", cl.categories)
 ```
 
 <br>
+
+### Prepare sequences and metadata
+
+The sequences and the *PRONTO* metadata for the new run are located in the `file-import` folder.
+They must be moved to the `TSO500_sequences` and `TSO500_pronto_metadata` folder, respectively, before launching the analysis.
+
+An invisible character is inserted in the first line of the *PROTO* metadata file. This character must be removed because the table cannot be properly read by other software and crash the analysis. Once this issue is solved, proceed to move the folders.
+
+
+```{bash, echo=TRUE, eval = FALSE}
+# Move sequences file
+mv ${DURABLE_DIR}/file-import/p1150-member-group/SampleSheet_${RUN_DATE} ${DURABLE_DIR}/TSO500_sequences
+
+# Move PRONTO metadata file
+mv ${DURABLE_DIR}/file-import/p1150-member-group/tsd/${RUN_DATE}* ${DURABLE_DIR}/TSO500_pronto_metadata/PRONTO_metadata_${RUN_DATE}.7z
+```
+
+```{r, echo=FALSE, eval = TRUE}
+cl.sections   <- add.cl.section("Remove invisible character in PRONTO metadata", cl.sections)
+cl.categories <- add.cl.categories("important", cl.categories)
+
+cl.sections   <- add.cl.section("Move sequences", cl.sections)
+cl.categories <- add.cl.categories("file_manip", cl.categories)
+
+cl.sections   <- add.cl.section("Move pronto metadata", cl.sections)
+cl.categories <- add.cl.categories("file_manip", cl.categories)
+```
+
 
 ### Verify flags and source `config.sh`
 
@@ -393,28 +427,64 @@ cl.categories <- add.cl.categories("setup", cl.categories)
 
 <br>
 
-### Prepare sequences and metadata
+## Launch TSO500 pipeline
 
-The sequences and the *PRONTO* metadata for the new run are located in the `file-import` folder.
-They must be moved to the `TSO500_sequences` and `TSO500_pronto_metadata` folder, respectively, before launching the analysis.
+<br>
+
+Now we are ready to launch the *TSO500* analysis pipeline. It has to be launched
+in many steps, and many of them require manual intervention.
+
+<br>
+
+### Launch LocalApp analysis
+
+<br>
+
+This analysis performs the data QC for the sequencing results.
+
+`r emo::ji("hourglass_flowing_sand")` Running time: ~13 hours
 
 ```{bash, echo=TRUE, eval = FALSE}
-# Move sequences file
-mv ${DURABLE_DIR}/file-import/p1150-member-group/SampleSheet_${RUN_DATE} ${DURABLE_DIR}/TSO500_sequences
-
-# Move PRONTO metadata file
-mv ${DURABLE_DIR}/file-import/p1150-member-group/tsd/${RUN_DATE}* ${DURABLE_DIR}/TSO500_pronto_metadata/PRONTO_metadata_${RUN_DATE}.7z
+bash 01_raw_sequencing_data_management_and_TSO500_analysis.sh ${RUN_ID} ${INPUT_DATA_TYPE} \
+  > ${SCRIPTS_AND_LOGS_FOLDER}/01_raw_sequencing_data_management_and_TSO500_analysis.stdout \
+  2> ${SCRIPTS_AND_LOGS_FOLDER}/01_raw_sequencing_data_management_and_TSO500_analysis.stdout &
 ```
+
+<br>
+
+Send an email to the local *InPreD* team to to tell them that the analyses have
+been launched.
+
+<br>
+
+Once this analysis is done, copy the logs and scripts for this sequencing run in
+the `${SCRIPTS_AND_LOGS_FOLDER}` folder.
+
+```{bash, echo=TRUE, eval = FALSE}
+cp -a 01_raw_sequencing_data_management_and_TSO500_analysis.sh ${SCRIPTS_AND_LOGS_FOLDER}
+cp -a config.sh ${SCRIPTS_AND_LOGS_FOLDER}/01_config.sh
+```
+
 
 ```{r, echo=FALSE, eval = TRUE}
-cl.sections   <- add.cl.section("Move sequences", cl.sections)
-cl.categories <- add.cl.categories("move", cl.categories)
+cl.sections   <- add.cl.section("Launch LocalApp", cl.sections)
+cl.categories <- add.cl.categories("analysis", cl.categories)
 
-cl.sections   <- add.cl.section("Move pronto metadata", cl.sections)
-cl.categories <- add.cl.categories("move", cl.categories)
+cl.sections   <- add.cl.section("Send LocalApp email", cl.sections)
+cl.categories <- add.cl.categories("email", cl.categories)
+
+cl.sections   <- add.cl.section("Copy LocalApp scripts and logs", cl.sections)
+cl.categories <- add.cl.categories("file_manip", cl.categories)
 ```
 
 
+<br>
+<br>
+<br>
+
+<!-- # ----------- # -->
+<!-- # Draft Email # -->
+<!-- # ----------- # -->
 
 Sequencing data and all the metadata are now in TSD and LocalApp analysis will start in an hour or so.
 
@@ -464,8 +534,6 @@ function toggleFigure(id) {
 # Generate CheckList entries
 html.output <- generate_checklist_html(checklist  = rev(cl.sections),
                                        categories = rev(cl.categories))
-
-print(html.output)
 
 # Placeholder list
 checklist.terms[['--runID--']] <- date.checklist
