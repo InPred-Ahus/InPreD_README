@@ -322,7 +322,8 @@ The following variables must be set up before launching the pipeline:
 ```{bash, echo=TRUE, eval = FALSE}
 RUN_ID="250515_AAAAAAAA_BBBB_CCCCCCCCCC"
 INPUT_DATA_TYPE="RAW"
-RUN_DATA="250515"
+RUN_DATE="250515"
+DURABLE_DIR="/tsd/p1150/data/durable"
 ```
 
 ```{r, echo=FALSE, eval = TRUE}
@@ -343,7 +344,6 @@ cl.categories <- add.cl.categories("setup", cl.categories)
 Verify the three following flags in the config file.
   
 ```{bash, echo=TRUE, eval = FALSE}
-
 # Default ';' but other separator (',', '-', '/') can be used
 SEPARATOR=";"
 
@@ -356,7 +356,6 @@ REMOVE_DECRYPTED_COMPRESSED_DATA="T"
 Then source the `config` file
 
 ```{bash, echo=TRUE, eval = FALSE}
-
 source config.sh ${RUN_ID}
 ```
 
@@ -377,6 +376,43 @@ cl.categories <- add.cl.categories("setup", cl.categories)
 
 <br>
 
+### Prepare folder structure
+
+Prepare the folder structure for a new run, this will create all folders to store
+results and logs.
+
+
+```{bash, echo=TRUE, eval = FALSE}
+bash 00_setup_folder_structure_for_new_run.sh ${RUN_ID}
+```
+
+```{r, echo=FALSE, eval = TRUE}
+cl.sections   <- add.cl.section("Prepare folder structure", cl.sections)
+cl.categories <- add.cl.categories("setup", cl.categories)
+```
+
+<br>
+
+### Prepare sequences and metadata
+
+The sequences and the *PRONTO* metadata for the new run are located in the `file-import` folder.
+They must be moved to the `TSO500_sequences` and `TSO500_pronto_metadata` folder, respectively, before launching the analysis.
+
+```{bash, echo=TRUE, eval = FALSE}
+# Move sequences file
+mv ${DURABLE_DIR}/file-import/p1150-member-group/SampleSheet_${RUN_DATE} ${DURABLE_DIR}/TSO500_sequences
+
+# Move PRONTO metadata file
+mv ${DURABLE_DIR}/file-import/p1150-member-group/tsd/${RUN_DATE}* ${DURABLE_DIR}/TSO500_pronto_metadata/PRONTO_metadata_${RUN_DATE}.7z
+```
+
+```{r, echo=FALSE, eval = TRUE}
+cl.sections   <- add.cl.section("Move sequences", cl.sections)
+cl.categories <- add.cl.categories("move", cl.categories)
+
+cl.sections   <- add.cl.section("Move pronto metadata", cl.sections)
+cl.categories <- add.cl.categories("move", cl.categories)
+```
 
 
 
