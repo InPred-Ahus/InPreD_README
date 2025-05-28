@@ -525,12 +525,48 @@ This analysis performs different analysis included in [TSOPPI](https://tsoppi.re
 
 <br>
 
+#### Create SampleSheet info TSOPPI
+
+Create the *TSOPPI* samplesheet.
+
+```{bash, echo=TRUE, eval = FALSE}
+cp ${SAMPLESHEETS_FOLDER}/${INFO_FILE_NAME} ${SAMPLESHEETS_FOLDER}/${INFO_FILE_NAME_TSOPPI}
+```
+
+```{r, echo=FALSE, eval = TRUE}
+cl.sections   <- add.cl.section("Copy SampleSheet info TSOPPI", cl.sections)
+cl.categories <- add.cl.categories("file_manip", cl.categories)
+```
+
+<br>
+
+#### Adapt ALL_SEQUENCING_RUN_IDs global variable
+
+Open the file `$ALL_RUN_IDs`, and add the new `$RUN_ID` in the second line. 
+See the example below.
+
+```{bash, echo=TRUE, eval = FALSE}
+emacs $ALL_RUN_IDs
+```
+
+```{bash, echo=TRUE, eval = FALSE}
+ALL_SEQUENCING_RUN_IDs=()
+#  -->    HERE       <---        # Insert new SEQ_ID in this line #
+ALL_SEQUENCING_RUN_IDs+=( "250522_AAAAAAAA_BBBB_CCCCCCCCCC" )
+ALL_SEQUENCING_RUN_IDs+=( "250515_AAAAAAAA_BBBB_CCCCCCCCCC" )
+```
+
+```{r, echo=FALSE, eval = TRUE}
+cl.sections   <- add.cl.section("Update ${ALL_RUN_IDs} variable", cl.sections)
+cl.categories <- add.cl.categories("setup", cl.categories)
+```
+
 TSOPPI:
 
  - Update table manually, insert figure here
  - Update ALL_RUN_IDs variable in script (see README)
  - Launch it
-
+ 
 <br>
 <br>
 <br>
