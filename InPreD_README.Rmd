@@ -8,7 +8,7 @@ output:
     theme: cosmo
     toc: yes
     toc_float:
-      collapsed: false
+      collapsed: true
     self_contained: true
     code_folding: show
 ---
@@ -347,10 +347,12 @@ cl.categories <- add.cl.categories("setup", cl.categories)
 
 ### Prepare sequences and metadata
 
+<br>
+
 The sequences and the *PRONTO* metadata for the new run are located in the `file-import` folder.
 They must be moved to the `TSO500_sequences` and `TSO500_pronto_metadata` folder, respectively, before launching the analysis.
 
-An invisible character is inserted in the first line of the *PROTO* metadata file. This character must be removed because the table cannot be properly read by other software and crash the analysis. Once this issue is solved, proceed to move the folders.
+An invisible character is inserted in the header of the *PRONTO* metadata file. This character must be removed because the table cannot be properly read by other software and crash the analysis. Once this issue is solved, proceed to move the folders.
 
 
 ```{bash, echo=TRUE, eval = FALSE}
@@ -365,13 +367,14 @@ mv ${DURABLE_DIR}/file-import/p1150-member-group/tsd/${RUN_DATE}* ${DURABLE_DIR}
 cl.sections   <- add.cl.section("Remove invisible character in PRONTO metadata", cl.sections)
 cl.categories <- add.cl.categories("important", cl.categories)
 
-cl.sections   <- add.cl.section("Move sequences", cl.sections)
+cl.sections   <- add.cl.section("Move sequences files", cl.sections)
 cl.categories <- add.cl.categories("file_manip", cl.categories)
 
-cl.sections   <- add.cl.section("Move pronto metadata", cl.sections)
+cl.sections   <- add.cl.section("Move PRONTO metadata", cl.sections)
 cl.categories <- add.cl.categories("file_manip", cl.categories)
 ```
 
+<br>
 
 ### Verify flags and source `config.sh`
 
@@ -427,6 +430,37 @@ cl.categories <- add.cl.categories("setup", cl.categories)
 
 <br>
 
+### Generate SampleSheet 
+
+<br>
+
+We will generate a sample sheet with metadata for the current run ID.
+
+```{bash, echo=TRUE, eval = FALSE}
+bash 00_generate_TSO500_sample_sheet.sh ${RUN_ID} ${INPUT_DATA_TYPE} \
+  &> ${SCRIPTS_AND_LOGS_FOLDER}/00_generate_TSO500_sample_sheet.log
+```
+
+<br>
+
+Copy the logs and scripts for this sequencing run in
+the `${SCRIPTS_AND_LOGS_FOLDER}` folder.
+
+```{bash, echo=TRUE, eval = FALSE}
+cp -a 00_generate_TSO500_sample_sheet.sh ${SCRIPTS_AND_LOGS_FOLDER}
+cp -a config.sh ${SCRIPTS_AND_LOGS_FOLDER}/00_config.sh
+```
+
+```{r, echo=FALSE, eval = TRUE}
+cl.sections   <- add.cl.section("Generate sample sheet", cl.sections)
+cl.categories <- add.cl.categories("setup", cl.categories)
+
+cl.sections   <- add.cl.section("Copy Samplesheet (00) scripts and logs", cl.sections)
+cl.categories <- add.cl.categories("file_manip", cl.categories)
+```
+
+<br>
+
 ## Launch TSO500 pipeline
 
 <br>
@@ -473,22 +507,30 @@ cl.categories <- add.cl.categories("analysis", cl.categories)
 cl.sections   <- add.cl.section("Send LocalApp email", cl.sections)
 cl.categories <- add.cl.categories("email", cl.categories)
 
-cl.sections   <- add.cl.section("Copy LocalApp scripts and logs", cl.sections)
+cl.sections   <- add.cl.section("Copy LocalApp (01) scripts and logs", cl.sections)
 cl.categories <- add.cl.categories("file_manip", cl.categories)
 ```
 
+<br>
+
+### Launch TSOPPI analysis
+
+<br>
+
+This analysis performs different analysis included in [TSOPPI](https://tsoppi.readthedocs.io/en/latest/index.html), such as:
+
+ - Quality control (QC) metrics for samples
+ - Fusion and splice variant output for RNA samples;
+ - Small variant output, copy number variant output (CNV) and microsatellite status (MS status) information for DNA samples.
+
+<br>
+
+Continue from HERE
 
 <br>
 <br>
 <br>
 
-<!-- # ----------- # -->
-<!-- # Draft Email # -->
-<!-- # ----------- # -->
-
-Sequencing data and all the metadata are now in TSD and LocalApp analysis will start in an hour or so.
-
-We will continue with TSOPPI and icnva on monday morning together with Jaime, so data for qc should be available shortly before Monday meeting or then around.
 
 <!-- # ---------- # -->
 <!-- # Extra code # -->
@@ -557,5 +599,18 @@ writeLines(text = template.to.fill, con = checklist.ready.file)
 
 
 ## To be added:
-- gpg --import /tsd/p1150/data/durable/gpg-keys/p1150-key1@tsd.usit.no-private-key.asc
 
+  - gpg --import /tsd/p1150/data/durable/gpg-keys/p1150-key1@tsd.usit.no-private-key.asc
+  - Check which samplesheet has the invisible character
+  - Add figure about How to get the sequence ID ?
+  - SampleSheet_YYMMDD_info.csv ? Is this automatically generated or imported?
+  - 
+
+
+<!-- # ----------- # -->
+<!-- # Draft Email # -->
+<!-- # ----------- # -->
+
+Sequencing data and all the metadata are now in TSD and LocalApp analysis will start in an hour or so.
+
+We will continue with TSOPPI and icnva on monday morning together with Jaime, so data for qc should be available shortly before Monday meeting or then around.
