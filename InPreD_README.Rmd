@@ -7,6 +7,7 @@ output:
     number_sections: true
     theme: cosmo
     toc: yes
+    toc_depth: 4
     toc_float:
       collapsed: true
     self_contained: true
@@ -282,9 +283,9 @@ cl.categories <- add.cl.categories("prepare_pipeline", cl.categories)
 
 <br>
 
-### Connect to hpc server.
+### Connect to hpc (*Colossus*) server.
 
-**NOTE**: we must be connected to this server to launch the pipeline. Data manipulation can be done outside.
+**NOTE**: we must be connected to the *Colossus* server to launch the pipeline. Data manipulation can be done outside.
 
 ```{bash, echo=TRUE, eval = FALSE}
 # Connect to hpc
@@ -292,7 +293,7 @@ ssh p1150-hpc-01
 ```
 
 ```{r, echo=FALSE, eval = TRUE}
-cl.sections   <- add.cl.section("Connect to hpc server", cl.sections)
+cl.sections   <- add.cl.section("Connect to hpc (Colossus) server", cl.sections)
 cl.categories <- add.cl.categories("prepare_pipeline", cl.categories)
 ```
 
@@ -349,25 +350,31 @@ cl.categories <- add.cl.categories("setup", cl.categories)
 
 <br>
 
-The sequences and the *PRONTO* metadata for the new run are located in the `file-import` folder.
-They must be moved to the `TSO500_sequences` and `TSO500_pronto_metadata` folder, respectively, before launching the analysis.
+The sequences, the *PRONTO* metadata, and the *SampleSheet* for the new run are located in the `file-import` folder.
+They must be moved to the `TSO500_sequences`, `TSO500_pronto_metadata`, and `TSO500_SampleSheets` folders, respectively, before launching the analysis.
 
-An invisible character is inserted in the header of the *PRONTO* metadata file. This character must be removed because the table cannot be properly read by other software and crash the analysis. Once this issue is solved, proceed to move the folders.
+An invisible character is inserted in the header of the `SampleSheet_$DATE.csv` metadata file. This character must be removed because the table cannot be properly read by other software and crash the analysis. Once this issue is solved, proceed to move the folders.
 
 
 ```{bash, echo=TRUE, eval = FALSE}
 # Move sequences file
-mv ${DURABLE_DIR}/file-import/p1150-member-group/SampleSheet_${RUN_DATE} ${DURABLE_DIR}/TSO500_sequences
+mv ${DURABLE_DIR}/file-import/p1150-member-group/tsd/${RUN_DATE}* ${DURABLE_DIR}/TSO500_sequences/
 
-# Move PRONTO metadata file
-mv ${DURABLE_DIR}/file-import/p1150-member-group/tsd/${RUN_DATE}* ${DURABLE_DIR}/TSO500_pronto_metadata/PRONTO_metadata_${RUN_DATE}.7z
+# Move SampleSheet metadata file
+mv ${DURABLE_DIR}/file-import/p1150-member-group/SampleSheet_${RUN_DATE}_info.csv ${DURABLE_DIR}/TSO500_SampleSheet_${RUN_DATE}_info.csv
+
+# Move PRONTO file
+mv ${DURABLE_DIR}/file-import/p1150-member-group/PRONTO_metadata_${RUN_DATE}* ${DURABLE_DIR}/TSO500_pronto_metadata/PRONTO_metadata_${RUN_DATE}.7z
 ```
 
 ```{r, echo=FALSE, eval = TRUE}
-cl.sections   <- add.cl.section("Remove invisible character in PRONTO metadata", cl.sections)
+cl.sections   <- add.cl.section("Remove invisible character in ShampleSheet file", cl.sections)
 cl.categories <- add.cl.categories("important", cl.categories)
 
 cl.sections   <- add.cl.section("Move sequences files", cl.sections)
+cl.categories <- add.cl.categories("file_manip", cl.categories)
+
+cl.sections   <- add.cl.section("Move ShampleSheet", cl.sections)
 cl.categories <- add.cl.categories("file_manip", cl.categories)
 
 cl.sections   <- add.cl.section("Move PRONTO metadata", cl.sections)
@@ -470,7 +477,7 @@ in many steps, and many of them require manual intervention.
 
 <br>
 
-### Launch LocalApp analysis
+### Launch *LocalApp* analysis
 
 <br>
 
@@ -481,7 +488,7 @@ This analysis performs the data QC for the sequencing results.
 ```{bash, echo=TRUE, eval = FALSE}
 bash 01_raw_sequencing_data_management_and_TSO500_analysis.sh ${RUN_ID} ${INPUT_DATA_TYPE} \
   > ${SCRIPTS_AND_LOGS_FOLDER}/01_raw_sequencing_data_management_and_TSO500_analysis.stdout \
-  2> ${SCRIPTS_AND_LOGS_FOLDER}/01_raw_sequencing_data_management_and_TSO500_analysis.stdout &
+  2> ${SCRIPTS_AND_LOGS_FOLDER}/01_raw_sequencing_data_management_and_TSO500_analysis.stderr &
 ```
 
 <br>
@@ -513,7 +520,7 @@ cl.categories <- add.cl.categories("file_manip", cl.categories)
 
 <br>
 
-### Launch TSOPPI analysis
+### Launch *TSOPPI* analysis
 
 <br>
 
@@ -525,7 +532,7 @@ This analysis performs different analysis included in [TSOPPI](https://tsoppi.re
 
 <br>
 
-#### Create SampleSheet info TSOPPI
+#### Create SampleSheet info *TSOPPI*
 
 Create the *TSOPPI* samplesheet.
 
@@ -561,15 +568,167 @@ cl.sections   <- add.cl.section("Update ${ALL_RUN_IDs} variable", cl.sections)
 cl.categories <- add.cl.categories("setup", cl.categories)
 ```
 
-TSOPPI:
 
- - Update table manually, insert figure here
- - Update ALL_RUN_IDs variable in script (see README)
- - Launch it
- 
+#### Launch *TSOPP*`
+
+`r emo::ji("hourglass_flowing_sand")` Running time: ~30 minutes
+
+```{bash, echo=TRUE, eval = FALSE}
+bash 02_execute_tsoppi_and_archive_results.sh ${RUN_ID} \
+  > ${SCRIPTS_AND_LOGS_FOLDER}/02_execute_tsoppi_and_archive_results.stdout \
+  2> ${SCRIPTS_AND_LOGS_FOLDER}/02_execute_tsoppi_and_archive_results.stderr &
+```
+
+<br>
+
+Once this analysis is done, copy the logs and scripts for this sequencing run in
+the `${SCRIPTS_AND_LOGS_FOLDER}` folder.
+
+```{bash, echo=TRUE, eval = FALSE}
+cp -a 02_execute_tsoppi_and_archive_results.sh ${SCRIPTS_AND_LOGS_FOLDER}
+cp -a config.sh ${SCRIPTS_AND_LOGS_FOLDER}/02_config.sh
+```
+
+
+```{r, echo=FALSE, eval = TRUE}
+cl.sections   <- add.cl.section("Launch TSOPPI", cl.sections)
+cl.categories <- add.cl.categories("analysis", cl.categories)
+
+cl.sections   <- add.cl.section("Copy TSOPPI (02) scripts and logs", cl.sections)
+cl.categories <- add.cl.categories("file_manip", cl.categories)
+```
+
+<br>
+
+### Launch *ICNVA* analysis
+
+<br>
+
+[*ICNVA*](https://tsoppi.readthedocs.io/en/latest/ICNVA.html) runs two types of analysis on each input sample:
+
+  - Allele-specific copy number analysis performed by *PureCN* (LoH assessment.)
+  -Normalized read coverage (NRC) profile plotting for selected genes (dentify/confirm intra-genic duplications/losses).
+
+An in-house set of controls is utilized during both analyses.
+
+<br>
+
+#### Select DNA tumour samples
+
+Adapt the `$SAMPLE_IDs` array to contain only DNA tumour samples, those ones containing **-D01-** in the second field in their sample ID.
+
+Be aware to adapt the variable according to the example below, Keep in mind the spacing, quotations and no separators.
+
+```{bash, echo=TRUE, eval = FALSE}
+SAMPLE_IDs=( "SAMPLE1" "SAMPLE_2" ... "SAMPLE_3" )
+```
+
+```{r, echo=FALSE, eval = TRUE}
+cl.sections   <- add.cl.section("Update ${SAMPLE_IDs} variable", cl.sections)
+cl.categories <- add.cl.categories("setup", cl.categories)
+```
+
+<br>
+
+#### Launch *ICNVA*
+
+`r emo::ji("hourglass_flowing_sand")` Running time: ~30 minutes
+
+```{bash, echo=TRUE, eval = FALSE}
+for SAMPLE_ID in ${SAMPLE_IDs[@]}
+do
+      echo "SAMPLE_ID=${SAMPLE_ID}"
+      echo "RUN_ID=${RUN_ID}"
+      
+      bash 025_run_initial_icnva.sh \
+          config.sh                 \
+          ${RUN_ID}                 \
+          ${SAMPLE_ID}              \
+          > ${SCRIPTS_AND_LOGS_FOLDER}/025_run_initial_icnva_${SAMPLE_ID}_${RUN_ID}.stdout \
+          2> ${SCRIPTS_AND_LOGS_FOLDER}/025_run_initial_icnva_${SAMPLE_ID}_${RUN_ID}.stderr &
+done
+```
+
+<br>
+
+Once this analysis is done, copy the logs and scripts for this sequencing run in
+the `${SCRIPTS_AND_LOGS_FOLDER}` folder.
+
+```{bash, echo=TRUE, eval = FALSE}
+cp -a 025_run_initial_icnva.sh ${SCRIPTS_AND_LOGS_FOLDER}
+cp -a config.sh ${SCRIPTS_AND_LOGS_FOLDER}/025_config.sh
+```
+
+<br>
+
+Send an email to the local *InPreD* team to to tell them that *TSOPPI* and *ICNVA*  analyses are ready and they can proceed with QC.
+
+```{r, echo=FALSE, eval = TRUE}
+cl.sections   <- add.cl.section("Launch ICNVA", cl.sections)
+cl.categories <- add.cl.categories("analysis", cl.categories)
+
+cl.sections   <- add.cl.section("Copy ICNVA (025) scripts and logs", cl.sections)
+cl.categories <- add.cl.categories("file_manip", cl.categories)
+
+cl.sections   <- add.cl.section("Send TSOPPI + ICNVA email", cl.sections)
+cl.categories <- add.cl.categories("email", cl.categories)
+
+```
+
+#### Process QC variant tables
+
+Convert QC-ed small variables tables, from *xlsx* back to *tsv* format.
+
+`r emo::ji("hourglass_flowing_sand")` Running time: ~3 minutes
+
+```{bash, echo=TRUE, eval = FALSE}
+for SAMPLE_ID in ${SAMPLE_IDs[@]}
+do
+      echo "SAMPLE_ID=${SAMPLE_ID}"
+      echo "RUN_ID=${RUN_ID}"
+      
+      bash 023c_convert_variant_table_forQC_xlsx_to_tsv.sh \
+          config.sh                 \
+          ${RUN_ID}                 \
+          ${SAMPLE_ID}              \
+          > ${SCRIPTS_AND_LOGS_FOLDER}/023c_convert_variant_table_forQC_xlsx_to_tsv_${SAMPLE_ID}_${RUN_ID}.stdout \
+          2> ${SCRIPTS_AND_LOGS_FOLDER}/023c_convert_variant_table_forQC_xlsx_to_tsv_${SAMPLE_ID}_${RUN_ID}.stderr &
+done
+```
+
+<br>
+
+Once this analysis is done, copy the logs and scripts for this sequencing run in
+the `${SCRIPTS_AND_LOGS_FOLDER}` folder.
+
+```{bash, echo=TRUE, eval = FALSE}
+cp -a 023c_convert_variant_table_forQC_xlsx_to_tsv.sh ${SCRIPTS_AND_LOGS_FOLDER}
+cp -a config.sh ${SCRIPTS_AND_LOGS_FOLDER}/023_config.sh
+```
+
+```{r, echo=FALSE, eval = TRUE}
+cl.sections   <- add.cl.section("Convert tables: xlsx -> tsv", cl.sections)
+cl.categories <- add.cl.categories("analysis", cl.categories)
+
+cl.sections   <- add.cl.section("Copy xlsx -> tsv (023) scripts and logs", cl.sections)
+cl.categories <- add.cl.categories("file_manip", cl.categories)
+```
+
+<br>
+
+
+
 <br>
 <br>
 <br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+
 
 
 <!-- # ---------- # -->
@@ -637,6 +796,64 @@ for (t in names(checklist.terms)) {
 writeLines(text = template.to.fill, con = checklist.ready.file)
 ```
 
+## Email Drafts
+
+<br>
+
+### After launching *LocalApp*
+
+<br>
+
+```
+Dear all,
+
+Sequencing data and all the metadata are now in TSD.
+LocalApp analysis will start in an hour.
+
+We will continue with TSOPPI and ICNVA on monday morning, so data for QC should be available shortly before Monday meeting.
+
+Have a nice weekend
+
+Jaime
+```
+
+<br>
+
+### When *TSOPPI* and *ICNVA* are ready
+
+<br>
+
+```
+Dear all,
+
+The small variant tables are ready for QC.
+
+Best,
+
+Jaime
+```
+
+<br>
+
+### When reports are ready in TSD
+
+<br>
+
+```
+Dear all, 
+
+The reports and all the related data are now available in the //hypatia/InPred folder. We have sequenced and processed N IPA cases (N1_ID, N2_ID, ... ,NN_ID ). 
+
+Sequencing went fine. No ctDNA data. 
+
+We observed some sequencing-related warnings for IPA065, be aware that this may be reflected in the interpretation.
+
+Best,
+
+Jaime
+```
+
+<br>
 
 ## To be added:
 
@@ -644,7 +861,7 @@ writeLines(text = template.to.fill, con = checklist.ready.file)
   - Check which samplesheet has the invisible character
   - Add figure about How to get the sequence ID ?
   - SampleSheet_YYMMDD_info.csv ? Is this automatically generated or imported?
-  - 
+  - What does adapt TSOPII table if needed?
 
 
 <!-- # ----------- # -->
