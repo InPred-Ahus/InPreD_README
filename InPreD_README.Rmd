@@ -110,11 +110,12 @@ file.copy(from = checklist.template.file,
 
 ## Intro
 
-This document explains how to run the InPreD pipeline to detect CNAs, driver mutations, gene fusions and other mutations from a Illumina TS0500 panel. Every week we sequence a batch of max 8 samples (hereafter referred as *sequencing run*). 
+This document explains how to run the *InPreD* pipeline to detect CNAs, driver mutations, gene fusions and other mutations from a *Illumina TS0500* panel. Every week we sequence a batch of max 8 samples (hereafter referred as *sequencing run*). 
 
-In this document we will use the following sequence run ID, we can easily identify by the first 6 digits corresponding to the data when the sequences were generated.
+In this document we will use the following run ID, we can easily identify it by the first 6 digits corresponding to the data when the sequences were generated.
 
 ```{bash, echo=TRUE, eval = FALSE}
+# Example of run ID
 250515_AAAAAAAA_BBBB_CCCCCCCCCC
 ```
 
@@ -158,7 +159,7 @@ insert.fig.toggle(
 
 ## Folder structure
 
-We will be working in the following directory: `/ess/p1150/data/durable`. Next we have a list of folders that will be constantly used during the analysis, from now on, **the file paths are relative to the working directory**.
+We will be working in the following directory: `/ess/p1150/data/durable`. We have a list of subfolders that will be constantly used during the analysis, from now on, **the file paths are relative to the working directory `durable`**.
 
 
 ```{bash, echo=TRUE, eval = FALSE}
@@ -167,46 +168,46 @@ cd /ess/p1150/data/durable
 
  <br>
  
-  - **`file-import/p1150-member-group/tsd`** : this is the folder where raw files are available. The files are usually uploaded every friday.
+  - **`file-import/p1150-member-group/tsd`** : this is the folder where raw files and metadata are available. The files are manually uploaded every friday.
 
 <br>
 
-  - **`file-export/`** : this is the folder where files can be exported outside the [TSD](https://selfservice.tsd.usit.no/) framework.
+  - **`file-export/`** : this is the folder where files can be exported outside the [TSD](https://selfservice.tsd.usit.no/) framework. Any file in this folder is visible outside the *TSD* framework and can be downloaded, so we must be cautious about its content.
 
 <br>
 
   - **`TSO500_SampleSheets/`** : in this folder we should place the Sample sheet files (see Step X) generated in every sequence run. Every sequence run should have three associated files. 
-    - `250515_info.csv` : Original Samplesheet (for this sequencing run ID). 
-    - `250515_info_TSOPPI.csv` : Customized Samplesheet (required by TSOPPI, may contain samples from many run IDs).
+    - `250515_info.csv` : Original Samplesheet (for this run ID). 
+    - `250515_info_TSOPPI.csv` : Customized Samplesheet (required by *TSOPPI*, may contain samples from many run IDs).
     - `250515_AAAAAAAA_BBBB_CCCCCCCCCC.csv` : Curated Samplesheet.
 
 <br>
 
   - **`/TSO500_pronto_metadata/`** : in this folder we should place the metadata tables (original and in a compressed version; see Step X). Every sequence run should have two associated files. 
     - `PRONTO_metadata_250515.txt` : Original metadata. 
-    - `PRONTO_metadata_250515.7z` : Compressed table.
+    - `PRONTO_metadata_250515.7z` : Compressed and encrypted table.
 
 <br>
 
-  - **`TSO500_sequences/`** : in this folder we should place the sequence files (see Step X) generated in every sequence run. Every sequence run should have two associated files. 
+  - **`TSO500_sequences/`** : in this folder we should place the sequence files (see Step X) generated in every run. Every sequence run should have two associated files. 
     - `250515/` : Folder with sequences. 
     - `250515.md5` : File with checksums.
 
 <br>
 
-  - **`/TSO500_scripts_and_logs/`** : in this folder we will place the log and error messages of each analysis launched in the pipeline. One folder per sequence run ID.
+  - **`/TSO500_scripts_and_logs/`** : in this folder we will place the log and error messages of each analysis launched in the pipeline. One folder per run ID.
 
 <br>
 
   - **`TSO500_analyses/`** : here we will find the results after running *LocalApp*. Every sequence run should have one associated folder. 
     - `250515_AAAAAAAA_BBBB_CCCCCCCCCC_TSO500_LocalApp_analysis/` : this is a link. 
     - `250515_AAAAAAAA_BBBB_CCCCCCCCCC_TSO500_LocalApp_analysis_fromRAW/` : *LocalApp* results : 
-        - `results/${SAMPLE_ID}/` : Sample ID results are in individual folders.
+        - `results/${SAMPLE_ID}/` : Sample ID results are in individual folders
         - `results/MetricsOutput.tsv` : Table with sequencing metrics
 
 <br>
 
-  - **`TSO500_postprocessing/`** : here we will find the results after running *LocalApp* and *TSOPPI*, two folders per sequence run ID. Both folders follow the same structure.
+  - **`TSO500_postprocessing/`** : here we will find the results after running *LocalApp* and *TSOPPI*, two folders per run ID. Both folders follow the same structure.
   
     - `250515_AAAAAAAA_BBBB_CCCCCCCCCC_TSO500_LocalApp_postprocessing_results/` : *LocalApp*. 
         - `${SAMPLE_ID}` : One folder per sample.
@@ -217,7 +218,7 @@ cd /ess/p1150/data/durable
 
 <br>
 
-  - **`TSO500_icnva/`** : here we will find the [*PureCN*](https://scfbm.biomedcentral.com/articles/10.1186/s13029-016-0060-z) results. One folder per sequence run ID, and one folder per sample ID.
+  - **`TSO500_icnva/`** : here we will find the [*PureCN*](https://scfbm.biomedcentral.com/articles/10.1186/s13029-016-0060-z) results. One folder per run ID, and one folder per sample ID.
   
     - `250515_AAAAAAAA_BBBB_CCCCCCCCCC/${SAMPLE_ID}_icnva/`
         - `PureCN_results_default/` : *PureCN* results of each patient. Including the local optima solutions for ploidy/purity.
@@ -233,7 +234,7 @@ cd /ess/p1150/data/durable
 
 <br>
 
-  - **`software/`** : here we will find the bioinformatic analysis pipeline scripts and the soruce code for all the software required. 
+  - **`software/`** : here we will find the bioinformatic analysis pipeline scripts and the source code for all the software required. 
     - **`pipeline/v003_upgrading_pronto_to_1.2.0`**
 
 <br>
@@ -253,7 +254,7 @@ Before launching the pipeline we must verify if there is enough space in the dis
 
 ### Verify disk space availability
 
-  - Disk space : we need at least 200GB of free space. If this is not the case, contact people involved in the project to release some space.
+  - **Disk space** : we need at least **200GB of free space**. If this is not the case, contact people involved in the project to release some space.
 
 ```{bash, echo=TRUE, eval = FALSE}
 # Check disk space
@@ -269,7 +270,7 @@ cl.categories <- add.cl.categories("prepare_pipeline", cl.categories)
 
 ### Verify size of sequencing run
 
-  - Size of files from current sequence run: usually a sequencing run produces a folder with size varying from ~30-60 GB. If this number is outside this range, please contact the people involved in sequencing.
+  - **Size of files from current run ID**: usually a sequencing run produces a folder with size varying from **~30-60 GB**. If this number is outside this range, please contact the people involved in sequencing.
 
 ```{bash, echo=TRUE, eval = FALSE}
 # Check size of sequencing results
@@ -325,8 +326,8 @@ The following variables must be set up before launching the pipeline:
   
 ```{bash, echo=TRUE, eval = FALSE}
 RUN_ID="250515_AAAAAAAA_BBBB_CCCCCCCCCC"
+RUN_DATE="${RUN_ID%%_*}"
 INPUT_DATA_TYPE="RAW"
-RUN_DATE="250515"
 DURABLE_DIR="/tsd/p1150/data/durable"
 ```
 
@@ -334,10 +335,10 @@ DURABLE_DIR="/tsd/p1150/data/durable"
 cl.sections   <- add.cl.section("Set up  ${RUN_ID}", cl.sections)
 cl.categories <- add.cl.categories("setup", cl.categories)
 
-cl.sections   <- add.cl.section("Set up  ${INPUT_DATA_TYPE}", cl.sections)
+cl.sections   <- add.cl.section("Set up  ${RUN_DATA}", cl.sections)
 cl.categories <- add.cl.categories("setup", cl.categories)
 
-cl.sections   <- add.cl.section("Set up  ${RUN_DATA}", cl.sections)
+cl.sections   <- add.cl.section("Set up  ${INPUT_DATA_TYPE}", cl.sections)
 cl.categories <- add.cl.categories("setup", cl.categories)
 
 cl.sections   <- add.cl.section("Set up  ${DURABLE_DIR}", cl.sections)
@@ -350,10 +351,10 @@ cl.categories <- add.cl.categories("setup", cl.categories)
 
 <br>
 
-The sequences, the *PRONTO* metadata, and the *SampleSheet* for the new run are located in the `file-import` folder.
+The sequences, the *PRONTO* metadata, and the *SampleSheet* for the current run ID are located in the `file-import` folder.
 They must be moved to the `TSO500_sequences`, `TSO500_pronto_metadata`, and `TSO500_SampleSheets` folders, respectively, before launching the analysis.
 
-An invisible character is inserted in the header of the `SampleSheet_$DATE.csv` metadata file. This character must be removed because the table cannot be properly read by other software and crash the analysis. Once this issue is solved, proceed to move the folders.
+**NOTE**: An invisible character is inserted in the header of the `SampleSheet_$DATE.csv` metadata file. This character must be removed because the table cannot be properly read by other software and crash the analysis. Once this issue is solved, proceed to move the folders.
 
 
 ```{bash, echo=TRUE, eval = FALSE}
@@ -494,7 +495,8 @@ bash 01_raw_sequencing_data_management_and_TSO500_analysis.sh ${RUN_ID} ${INPUT_
 <br>
 
 Send an email to the local *InPreD* team to to tell them that the analyses have
-been launched.
+been launched. You can find a draft in the *Email Drafts* section below in this
+document.
 
 <br>
 
@@ -524,7 +526,7 @@ cl.categories <- add.cl.categories("file_manip", cl.categories)
 
 <br>
 
-This analysis performs different analysis included in [TSOPPI](https://tsoppi.readthedocs.io/en/latest/index.html), such as:
+This analysis performs different analysis included in the  [TSOPPI](https://tsoppi.readthedocs.io/en/latest/index.html) tool, such as:
 
  - Quality control (QC) metrics for samples
  - Fusion and splice variant output for RNA samples;
@@ -548,6 +550,8 @@ cl.categories <- add.cl.categories("file_manip", cl.categories)
 <br>
 
 #### Adapt ALL_SEQUENCING_RUN_IDs global variable
+
+# Continuar desde AQUI
 
 Open the file `$ALL_RUN_IDs`, and add the new `$RUN_ID` in the second line. 
 See the example below.
