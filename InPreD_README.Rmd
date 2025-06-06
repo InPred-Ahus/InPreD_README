@@ -108,7 +108,9 @@ file.copy(from = checklist.template.file,
 
 
 
-## Intro
+## Introduction
+
+<br>
 
 This document explains how to run the *InPreD* pipeline to detect CNAs, driver mutations, gene fusions and other mutations from a *Illumina TS0500* panel. Every week we sequence a batch of max 8 samples (hereafter referred as *sequencing run*). 
 
@@ -159,6 +161,8 @@ insert.fig.toggle(
 
 ## Folder structure
 
+<br>
+
 We will be working in the following directory: `/ess/p1150/data/durable`. We have a list of subfolders that will be constantly used during the analysis, from now on, **the file paths are relative to the working directory `durable`**.
 
 
@@ -166,7 +170,7 @@ We will be working in the following directory: `/ess/p1150/data/durable`. We hav
 cd /ess/p1150/data/durable
 ```
 
- <br>
+<br>
  
   - **`file-import/p1150-member-group/tsd`** : this is the folder where raw files and metadata are available. The files are manually uploaded every friday.
 
@@ -244,9 +248,9 @@ cd /ess/p1150/data/durable
 cd software/pipeline/v003_upgrading_pronto_to_1.2.0
 ```
 
-<br>
-
 ## Prepare pipeline
+
+<br>
 
 Before launching the pipeline we must verify if there is enough space in the disk and the size of the sequencing data.
 
@@ -286,7 +290,7 @@ cl.categories <- add.cl.categories("prepare_pipeline", cl.categories)
 
 ### Connect to hpc (*Colossus*) server.
 
-**NOTE**: we must be connected to the *Colossus* server to launch the pipeline. Data manipulation can be done outside.
+  - **NOTE**: we must be connected to the *Colossus* server to launch the pipeline. Data manipulation can be done outside.
 
 ```{bash, echo=TRUE, eval = FALSE}
 # Connect to hpc
@@ -302,7 +306,7 @@ cl.categories <- add.cl.categories("prepare_pipeline", cl.categories)
 
 ### Pipeline run directory.
 
-**NOTE**: the pipeline must be launched from this folder.
+  - **NOTE**: the pipeline must be launched from this folder.
 
 ```{bash, echo=TRUE, eval = FALSE}
 cd  /ess/p1150/data/durable/software/pipeline/v003_upgrading_pronto_to_1.2.0
@@ -316,6 +320,8 @@ cl.categories <- add.cl.categories("prepare_pipeline", cl.categories)
 <br>
 
 ### Set up global variables.
+
+<br>
 
 The following variables must be set up before launching the pipeline:
 
@@ -356,7 +362,6 @@ They must be moved to the `TSO500_sequences`, `TSO500_pronto_metadata`, and `TSO
 
 **NOTE**: An invisible character is inserted in the header of the `SampleSheet_$DATE.csv` metadata file. This character must be removed because the table cannot be properly read by other software and crash the analysis. Once this issue is solved, proceed to move the folders.
 
-
 ```{bash, echo=TRUE, eval = FALSE}
 # Move sequences file
 mv ${DURABLE_DIR}/file-import/p1150-member-group/tsd/${RUN_DATE}* ${DURABLE_DIR}/TSO500_sequences/
@@ -386,7 +391,7 @@ cl.categories <- add.cl.categories("file_manip", cl.categories)
 
 ### Verify flags and source `config.sh`
 
-Verify the three following flags in the config file.
+ - Verify the three following flags in the config file.
   
 ```{bash, echo=TRUE, eval = FALSE}
 # Default ';' but other separator (',', '-', '/') can be used
@@ -398,7 +403,7 @@ REMOVE_DECRYPTED_COMPRESSED_DATA="T"
 
 <br>
 
-Then source the `config` file
+ - Then source the `config` file
 
 ```{bash, echo=TRUE, eval = FALSE}
 source config.sh ${RUN_ID}
@@ -423,9 +428,8 @@ cl.categories <- add.cl.categories("setup", cl.categories)
 
 ### Prepare folder structure
 
-Prepare the folder structure for a new run, this will create all folders to store
+ - Prepare the folder structure for a new run, this will create all folders to store
 results and logs.
-
 
 ```{bash, echo=TRUE, eval = FALSE}
 bash 00_setup_folder_structure_for_new_run.sh ${RUN_ID}
@@ -442,7 +446,7 @@ cl.categories <- add.cl.categories("setup", cl.categories)
 
 <br>
 
-We will generate a sample sheet with metadata for the current run ID.
+  - We will generate a sample sheet with metadata for the current run ID.
 
 ```{bash, echo=TRUE, eval = FALSE}
 bash 00_generate_TSO500_sample_sheet.sh ${RUN_ID} ${INPUT_DATA_TYPE} \
@@ -451,7 +455,7 @@ bash 00_generate_TSO500_sample_sheet.sh ${RUN_ID} ${INPUT_DATA_TYPE} \
 
 <br>
 
-Copy the logs and scripts for this sequencing run in
+  - Copy the logs and scripts for this sequencing run in
 the `${SCRIPTS_AND_LOGS_FOLDER}` folder.
 
 ```{bash, echo=TRUE, eval = FALSE}
@@ -473,7 +477,7 @@ cl.categories <- add.cl.categories("file_manip", cl.categories)
 
 <br>
 
-Now we are ready to launch the *TSO500* analysis pipeline. It has to be launched
+  - Now we are ready to launch the *TSO500* analysis pipeline. It has to be launched
 in many steps, and many of them require manual intervention.
 
 <br>
@@ -482,7 +486,7 @@ in many steps, and many of them require manual intervention.
 
 <br>
 
-This analysis performs the data QC for the sequencing results.
+  - This analysis performs the data QC for the sequencing results.
 
 `r emo::ji("hourglass_flowing_sand")` Running time: ~13 hours
 
@@ -494,20 +498,19 @@ bash 01_raw_sequencing_data_management_and_TSO500_analysis.sh ${RUN_ID} ${INPUT_
 
 <br>
 
-Send an email to the local *InPreD* team to to tell them that the analyses have
+  - **Send an email to the local *InPreD* team** to to tell them that the analyses have
 been launched. You can find a draft in the *Email Drafts* section below in this
 document.
 
 <br>
 
-Once this analysis is done, copy the logs and scripts for this sequencing run in
+  - Once this analysis is done, copy the logs and scripts for this sequencing run in
 the `${SCRIPTS_AND_LOGS_FOLDER}` folder.
 
 ```{bash, echo=TRUE, eval = FALSE}
 cp -a 01_raw_sequencing_data_management_and_TSO500_analysis.sh ${SCRIPTS_AND_LOGS_FOLDER}
 cp -a config.sh ${SCRIPTS_AND_LOGS_FOLDER}/01_config.sh
 ```
-
 
 ```{r, echo=FALSE, eval = TRUE}
 cl.sections   <- add.cl.section("Launch LocalApp", cl.sections)
@@ -536,7 +539,9 @@ This analysis performs different analysis included in the  [TSOPPI](https://tsop
 
 #### Create SampleSheet info *TSOPPI*
 
-Create the *TSOPPI* samplesheet.
+<br>
+
+  - Create the *TSOPPI* samplesheet.
 
 ```{bash, echo=TRUE, eval = FALSE}
 cp ${SAMPLESHEETS_FOLDER}/${INFO_FILE_NAME} ${SAMPLESHEETS_FOLDER}/${INFO_FILE_NAME_TSOPPI}
@@ -551,14 +556,9 @@ cl.categories <- add.cl.categories("file_manip", cl.categories)
 
 #### Adapt ALL_SEQUENCING_RUN_IDs global variable
 
-# Continuar desde AQUI
+<br>
 
-Open the file `$ALL_RUN_IDs`, and add the new `$RUN_ID` in the second line. 
-See the example below.
-
-```{bash, echo=TRUE, eval = FALSE}
-emacs $ALL_RUN_IDs
-```
+  - Update the file `$ALL_RUN_IDs` and add the new `$RUN_ID` in the second line. See the example below.
 
 ```{bash, echo=TRUE, eval = FALSE}
 ALL_SEQUENCING_RUN_IDs=()
@@ -567,13 +567,43 @@ ALL_SEQUENCING_RUN_IDs+=( "250522_AAAAAAAA_BBBB_CCCCCCCCCC" )
 ALL_SEQUENCING_RUN_IDs+=( "250515_AAAAAAAA_BBBB_CCCCCCCCCC" )
 ```
 
+<br>
+
+  - **NOTE**: originally this step was done manually, now we added the code below to do it automatically.
+
+```{bash, echo=TRUE, eval = FALSE}
+# Backup copy
+cp $ALL_RUN_IDs $ALL_RUN_IDs.bk
+
+# Check if the RUN_ID is already present
+if grep -qF "$RUN_ID" "$ALL_RUN_IDs"; then
+    echo "RUN_ID already present in $ALL_RUN_IDs"
+else
+    # Insert RUN_ID after the initialization line
+    TEMP_FILE=$(mktemp)
+    insert_line='ALL_SEQUENCING_RUN_IDs+=( "'"$RUN_ID"'" )'
+
+    awk -v line="$insert_line" '
+        $0 ~ /^ALL_SEQUENCING_RUN_IDs=\(\)/ {
+            print
+            print line
+            next
+        }
+        { print }
+    ' "$ALL_RUN_IDs" > "$TEMP_FILE" && mv "$TEMP_FILE" "$ALL_RUN_IDs"
+fi
+```
+
 ```{r, echo=FALSE, eval = TRUE}
 cl.sections   <- add.cl.section("Update ${ALL_RUN_IDs} variable", cl.sections)
 cl.categories <- add.cl.categories("setup", cl.categories)
 ```
 
+<br>
 
-#### Launch *TSOPP*`
+#### Launch *TSOPPI*`
+
+<br>
 
 `r emo::ji("hourglass_flowing_sand")` Running time: ~30 minutes
 
@@ -585,14 +615,13 @@ bash 02_execute_tsoppi_and_archive_results.sh ${RUN_ID} \
 
 <br>
 
-Once this analysis is done, copy the logs and scripts for this sequencing run in
+  - Once this analysis is done, copy the logs and scripts for this sequencing run in
 the `${SCRIPTS_AND_LOGS_FOLDER}` folder.
 
 ```{bash, echo=TRUE, eval = FALSE}
 cp -a 02_execute_tsoppi_and_archive_results.sh ${SCRIPTS_AND_LOGS_FOLDER}
 cp -a config.sh ${SCRIPTS_AND_LOGS_FOLDER}/02_config.sh
 ```
-
 
 ```{r, echo=FALSE, eval = TRUE}
 cl.sections   <- add.cl.section("Launch TSOPPI", cl.sections)
@@ -611,24 +640,62 @@ cl.categories <- add.cl.categories("file_manip", cl.categories)
 [*ICNVA*](https://tsoppi.readthedocs.io/en/latest/ICNVA.html) runs two types of analysis on each input sample:
 
   - Allele-specific copy number analysis performed by *PureCN* (LoH assessment.)
-  -Normalized read coverage (NRC) profile plotting for selected genes (dentify/confirm intra-genic duplications/losses).
+  - Normalized read coverage (NRC) profile plotting for selected genes (identify/confirm intra-genic duplications/losses).
 
-An in-house set of controls is utilized during both analyses.
+  - An in-house set of controls is utilized during both analyses.
 
 <br>
 
 #### Select DNA tumour samples
 
-Adapt the `$SAMPLE_IDs` array to contain only DNA tumour samples, those ones containing **-D01-** in the second field in their sample ID.
+<br>
 
-Be aware to adapt the variable according to the example below, Keep in mind the spacing, quotations and no separators.
+  - Adapt the `$SAMPLE_IDs` array to contain only DNA tumour samples, those ones containing **-D01-** in the second field in their sample ID.
+
+  - Be aware to adapt the variable according to the example below, Keep in mind the spacing, quotations and no separators.
 
 ```{bash, echo=TRUE, eval = FALSE}
 SAMPLE_IDs=( "SAMPLE1" "SAMPLE_2" ... "SAMPLE_3" )
 ```
 
+<br>
+
+  - **NOTE**: originally this step was done manually, now we added the code below to do it automatically.
+
+```{bash, echo=TRUE, eval = FALSE}
+# Get sample IDs from SampleSheet
+DNA_TUMOUR_SAMPLE_IDS=$(cut -d',' -f1 ${SAMPLESHEETS_FOLDER}/${INFO_FILE_NAME} | awk -F'-' '$2 == "D01"')
+#DNA_TUMOUR_SAMPLE_IDS=$(cut -d',' -f1 samples.txt | awk -F'-' 'tolower($2) == "d01"') # Case insensitive alternative
+
+# Build array declaration string
+ARRAY_STRING="SAMPLE_IDs=("
+while IFS= read -r id; do
+    ARRAY_STRING+=" \"$id\""
+done <<< "$DNA_TUMOUR_SAMPLE_IDS"
+ARRAY_STRING+=" )"
+
+# Evaluate the string to create the array variable
+eval "$ARRAY_STRING"
+```
+
+<br>
+
+  - Verify `SAMPLE_IDs` size and content.
+
+```{bash, echo=TRUE, eval = FALSE}
+# Optional: check the array content
+declare -p SAMPLE_IDs
+
+# Print array size and content in screen
+echo ${#SAMPLE_IDs[@]}
+printf "%s\n" "${SAMPLE_IDs[@]}"
+```
+
 ```{r, echo=FALSE, eval = TRUE}
 cl.sections   <- add.cl.section("Update ${SAMPLE_IDs} variable", cl.sections)
+cl.categories <- add.cl.categories("setup", cl.categories)
+
+cl.sections   <- add.cl.section("Verify ${SAMPLE_IDs} size and content", cl.sections)
 cl.categories <- add.cl.categories("setup", cl.categories)
 ```
 
@@ -655,7 +722,7 @@ done
 
 <br>
 
-Once this analysis is done, copy the logs and scripts for this sequencing run in
+  - Once this analysis is done, copy the logs and scripts for this sequencing run in
 the `${SCRIPTS_AND_LOGS_FOLDER}` folder.
 
 ```{bash, echo=TRUE, eval = FALSE}
@@ -665,7 +732,7 @@ cp -a config.sh ${SCRIPTS_AND_LOGS_FOLDER}/025_config.sh
 
 <br>
 
-Send an email to the local *InPreD* team to to tell them that *TSOPPI* and *ICNVA*  analyses are ready and they can proceed with QC.
+  - Send an email to the local *InPreD* team to to tell them that *TSOPPI* and *ICNVA*  analyses are ready and they can proceed with QC.
 
 ```{r, echo=FALSE, eval = TRUE}
 cl.sections   <- add.cl.section("Launch ICNVA", cl.sections)
