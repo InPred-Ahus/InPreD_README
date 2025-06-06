@@ -732,7 +732,8 @@ cp -a config.sh ${SCRIPTS_AND_LOGS_FOLDER}/025_config.sh
 
 <br>
 
-  - Send an email to the local *InPreD* team to to tell them that *TSOPPI* and *ICNVA*  analyses are ready and they can proceed with QC.
+  - **Send an email to the local *InPreD* team** to to tell them that *TSOPPI* and *ICNVA* analyses are ready and they can proceed with QC. You can find a draft in the *Email Drafts* section below in this
+document.
 
 ```{r, echo=FALSE, eval = TRUE}
 cl.sections   <- add.cl.section("Launch ICNVA", cl.sections)
@@ -745,6 +746,8 @@ cl.sections   <- add.cl.section("Send TSOPPI + ICNVA email", cl.sections)
 cl.categories <- add.cl.categories("email", cl.categories)
 
 ```
+
+<br>
 
 #### Process QC variant tables
 
@@ -769,7 +772,7 @@ done
 
 <br>
 
-Once this analysis is done, copy the logs and scripts for this sequencing run in
+  - Once this analysis is done, copy the logs and scripts for this sequencing run in
 the `${SCRIPTS_AND_LOGS_FOLDER}` folder.
 
 ```{bash, echo=TRUE, eval = FALSE}
