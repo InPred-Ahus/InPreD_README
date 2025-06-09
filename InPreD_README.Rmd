@@ -22,6 +22,15 @@ knitr::opts_chunk$set(echo = TRUE)
 date.checklist <- substr(gsub(x = Sys.Date(), pattern = "-", ""), start = 3, 8)
 
 checklist.terms <- list()
+
+if (file.exists("InPreD_README.html")) {
+  file.remove("InPreD_README.html")
+}
+
+
+if (file.exists("250609_InPreD_pipeline_Checklist.html")) {
+  file.remove("250609_InPreD_pipeline_Checklist.html")
+}
 ```
 
 
@@ -129,7 +138,7 @@ In this document we will use the following run ID, we can easily identify it by 
 
 <br>
 
-In your browser, open the [VMWare Horizon](https://view.tsd.usit.no/portal/webclient/#/home) website. Log in with your *username* and *2FA* first, then VMWare will ask your *password* (Figure 1).
+  - In your browser, open the [View TSD Portal](https://view.tsd.usit.no/portal/webclient/#/home) website. Log in with your *username* and *2FA* first, then VMWare will ask your *password* (Figure 1).
 
 ```{r figVMWare, echo=FALSE, results='asis'}
 
@@ -143,7 +152,7 @@ insert.fig.toggle(
 
 ```
 
-2. Click on the **p1150-rhel8-01-pool** icon, this will open the Linux VM (Figure 2). The other icon (*p1150-win02-pool*) will open the Windows VM.
+  - Click on the **p1150-rhel8-01-pool** icon, this will open the Linux VM (Figure 2). The other icon (*p1150-win02-pool*) will open the Windows VM.
 
 ```{r figVMs, echo=FALSE, results='asis'}
 
@@ -243,9 +252,211 @@ cd /ess/p1150/data/durable
 
 <br>
 
-4. Go to the pipeline folder, the analysis must be launched from this path.
-```{bash, echo=TRUE, eval = FALSE}
-cd software/pipeline/v003_upgrading_pronto_to_1.2.0
+## Import Samplesheets to TSD
+
+<br>
+
+  - Before launching the pipeline, we must generate the SampleSheet and *PRONTO* metadata from the [View UiO TSD portal](https://view.uio.no/portal/webclient/#/home). Note that this is a *Windows* VM.
+
+  - Log in into the [View UiO TSD portal](https://view.uio.no/portal/webclient/#/home). You must write your *2FA* onte time code and your password.
+  
+  - Click on *Windows icon* -> *This PC* -> *Hypathia.uio.no* (Figure 3).
+
+```{r ViewUiO, echo=FALSE, results='asis'}
+
+insert.fig.toggle(
+  fig.id = "Hypathia",
+  button.label = "Figure 3",
+  img.src = "fig/03_Hypatia.png",
+  fig.width = "75%",
+  fig.cap = "Access the Hypathia server thorugh UiO View Portal"
+)
+
+```
+
+<br>
+
+  - **SampleSheet** file: `hypathia.uio.no/Ih-med-klinmed-ahus-inpred/TS0500/Samples_YYYY_wWW`, where *YYYY* = Year and *wWW* = week, e.g., w22 for week 22, (Figure 4).
+
+```{r ViewUiO_SampleSheet, echo=FALSE, results='asis'}
+
+insert.fig.toggle(
+  fig.id = "ViewUiO_SampleSheet ",
+  button.label = "Figure 4",
+  img.src = "fig/04_SampleSheet.png",
+  fig.width = "75%",
+  fig.cap = "Original SampleSheet in View UiO portal"
+)
+
+```
+
+<br>
+
+### Generate *SampleSheet* and *PRONTO* metadata
+
+<br>
+
+  - Open the *SampleSheet file* with *Microsoft Excel*. You will see two sheets, namely **Sheet1** and **PRONTO**.
+
+<br>
+
+  - **SampleSheet**:
+  
+    - In *Sheet1*, select columns **InPred ID (IPA)** (E), **Tumor content** (R), and  **Barcode** (S).
+    - Create a new file with these columns and  **remove the header**. The file must be named `SampleSheet_YYMMDD.csv`.
+    
+    - Save the new file in the metadata folder `\\platon.uio.no\med-klinmed-u2\jamondra\pc\Dokumenter\Metadata`.
+
+<br>
+
+  - **PRONTO metadata**:
+  
+    - In *PRONTO* sheet. Save the content as it is in a new **tab separated file (.txt)**. The file must be named `PRONTO_metadata_YYMMDD.txt`.
+    
+    - Save the new file in the metadata folder `\\platon.uio.no\med-klinmed-u2\jamondra\pc\Dokumenter\Metadata`.
+    
+    - **Encrypt this file in *7z* format.** *Right click* on the file and select the *7-zip* option, select the *Leff til arkiv* option (Figure 5). This will open a window, write and repeat your encryption password in the *Angi passord* and *Bekreft passord* text boxes (Figure 6). Do not modify the other parameters.
+
+```{r Encrypt_PRONTO_pt1, echo=FALSE, results='asis'}
+
+insert.fig.toggle(
+  fig.id = "Encrypt_PRONTO_pt1",
+  button.label = "Figure 5",
+  img.src = "fig/05_Encrypt_pt1.png",
+  fig.width = "85%",
+  fig.cap = "Right click on the PRONTO metadata file to display encryption options"
+)
+
+```
+
+```{r Encrypt_PRONTO_pt2, echo=FALSE, results='asis'}
+
+insert.fig.toggle(
+  fig.id = "Encrypt_PRONTO_pt2",
+  button.label = "Figure 6",
+  img.src = "fig/06_Encrypt_pt2.png",
+  fig.width = "65%",
+  fig.cap = "Write and repeat your encryption password"
+)
+
+```
+
+<br>
+
+  - **NOTE:** both *SampleSheet* and *PRONTO* metadata file **must** have the exact same date *YYMMDD*.
+  
+
+```{r, echo=FALSE, eval = TRUE}
+cl.sections   <- add.cl.section("Create SampleSheet (View UiO)", cl.sections)
+cl.categories <- add.cl.categories("file_manip", cl.categories)
+
+cl.sections   <- add.cl.section("Create PRONTO metadata (View UiO)", cl.sections)
+cl.categories <- add.cl.categories("file_manip", cl.categories)
+
+cl.sections   <- add.cl.section("Encrypt PRONTO metadata", cl.sections)
+cl.categories <- add.cl.categories("important", cl.categories)
+```
+
+<br>
+
+### Import *SampleSheet* and *PRONTO* metadata (Uio View -> TSD)
+
+<br>
+
+  - **NOTE**: the TSD import must be done through the *UiO View portal* only, never through a personal computer.
+  
+  - Open *Chrome* or any internet browser.
+  
+  - Go to the [*TSD / Data Portal*](data.tsd.usit.no) and click on *Import Files* button (Figure 7).
+  
+  - Log in with your *username*, *2F2 one time code*. and *password*.
+  
+  - Upload the `SampleSheet_YYMMDD.csv` and `PRONTO_metadata_YYMMDD.7z` files. Verify both files are listed and checked, and click on the *import button* (Figure 8).
+  
+  - **NOTE**: only import the encrypted *PRONTO metadata* file, never the *.txt (non-encrypted)* version.
+
+<br>
+
+```{r TSD_import, echo=FALSE, results='asis'}
+
+insert.fig.toggle(
+  fig.id = "TSD_import",
+  button.label = "Figure 7",
+  img.src = "fig/07_TSD_DP.png",
+  fig.width = "65%",
+  fig.cap = "Import Files in TSD Data Portal"
+)
+
+```
+
+<br>
+
+```{r TSD_import_button, echo=FALSE, results='asis'}
+
+insert.fig.toggle(
+  fig.id = "TSD_import_button",
+  button.label = "Figure 8",
+  img.src = "fig/08_TSD_import_button.png",
+  fig.width = "85%",
+  fig.cap = "Verify SampleSheet and encrypted PRONTO metadata are listed and checked. Then click on the import button"
+)
+
+```
+
+<br>
+
+  - Open the [View TSD Portal](https://view.tsd.usit.no/portal/webclient/#/home) with the *Windows VM*.
+  
+  - Verify that `SampleSheet_YYMMDD.csv` and `PRONTO_metadata_YYMMDD.7z` files are in the *file-import* folder (Figure 9): **`file-import/p1150-member-group/`**.
+  
+  - Right click on the `PRONTO_metadata_YYMMDD.7z` file, select the *7-zip* option and *Pakk ut ...* (Figure 10).
+  
+  - Write the encryption password and click on *OK* (Figure 11).
+  
+<br>
+
+```{r TSD_import_files_windows, echo=FALSE, results='asis'}
+
+insert.fig.toggle(
+  fig.id = "TSD_import_files_windows",
+  button.label = "Figure 9",
+  img.src = "fig/09_TSD_import-files.png",
+  fig.width = "85%",
+  fig.cap = "In the import-files folder you will see the SampleSheet and the encrypted PRONTO metadata"
+)
+
+```
+
+<br>
+
+```{r Decrytp_PRONTO_pt1, echo=FALSE, results='asis'}
+insert.fig.toggle(
+  fig.id = "Decrytp_PRONTO_pt1",
+  button.label = "Figure 10",
+  img.src = "fig/10_Decrypt_pt1.png",
+  fig.width = "85%",
+  fig.cap = "Right click on the .7z file to show the decryption options."
+)
+```
+
+<br>
+
+```{r Decrytp_PRONTO_pt2, echo=FALSE, results='asis'}
+insert.fig.toggle(
+  fig.id = "Decrytp_PRONTO_pt2",
+  button.label = "Figure 11",
+  img.src = "fig/11_Decrypt_pt2.png",
+  fig.width = "85%",
+  fig.cap = "Write the decryption password"
+)
+```
+
+```{r, echo=FALSE, eval = TRUE}
+cl.sections   <- add.cl.section("Import files in TSD Data Portal", cl.sections)
+cl.categories <- add.cl.categories("file_manip", cl.categories)
+
+cl.sections   <- add.cl.section("Decrypt PRONTO metadata", cl.sections)
+cl.categories <- add.cl.categories("file_manip", cl.categories)
 ```
 
 ## Prepare pipeline
@@ -367,10 +578,10 @@ They must be moved to the `TSO500_sequences`, `TSO500_pronto_metadata`, and `TSO
 mv ${DURABLE_DIR}/file-import/p1150-member-group/tsd/${RUN_DATE}* ${DURABLE_DIR}/TSO500_sequences/
 
 # Move SampleSheet metadata file
-mv ${DURABLE_DIR}/file-import/p1150-member-group/SampleSheet_${RUN_DATE}_info.csv ${DURABLE_DIR}/TSO500_SampleSheet_${RUN_DATE}_info.csv
+mv ${DURABLE_DIR}/file-import/p1150-member-group/SampleSheet_${RUN_DATE}_info.csv ${DURABLE_DIR}/TSO500_SampleSheets/SampleSheet_${RUN_DATE}_info.csv
 
 # Move PRONTO file
-mv ${DURABLE_DIR}/file-import/p1150-member-group/PRONTO_metadata_${RUN_DATE}* ${DURABLE_DIR}/TSO500_pronto_metadata/PRONTO_metadata_${RUN_DATE}.7z
+mv ${DURABLE_DIR}/file-import/p1150-member-group/PRONTO_metadata_${RUN_DATE}.7z ${DURABLE_DIR}/TSO500_pronto_metadata/PRONTO_metadata_${RUN_DATE}.7z
 ```
 
 ```{r, echo=FALSE, eval = TRUE}
