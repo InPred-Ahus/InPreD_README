@@ -16,12 +16,23 @@ output:
 
 ```{r setup, include=FALSE}
 library(emo)
+library(glue)
 
 knitr::opts_chunk$set(echo = TRUE)
 
 date.checklist <- substr(gsub(x = Sys.Date(), pattern = "-", ""), start = 3, 8)
 
 checklist.terms <- list()
+run.id          <- NULL
+
+
+# Force user to define a Run ID
+run.id <- "250606_NB552811_0087_AH2T7NBGYX"
+if (is.null(run.id)){
+  stop("run.id cannot be NULL")
+}
+
+run.date <- unlist(strsplit(run.id, split = "_"))[1]
 
 if (file.exists("InPreD_README.html")) {
   file.remove("InPreD_README.html")
@@ -541,11 +552,19 @@ The following variables must be set up before launching the pipeline:
   - Sequencing run date = `RUN_DATE`
   - Durable folder = `DURABLE_DIR`
   
-```{bash, echo=TRUE, eval = FALSE}
-RUN_ID="250515_AAAAAAAA_BBBB_CCCCCCCCCC"
-RUN_DATE="${RUN_ID%%_*}"
+```{r env_var, echo=FALSE, eval = TRUE, comment=""}
+cat(glue('RUN_ID="{run.id}"
+RUN_DATE="${{RUN_ID%%_*}}"
 INPUT_DATA_TYPE="RAW"
-DURABLE_DIR="/tsd/p1150/data/durable"
+DURABLE_DIR="/tsd/p1150/data/durable"'), "\n")
+```
+
+```{bash, echo=TRUE, eval = FALSE}
+# Check ENV variables content
+echo $RUN_ID
+echo $RUN_DATE
+echo $INPUT_DATA_TYPE
+echo $DURABLE_DIR
 ```
 
 ```{r, echo=FALSE, eval = TRUE}
@@ -1111,7 +1130,8 @@ Jaime
 ```
 Dear all,
 
-The small variant tables are ready for QC.
+TSOPPI and ICNVA analysis are running now.
+The small variant tables should be ready for QC in ̃~30 minutes.
 
 Best,
 
