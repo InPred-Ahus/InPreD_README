@@ -1160,6 +1160,32 @@ Jaime
 
 <br>
 
+## Q & A
+
+<br>
+
+1. How can I know the run ID `$RUN_ID` ?
+
+  - The run ID is in the name of the sequencing files and it is automatically generated from the sequencer.
+  
+  - The run ID has the following format `YYMMDD_AAAAAAAA_BBBB_CCCCCCCCCC` (Figure 12). You can copy the prefix name (i.e., without the file extension) and save the content in the `$RUN_ID` variable.
+  
+  - In Figure 12, `RUN_ID="250606_NB552811_0087_AH2T7NBGYX"`.
+
+<br>
+
+```{r find_runid, echo=FALSE, results='asis'}
+insert.fig.toggle(
+  fig.id = "find_runid",
+  button.label = "Figure 12",
+  img.src = "fig/12_Find_run_ID.png",
+  fig.width = "95%",
+  fig.cap = "The run ID is the prefix of the sequencing files, in this example, the file name without the *.md5* extension"
+)
+```
+
+<br>
+
 ## To be added:
 
   - gpg --import /tsd/p1150/data/durable/gpg-keys/p1150-key1@tsd.usit.no-private-key.asc
@@ -1167,12 +1193,3 @@ Jaime
   - Add figure about How to get the sequence ID ?
   - SampleSheet_YYMMDD_info.csv ? Is this automatically generated or imported?
   - What does adapt TSOPII table if needed?
-
-
-<!-- # ----------- # -->
-<!-- # Draft Email # -->
-<!-- # ----------- # -->
-
-Sequencing data and all the metadata are now in TSD and LocalApp analysis will start in an hour or so.
-
-We will continue with TSOPPI and icnva on monday morning together with Jaime, so data for qc should be available shortly before Monday meeting or then around.
