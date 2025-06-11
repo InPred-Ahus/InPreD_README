@@ -1020,6 +1020,17 @@ cl.categories <- add.cl.categories("file_manip", cl.categories)
 
 <br>
 
+  - Update PRONTO metadata master table: add the metadata of the current run.
+  - Update column with Ns (previous run)
+  - Add run ID in current IDs (prefilled with 0s)
+  - Double check nork characters: å, ø, æ
+  
+## Tranfer folders
+
+  - Move old folders to the respective section
+  - Move foldres of seq ID to RECEN_RUN
+  - 7z encryption in windows VM
+  
 
 
 <br>
@@ -1164,7 +1175,7 @@ Jaime
 
 <br>
 
-1. How can I know the run ID `$RUN_ID` ?
+### 1. How can I know the run ID `$RUN_ID` ?
 
   - The run ID is in the name of the sequencing files and it is automatically generated from the sequencer.
   
@@ -1181,6 +1192,109 @@ insert.fig.toggle(
   img.src = "fig/12_Find_run_ID.png",
   fig.width = "95%",
   fig.cap = "The run ID is the prefix of the sequencing files, in this example, the file name without the *.md5* extension"
+)
+```
+
+<br>
+
+### 2. Visualize fusions with `FusViz`. 
+
+<br>
+
+  - Open a new terminal, but do not acces to the `Colossus` server.
+  
+  - Go to the *FusViz* folder (`$DURABLE/software/fusviz`) and launch the image.
+  
+  - Open the http link in a browser, in this example `http://127.0.0.1:5776`, (Figure 13).
+
+```{bash, echo=TRUE, eval = FALSE}
+# Launch image from fuzviz folder
+cd $DURABLE/software/fusviz
+
+singularity run fusviz_v1.0.0.sif 4000
+```
+
+```{r launch_fusviz, echo=FALSE, results='asis'}
+insert.fig.toggle(
+  fig.id = "launch_fusviz",
+  button.label = "Figure 13",
+  img.src = "fig/13_Launch_fusviz_image.png",
+  fig.width = "95%",
+  fig.cap = "When launching the fusviz image, you will see the same text in the terminal"
+)
+```
+
+<br>
+
+  - Click On the *Home* tab (left-side). Select the genome *hg19 (offline)* and upload your text files with the SV details (Figure 14).
+  
+```{r load_SV, echo=FALSE, results='asis'}
+insert.fig.toggle(
+  fig.id = "load_SV",
+  button.label = "Figure 14",
+  img.src = "fig/14_Load_SV_table.png",
+  fig.width = "100%",
+  fig.cap = "Select genome and load SV table"
+)
+```
+
+<br>
+
+  - Click On the *Linear* tab (left-side). Click on the *Upload a file* button, and add the `hg19.fasta.fai`, `hg19.fasta`, and `cytoBand.txt`, all of them available in the *fusviz* folder `$DURABLE/software/fusviz` (Figure 15).
+  
+  - Then click on the *Load gene track (offline)* button.
+
+```{r load_genetrack, echo=FALSE, results='asis'}
+insert.fig.toggle(
+  fig.id = "load_genetrack",
+  button.label = "Figure 15",
+  img.src = "fig/15_Load_genome.png",
+  fig.width = "100%",
+  fig.cap = "Load hg19 fasta, index and cytoBand files"
+)
+```
+
+<br>
+  
+  - Click On the *Two-way* tab (left-side). Now you will see three tabs in the top. Click on the *Overview_plot* button. 
+  
+    - Manually select the two genes involved in the fusion and their breakpoints (position in the genome where the fusion occurred). These numbers are the same values provided in the SV table (Figure 16).
+    
+    - You will see a plot in the right side with all the transcripts associated to each of the selected genes (upstream: green; downstream: orange), the location in their chromosomes and the parts of the transcript connected through the fusion.
+    
+    - Click on the *Download plot* at the bottom to save the figure.
+
+<br>
+
+```{r overview_plot, echo=FALSE, results='asis'}
+insert.fig.toggle(
+  fig.id = "overview_plot",
+  button.label = "Figure 16",
+  img.src = "fig/16_Overview_plot.png",
+  fig.width = "100%",
+  fig.cap = "The *Overview_plot* option is located in the *Two-way* tab in the left menu. Select the genes and their breakpoints manually (left side) to see the connected parts in the transcripts (right side). Upstream gene: green; Downstream gene: orange"
+)
+```
+
+<br>
+
+  - Click On the *Two-way* tab (left-side). Now you will see three tabs in the top. Click on the *Domain_plot* button. 
+  
+    - Manually select the two genes involved in the fusion, select one transcript for each gene and their breakpoints (position in the genome where the fusion occurred).
+    
+    - You will see a plot in the right side with the exons and annotated protein domains across the selected transcripts (upstream: green; downstream: orange). The arrow connecting the two transcripts indicates the place where the fusion occurs (Figure 17).
+    
+    - Click on the *Download plot* at the bottom to save the figure.
+
+<br>
+
+```{r domain_plot, echo=FALSE, results='asis'}
+insert.fig.toggle(
+  fig.id = "domain_plot",
+  button.label = "Figure 17",
+  img.src = "fig/17_Domain_plot.png",
+  fig.width = "100%",
+  fig.cap = "The *Domain_plot* option is located in the *Two-way* tab in the left menu. Select the genes, one transcript per gene and their breakpoints manually (left side) to see the exons and protein domains of the fused transcripts (right side). Upstream gene: green; Downstream gene: orange"
 )
 ```
 
