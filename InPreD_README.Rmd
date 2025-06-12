@@ -14,15 +14,11 @@ output:
     code_folding: show
 ---
 
-```{r klippy, echo=FALSE, include=TRUE}
-klippy::klippy(lang     = c('r', 'python', 'bash'),
-               position = c('top', 'right'),
-               color    = '#253494')
-```
-
 ```{r setup, include=FALSE}
 library(emo)
 library(glue)
+library(broom)
+library(klippy)
 
 knitr::opts_chunk$set(echo = TRUE)
 
@@ -50,6 +46,11 @@ if (file.exists("250609_InPreD_pipeline_Checklist.html")) {
 }
 ```
 
+```{r klippy, echo=FALSE, include=TRUE}
+klippy::klippy(lang     = c('r', 'python', 'bash'),
+               position = c('top', 'right'),
+               color    = '#253494')
+```
 
 ```{r functions, include=FALSE}
 # ----------------------- #
@@ -132,22 +133,19 @@ file.copy(from = checklist.template.file,
 
 ```
 
-
+<br>
 
 ## Introduction
 
 <br>
 
-This document explains how to run the *InPreD* pipeline to detect CNAs, driver mutations, gene fusions and other mutations from a *Illumina TS0500* panel. Every week we sequence a batch of max 8 samples (hereafter referred as *sequencing run*). 
+This document explains how to run the *InPreD* pipeline to detect CNAs, driver mutations, gene fusions and other mutations from a *Illumina TS0500* panel. Every week we sequence a batch of max 8 samples (hereafter referred as *sequencing run*), with its corresponding unique run ID.
 
-In this document we will use the following run ID, we can easily identify it by the first 6 digits corresponding to the data when the sequences were generated.
+<br>
 
-```{bash, echo=TRUE, eval = FALSE}
-# Example of run ID
-250515_AAAAAAAA_BBBB_CCCCCCCCCC
+```{r runID, echo=FALSE, eval = TRUE, comment=""}
+cat(run.id)
 ```
-
-<!-- # Steps -->
 
 <br>
 
@@ -198,7 +196,7 @@ cd /ess/p1150/data/durable
 
 <br>
  
-  - **`file-import/p1150-member-group/tsd`** : this is the folder where raw files and metadata are available. The files are manually uploaded every friday.
+  - **`file-import/p1150-member-group/`** : all uploaded files through the [*TSD Data Portal*](data.tsd.usit.no) will be located here (e.g., sequencing raw files, sample sheets and metadata). The files are uploaded usually every friday afternoon. See section *4 Import Samplesheets to TSD*.
 
 <br>
 
@@ -206,51 +204,51 @@ cd /ess/p1150/data/durable
 
 <br>
 
-  - **`TSO500_SampleSheets/`** : in this folder we should place the Sample sheet files (see Step X) generated in every sequence run. Every sequence run should have three associated files. 
-    - `250515_info.csv` : Original Samplesheet (for this run ID). 
-    - `250515_info_TSOPPI.csv` : Customized Samplesheet (required by *TSOPPI*, may contain samples from many run IDs).
-    - `250515_AAAAAAAA_BBBB_CCCCCCCCCC.csv` : Curated Samplesheet.
+  - **`TSO500_SampleSheets/`** : in this folder we place the Sample sheet files (see Step X) generated in every sequence run. Every sequence run should have three associated files. 
+    - ``r paste0(run.date, "_info.csv")`` : Original Samplesheet (for this run ID). Taken from `file-import/` folder, do not modify this file.
+    - ``r paste0(run.date, "_info_TSOPPI.csv")`` : Copy of the original Samplesheet, it may be modified. This copy is required by *TSOPPI*, may contain samples from many run IDs or commented samples.
+    - ``r paste0(run.id, ".csv")`` : Curated Samplesheet.
 
 <br>
 
-  - **`/TSO500_pronto_metadata/`** : in this folder we should place the metadata tables (original and in a compressed version; see Step X). Every sequence run should have two associated files. 
-    - `PRONTO_metadata_250515.txt` : Original metadata. 
-    - `PRONTO_metadata_250515.7z` : Compressed and encrypted table.
+  - **`/TSO500_pronto_metadata/`** : in this folder we place the metadata tables (original and in an encrypted version; see Step X). Every sequence run should have two associated files. 
+    - ``r paste0("PRONTO_metadata_", run.date, ".txt")`` : Original metadata table. 
+    - ``r paste0("PRONTO_metadata_", run.date, ".7z")`` : Compressed and encrypted table.
 
 <br>
 
-  - **`TSO500_sequences/`** : in this folder we should place the sequence files (see Step X) generated in every run. Every sequence run should have two associated files. 
-    - `250515/` : Folder with sequences. 
-    - `250515.md5` : File with checksums.
+  - **`TSO500_sequences/`** : in this folder we place the sequence files (see Step X) generated in every run. Every sequence run should have two associated files. 
+    - ``r paste0(run.id, "/")`` : Folder with sequences. 
+    - ``r paste0(run.id, ".md5")`` : File with checksums.
 
 <br>
 
-  - **`/TSO500_scripts_and_logs/`** : in this folder we will place the log and error messages of each analysis launched in the pipeline. One folder per run ID.
+  - **`/TSO500_scripts_and_logs/`** : in this folder we will place the logs and error messages of each analysis launched in the pipeline. One folder per run ID.
 
 <br>
 
   - **`TSO500_analyses/`** : here we will find the results after running *LocalApp*. Every sequence run should have one associated folder. 
-    - `250515_AAAAAAAA_BBBB_CCCCCCCCCC_TSO500_LocalApp_analysis/` : this is a link. 
-    - `250515_AAAAAAAA_BBBB_CCCCCCCCCC_TSO500_LocalApp_analysis_fromRAW/` : *LocalApp* results : 
+    - ``r paste0(run.id, "_LocalApp_analysis/")`` : this is a link. 
+    - ``r paste0(run.id, "_LocalApp_analysis_fromRAW/")`` : *LocalApp* results : 
         - `results/${SAMPLE_ID}/` : Sample ID results are in individual folders
         - `results/MetricsOutput.tsv` : Table with sequencing metrics
 
 <br>
 
-  - **`TSO500_postprocessing/`** : here we will find the results after running *LocalApp* and *TSOPPI*, two folders per run ID. Both folders follow the same structure.
+  - **`TSO500_postprocessing/`** : here we find the results after running *LocalApp* and *TSOPPI*, two folders per run ID. Both folders follow the same structure.
   
-    - `250515_AAAAAAAA_BBBB_CCCCCCCCCC_TSO500_LocalApp_postprocessing_results/` : *LocalApp*. 
+    - ``r paste0(run.id, "_TSO500_LocalApp_postprocessing_results/")`` : *LocalApp*. 
         - `${SAMPLE_ID}` : One folder per sample.
-        - `250515_AAAAAAAA_BBBB_CCCCCCCCCC_metrics_plots` : Sequencing QC-related plots.
-        - `250515_AAAAAAAA_BBBB_CCCCCCCCCC_variant_summary.csv` : Table with variants.
+        - ``r paste0(run.id, "_metrics_plots")`` : Sequencing QC-related plots.
+        - ``r paste0(run.id, "_variant_summary.csv")`` : Table with variants.
 
-    - `250515_AAAAAAAA_BBBB_CCCCCCCCCC_TSO500_TSOPPI_v0.3.2_main_2022_06_07/`: *TSOPPI*.
+    - ``r paste0(run.id, "_TSO500_TSOPPI_v0.3.2_main_2022_06_07/")`` : *TSOPPI*.
 
 <br>
 
-  - **`TSO500_icnva/`** : here we will find the [*PureCN*](https://scfbm.biomedcentral.com/articles/10.1186/s13029-016-0060-z) results. One folder per run ID, and one folder per sample ID.
+  - **`TSO500_icnva/`** : here we find the [*PureCN*](https://scfbm.biomedcentral.com/articles/10.1186/s13029-016-0060-z) results. One folder per run ID, and one folder per sample ID.
   
-    - `250515_AAAAAAAA_BBBB_CCCCCCCCCC/${SAMPLE_ID}_icnva/`
+    - ``r paste0(run.id, "/${SAMPLE_ID}_icnva/")``
         - `PureCN_results_default/` : *PureCN* results of each patient. Including the local optima solutions for ploidy/purity.
         - `PureCN_results_custom/` : *PureCN* results of each patient.
         - `${SAMPLE_ID}_NRC_plots.pdf` : Tumor vs Normal samples comparison plots.
@@ -264,7 +262,7 @@ cd /ess/p1150/data/durable
 
 <br>
 
-  - **`software/`** : here we will find the bioinformatic analysis pipeline scripts and the source code for all the software required. 
+  - **`software/`** : here we find the bioinformatic analysis pipeline scripts and the source code for all the software required. 
     - **`pipeline/v003_upgrading_pronto_to_1.2.0`**
 
 <br>
@@ -275,9 +273,13 @@ cd /ess/p1150/data/durable
 
   - Before launching the pipeline, we must generate the SampleSheet and *PRONTO* metadata from the [View UiO TSD portal](https://view.uio.no/portal/webclient/#/home). Note that this is a *Windows* VM.
 
-  - Log in into the [View UiO TSD portal](https://view.uio.no/portal/webclient/#/home). You must write your *2FA* onte time code and your password.
+  - Log in into the [View UiO TSD portal](https://view.uio.no/portal/webclient/#/home). You must write your *2FA* one time code and your password.
   
   - Click on *Windows icon* -> *This PC* -> *Hypathia.uio.no* (Figure 3).
+  
+  - **SampleSheet** file: 
+    
+    - `hypathia.uio.no/Ih-med-klinmed-ahus-inpred/TS0500/Samples_YYYY_wWW.xlsx` (where *YYYY* = Year and *wWW* = week. Example: *w22* for week 22; see Figure 4).
 
 ```{r ViewUiO, echo=FALSE, results='asis'}
 
@@ -292,8 +294,6 @@ insert.fig.toggle(
 ```
 
 <br>
-
-  - **SampleSheet** file: `hypathia.uio.no/Ih-med-klinmed-ahus-inpred/TS0500/Samples_YYYY_wWW`, where *YYYY* = Year and *wWW* = week, e.g., w22 for week 22, (Figure 4).
 
 ```{r ViewUiO_SampleSheet, echo=FALSE, results='asis'}
 
