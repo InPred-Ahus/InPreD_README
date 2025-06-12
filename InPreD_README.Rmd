@@ -14,6 +14,12 @@ output:
     code_folding: show
 ---
 
+```{r klippy, echo=FALSE, include=TRUE}
+klippy::klippy(lang     = c('r', 'python', 'bash'),
+               position = c('top', 'right'),
+               color    = '#253494')
+```
+
 ```{r setup, include=FALSE}
 library(emo)
 library(glue)
