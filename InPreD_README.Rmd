@@ -2,11 +2,11 @@
 title: "InPreD_README"
 author: "Jaime Abraham Castro-Mondragon"
 date: 'Last update: `r Sys.Date()`'
-output: 
+output:
   html_document:
     number_sections: true
     theme: cosmo
-    toc: yes
+    toc: true
     toc_depth: 4
     toc_float:
       collapsed: true
@@ -29,7 +29,7 @@ run.id          <- NULL
 
 
 # Force user to define a Run ID
-run.id <- "250606_NB552811_0087_AH2T7NBGYX"
+run.id <- "250614_AAAAAAAA_BBBB_CCCCCCCCCC" # "250606_AAAAAAAA_BBBB_CCCCCCCCCC"
 if (is.null(run.id)){
   stop("run.id cannot be NULL")
 }
@@ -100,7 +100,7 @@ add.cl.categories <- make_prepender("category")
 ```{r checklist, include=FALSE}
 
 checklist.template.file <- "templates/InPreD_pipeline_Checklist.html"
-checklist.ready.file    <- paste0(date.checklist, "_InPreD_pipeline_Checklist.html")
+checklist.ready.file    <- paste0(run.date, "_InPreD_pipeline_Checklist.html")
 
 # ------------------------------- #
 # Prepare CheckList section names #
@@ -320,7 +320,7 @@ insert.fig.toggle(
   - **SampleSheet**:
   
     - In *Sheet1*, select columns **InPred ID (IPA)** (E), **Tumor content** (R), and  **Barcode** (S).
-    - Create a new file with these columns and  **remove the header**. The file must be named `SampleSheet_YYMMDD.csv`.
+    - Create a new file with these columns and  **remove the header**. The file must be named `SampleSheet_YYMMDD_info.csv`.
     
     - Save the new file in the metadata folder `\\platon.uio.no\med-klinmed-u2\jamondra\pc\Dokumenter\Metadata`.
 
