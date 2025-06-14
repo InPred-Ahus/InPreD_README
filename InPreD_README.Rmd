@@ -29,7 +29,7 @@ run.id          <- NULL
 
 
 # Force user to define a Run ID
-run.id <- "250614_AAAAAAAA_BBBB_CCCCCCCCCC" # "250606_AAAAAAAA_BBBB_CCCCCCCCCC"
+run.id <- "250613_NB552811_0088_AH753TBGYX" # "250606_AAAAAAAA_BBBB_CCCCCCCCCC"
 if (is.null(run.id)){
   stop("run.id cannot be NULL")
 }
@@ -601,10 +601,14 @@ They must be moved to the `TSO500_sequences`, `TSO500_pronto_metadata`, and `TSO
 ```{bash, echo=TRUE, eval = FALSE}
 # Move sequences file
 mv ${DURABLE_DIR}/file-import/p1150-member-group/tsd/${RUN_DATE}* ${DURABLE_DIR}/TSO500_sequences/
+```
 
+```{bash, echo=TRUE, eval = FALSE}
 # Move SampleSheet metadata file
 mv ${DURABLE_DIR}/file-import/p1150-member-group/SampleSheet_${RUN_DATE}_info.csv ${DURABLE_DIR}/TSO500_SampleSheets/SampleSheet_${RUN_DATE}_info.csv
+```
 
+```{bash, echo=TRUE, eval = FALSE}
 # Move PRONTO file
 mv ${DURABLE_DIR}/file-import/p1150-member-group/PRONTO_metadata_${RUN_DATE}.7z ${DURABLE_DIR}/TSO500_pronto_metadata/PRONTO_metadata_${RUN_DATE}.7z
 ```
@@ -1126,6 +1130,8 @@ writeLines(text = template.to.fill, con = checklist.ready.file)
 <br>
 
 ```
+Title: Bioinformatic analysis week WW
+
 Dear all,
 
 Sequencing data and all the metadata are now in TSD.
