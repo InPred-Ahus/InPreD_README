@@ -798,7 +798,7 @@ cl.categories <- add.cl.categories("file_manip", cl.categories)
 
 <br>
 
-  - Update the file `$ALL_RUN_IDs` and add the new `$RUN_ID` in the second line. See the example below.
+  - Update the file `$ALL_RUN_IDS` and add the new `$RUN_ID` in the second line. See the example below.
 
 ```{bash, echo=TRUE, eval = FALSE}
 ALL_SEQUENCING_RUN_IDs=()
@@ -813,11 +813,11 @@ ALL_SEQUENCING_RUN_IDs+=( "250515_AAAAAAAA_BBBB_CCCCCCCCCC" )
 
 ```{bash, echo=TRUE, eval = FALSE}
 # Backup copy
-cp $ALL_RUN_IDs $ALL_RUN_IDs.bk
+cp $ALL_RUN_IDS $ALL_RUN_IDS.bk
 
 # Check if the RUN_ID is already present
-if grep -qF "$RUN_ID" "$ALL_RUN_IDs"; then
-    echo "RUN_ID already present in $ALL_RUN_IDs"
+if grep -qF "$RUN_ID" "$ALL_RUN_IDS"; then
+    echo "RUN_ID already present in $ALL_RUN_IDS"
 else
     # Insert RUN_ID after the initialization line
     TEMP_FILE=$(mktemp)
@@ -830,7 +830,7 @@ else
             next
         }
         { print }
-    ' "$ALL_RUN_IDs" > "$TEMP_FILE" && mv "$TEMP_FILE" "$ALL_RUN_IDs"
+    ' "$ALL_RUN_IDS" > "$TEMP_FILE" && mv "$TEMP_FILE" "$ALL_RUN_IDS"
 fi
 ```
 
