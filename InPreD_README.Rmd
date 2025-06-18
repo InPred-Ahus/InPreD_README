@@ -1050,7 +1050,7 @@ and generate the reports using *PRONTO*.
 
 <br>
 
-  - Update the PRONTO master table metadata: `${DURABLE}/software/PRONTO/PRONTO-1.2.0/In/InPreD_PRONTO_metadata.txt`
+  - Update the *PRONTO* master table metadata: `${DURABLE}/software/PRONTO/PRONTO-1.2.0/In/InPreD_PRONTO_metadata.txt`
   
     - Comment previous run by adding a sharp `#` one line before the first entry of the previous run.
     
