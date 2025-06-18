@@ -101,46 +101,62 @@
   font-family: sans-serif;
 }
 
-.legend {
-  min-width: 250px;
-  font-family: sans-serif;
-  gap: 40px; /* increase this if more spacing is needed */
 
-}
+  /* ---------------- */
+  /* Customize legend */
+  /* ---------------- */
+  
+  .legend {
+    position: fixed;
+    top: 50%;
+    left: 13rem; /* adjust for padding from left */
+    transform: translateY(-50%);
+    background: var(--card-bg);
+    padding: 1rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 1000; /* ensure it stays above other elements */
+  }
 
-.legend-item {
-  display: flex;
-  align-items: center;
-  margin-bottom: 8px;
-}
+  
+  .legend-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+  }
 
-.color-box {
-  width: 16px;
-  height: 16px;
-  display: inline-block;
-  margin-right: 8px;
-  border-radius: 3px;
-}
+  .color-box {
+    width: 16px;
+    height: 16px;
+    display: inline-block;
+    margin-right: 8px;
+    border-radius: 3px;
+  }
+  
+  .color-box.prepare_pipeline {
+    background-color: #00acc1;
+  }
+  .color-box.setup {
+    background-color: #fb8c00;
+  }
+  .color-box.file_manip {
+    background-color: #8e24aa;
+  }
+  .color-box.analysis {
+    background-color: #43a047;
+  }
+  .color-box.important {
+    background-color: #a50f15;
+  }
+  .color-box.email {
+    background-color: #ffeda0;
+  }
 
-.color-box.prepare_pipeline {
-  background-color: #00acc1;
-}
-.color-box.setup {
-  background-color: #fb8c00;
-}
-.color-box.file_manip {
-  background-color: #8e24aa;
-}
-.color-box.analysis {
-  background-color: #43a047;
-}
-.color-box.important {
-  background-color: #a50f15;
-}
-.color-box.email {
-  background-color: #ffeda0;
-}
 
+  /* ------------------- */
+  /* Customize checklist */
+  /* ------------------- */
+  
   .checklist-item {
     padding: 10px;
     margin: 5px 0;
@@ -176,6 +192,29 @@
     background-color: #ffffcc; /* light cyan */
     border-left: 4px solid #ffeda0;
   }
+
+  /* ------------ */
+  /* Reset button */
+  /* ------------ */
+  
+  .reset-btn {
+    display: inline-block;
+    margin: 0.5rem 0 1.5rem;
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    font-family: inherit;
+    color: #fff;
+    background: var(--accent);
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  
+  .reset-btn:hover {
+    background: #574dff;        /* slightly darker accent */
+  }
+
   </style>
 </head>
 <body>
@@ -193,7 +232,9 @@
   <div class="checklist-container">
 
     <h1>InPreD pipeline Checklist</h1>
-    <div class="subtitle">Run ID = --runID--</div>  
+    <div class="subtitle">Run ID = --runID--</div>
+    <div id="runID" data-run="--runID--" style="display:none;"></div>
+    <button id="resetBtn" class="reset-btn" type="button">Reset all</button>
     <div class="checklist">
 
     --checklist_buttons--
@@ -208,22 +249,37 @@
     </div>
   </div>
 
-  <script>
-    // Load saved state
-    document.querySelectorAll('.checklist-item input[type="checkbox"]').forEach((checkbox) => {
-      const id = checkbox.id;
-      const saved = localStorage.getItem(id);
-      if (saved === "true") {
-        checkbox.checked = true;
-        checkbox.parentElement.classList.add("checked");
-      }
+<script>
+  const runID = document.getElementById("runID")?.dataset.run || "defaultRun";
 
-      checkbox.addEventListener('change', () => {
-        localStorage.setItem(id, checkbox.checked);
-        checkbox.parentElement.classList.toggle("checked", checkbox.checked);
-      });
+  const makeKey = id => `${runID}_${id}`;
+
+  // Initialize checklist
+  document.querySelectorAll('.checklist-item input[type="checkbox"]').forEach((checkbox) => {
+    const id = checkbox.id;
+    const saved = localStorage.getItem(makeKey(id));
+
+    if (saved === "true") {
+      checkbox.checked = true;
+      checkbox.parentElement.classList.add("checked");
+    }
+
+    checkbox.addEventListener('change', () => {
+      localStorage.setItem(makeKey(id), checkbox.checked);
+      checkbox.parentElement.classList.toggle("checked", checkbox.checked);
     });
-  </script>
+  });
+
+  // Reset button logic
+  document.getElementById('resetBtn')?.addEventListener('click', () => {
+    document.querySelectorAll('.checklist-item input[type="checkbox"]').forEach((checkbox) => {
+      localStorage.removeItem(makeKey(checkbox.id));
+      checkbox.checked = false;
+      checkbox.parentElement.classList.remove("checked");
+    });
+  });
+</script>
+
 
 </body>
 </html>
