@@ -29,7 +29,7 @@ run.id          <- NULL
 
 
 # Force user to define a Run ID
-run.id <- "250613_NB552811_0088_AH753TBGYX" # "250606_AAAAAAAA_BBBB_CCCCCCCCCC"
+run.id <- "250620_AAAAAAAA_BBBB_CCCCCCCCCC" # "250606_AAAAAAAA_BBBB_CCCCCCCCCC"
 if (is.null(run.id)){
   stop("run.id cannot be NULL")
 }
@@ -41,8 +41,9 @@ if (file.exists("InPreD_README.html")) {
 }
 
 
-if (file.exists("250609_InPreD_pipeline_Checklist.html")) {
-  file.remove("250609_InPreD_pipeline_Checklist.html")
+checklist.file <- paste0(run.date, "_InPreD_pipeline_Checklist.html")
+if (file.exists(checklist.file)) {
+  file.remove(checklist.file)
 }
 ```
 
@@ -79,7 +80,6 @@ insert.fig.toggle <- function(
 </div>
 ', safe_fig_id, safe_button_label, safe_fig_id, safe_img_src, fig.width, safe_button_label, safe_fig_cap))
 }
-
 
 # ------------------------------ #
 # Checklist names and categories #
@@ -608,9 +608,10 @@ mv ${DURABLE_DIR}/file-import/p1150-member-group/tsd/${RUN_DATE}* ${DURABLE_DIR}
 mv ${DURABLE_DIR}/file-import/p1150-member-group/SampleSheet_${RUN_DATE}_info.csv ${DURABLE_DIR}/TSO500_SampleSheets/SampleSheet_${RUN_DATE}_info.csv
 ```
 
+<!-- We need to move two files: the .7z and .txt -->
 ```{bash, echo=TRUE, eval = FALSE}
 # Move PRONTO file
-mv ${DURABLE_DIR}/file-import/p1150-member-group/PRONTO_metadata_${RUN_DATE}.7z ${DURABLE_DIR}/TSO500_pronto_metadata/PRONTO_metadata_${RUN_DATE}.7z
+mv ${DURABLE_DIR}/file-import/p1150-member-group/PRONTO_metadata_${RUN_DATE}* ${DURABLE_DIR}/TSO500_pronto_metadata/PRONTO_metadata_${RUN_DATE}*
 ```
 
 ```{r, echo=FALSE, eval = TRUE}
@@ -668,6 +669,8 @@ cl.categories <- add.cl.categories("setup", cl.categories)
 
 ### Prepare folder structure
 
+<br>
+
  - Prepare the folder structure for a new run, this will create all folders to store
 results and logs.
 
@@ -682,7 +685,7 @@ cl.categories <- add.cl.categories("setup", cl.categories)
 
 <br>
 
-### Generate SampleSheet 
+### Generate SampleSheet (00)
 
 <br>
 
@@ -722,7 +725,7 @@ in many steps, and many of them require manual intervention.
 
 <br>
 
-### Launch *LocalApp* analysis
+### Launch *LocalApp* analysis (01)
 
 <br>
 
@@ -812,8 +815,10 @@ ALL_SEQUENCING_RUN_IDs+=( "250515_AAAAAAAA_BBBB_CCCCCCCCCC" )
   - **NOTE**: originally this step was done manually, now we added the code below to do it automatically.
 
 ```{bash, echo=TRUE, eval = FALSE}
+ALL_RUN_IDs="${PIPELINE_FOLDER}/all_sequencing_runs.sh"
+
 # Backup copy
-cp $ALL_RUN_IDS $ALL_RUN_IDS.bk
+cp $ALL_RUN_IDS ${ALL_RUN_IDS}.bk
 
 # Check if the RUN_ID is already present
 if grep -qF "$RUN_ID" "$ALL_RUN_IDS"; then
@@ -841,7 +846,7 @@ cl.categories <- add.cl.categories("setup", cl.categories)
 
 <br>
 
-#### Launch *TSOPPI*`
+#### Launch *TSOPPI* (02)
 
 <br>
 
@@ -892,7 +897,7 @@ cl.categories <- add.cl.categories("file_manip", cl.categories)
 
   - Adapt the `$SAMPLE_IDs` array to contain only DNA tumour samples, those ones containing **-D01-** in the second field in their sample ID.
 
-  - Be aware to adapt the variable according to the example below, Keep in mind the spacing, quotations and no separators.
+  - Be aware to adapt the variable according to the example below. Keep in mind the spacing, quotations and no separators.
 
 ```{bash, echo=TRUE, eval = FALSE}
 SAMPLE_IDs=( "SAMPLE1" "SAMPLE_2" ... "SAMPLE_3" )
@@ -941,7 +946,7 @@ cl.categories <- add.cl.categories("setup", cl.categories)
 
 <br>
 
-#### Launch *ICNVA*
+#### Launch *ICNVA* (025)
 
 `r emo::ji("hourglass_flowing_sand")` Running time: ~30 minutes
 
@@ -989,7 +994,9 @@ cl.categories <- add.cl.categories("email", cl.categories)
 
 <br>
 
-#### Process QC variant tables
+#### Process QC variant tables (023)
+
+<br>
 
 Convert QC-ed small variables tables, from *xlsx* back to *tsv* format.
 
@@ -1030,10 +1037,73 @@ cl.categories <- add.cl.categories("file_manip", cl.categories)
 
 <br>
 
+### Generate reports
+
+<br>
+
+Once the list of mutations was filtered by the curators, we are ready to proceed
+and generate the reports using *PRONTO*.
+
+<br>
+
+#### Update *PRONTO* metadata master table
+
+<br>
+
+  - Update the PRONTO master table metadata: `${DURABLE}/software/PRONTO/PRONTO-1.2.0/In/InPreD_PRONTO_metadata.txt`
+  
+    - Comment previous run by adding a sharp `#` one line before the first entry of the previous run.
+    
+    - Set all values of the 3rd column (*Create report*) to *N*.
+    
+    - Add the values of current run ID PRONTO metadata to the master table after the header. Double check to not add the header twice.
+    
+    - Replace norsk characters:
+      
+      - Æ/æ : AE/ae
+      - Ø/ø : OE/oe
+      - Å/å : Aa/aa
+    
+    - Set all values of the 2nd columns (*Sequencing_run_id*) to the current run ID: ``r paste0(run.id)``.
+
+```{bash, echo=TRUE, eval = FALSE}
+#cp -a 023c_convert_variant_table_forQC_xlsx_to_tsv.sh ${SCRIPTS_AND_LOGS_FOLDER}
+#cp -a config.sh ${SCRIPTS_AND_LOGS_FOLDER}/023_config.sh
+```
+
+```{r, echo=FALSE, eval = TRUE}
+cl.sections   <- add.cl.section("Comment previous run in PRONTO master table", cl.sections)
+cl.categories <- add.cl.categories("file_manip", cl.categories)
+
+cl.sections   <- add.cl.section("Set 'N' in 3rd column in PRONTO master table", cl.sections)
+cl.categories <- add.cl.categories("file_manip", cl.categories)
+
+cl.sections   <- add.cl.section("Add current ID PRONTO metadata to PRONTO master table", cl.sections)
+cl.categories <- add.cl.categories("file_manip", cl.categories)
+
+cl.sections   <- add.cl.section("Replace Æ/æ in PRONTO master table", cl.sections)
+cl.categories <- add.cl.categories("file_manip", cl.categories)
+
+cl.sections   <- add.cl.section("Replace Ø/ø in PRONTO master table", cl.sections)
+cl.categories <- add.cl.categories("file_manip", cl.categories)
+
+cl.sections   <- add.cl.section("Replace Å/å in PRONTO master table", cl.sections)
+cl.categories <- add.cl.categories("file_manip", cl.categories)
+```
+
+<br>
+
+#### Generate reports with PRONTO
+
+<br>
+
+
+
   - Update PRONTO metadata master table: add the metadata of the current run.
   - Update column with Ns (previous run)
   - Add run ID in current IDs (prefilled with 0s)
   - Double check nork characters: å, ø, æ
+  - Updat the 
   
 ## Tranfer folders
 
