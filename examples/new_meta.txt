@@ -1,0 +1,4 @@
+Sample_id	Sequencing_run_id	Create_report	Comments
+Sample1	0	Y	Æ
+Sample2	0	Y	Ø
+Sample3	0	Y	Å
