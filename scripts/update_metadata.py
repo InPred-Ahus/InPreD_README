@@ -24,7 +24,7 @@ def process_new_meta(new_meta_path, new_run_id):
 
     # Note: the 'latin' encoding don't cause issues to read the metadata, however we must verify that other lines are not altered.
     #       save a copy of the original metadata, just in case.
-    with open(new_meta_path, 'r', encoding="latin") as f:
+    with open(new_meta_path, 'r', encoding="utf-8") as f:
         lines = f.readlines()
 
     if not lines:
@@ -48,7 +48,7 @@ def process_new_meta(new_meta_path, new_run_id):
 # 
 def update_meta_master(master_metapath, new_meta_lines, output_path):
 
-    with open(master_metapath, 'r', encoding="latin") as f:
+    with open(master_metapath, 'r', encoding="utf-8") as f:
         lines = f.readlines()
 
     # Save header and commented lines before the header
@@ -97,10 +97,10 @@ def main():
 
     try:
         print(f"; Reading new metadata file")
-        new_lines = process_new_meta(args.new_meta, args.new_run_id)
+        new_lines = process_new_meta(args.new_meta, args.run_id)
         print(f"; Updating metadata table")
         update_meta_master(args.master_meta, new_lines, args.output)
-        print(f" Metadata updated successfully. Output written to: {args.output}")
+        print(f"; Metadata updated successfully. Output written to: {args.output}")
     except Exception as e:
         print(f" Error: {e}")
 
