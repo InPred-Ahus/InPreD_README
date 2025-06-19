@@ -45,7 +45,10 @@ def process_new_meta(new_meta_path, new_run_id):
 
 
 # Updates the PRONTO metadata master table
+# Comment the previous run, create a new batch with the PRONTO metadata of the current run ID
 # 
+# To do:
+# - Verify which encoding is the good one.
 def update_meta_master(master_metapath, new_meta_lines, output_path):
 
     with open(master_metapath, 'r', encoding="utf-8") as f:
