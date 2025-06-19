@@ -1050,25 +1050,44 @@ and generate the reports using *PRONTO*.
 
 <br>
 
-  - Update the *PRONTO* master table metadata: `${DURABLE}/software/PRONTO/PRONTO-1.2.0/In/InPreD_PRONTO_metadata.txt`
+  - Update the *PRONTO* master table metadata: `${DURABLE}/software/PRONTO/PRONTO-1.2.0/In/InPreD_PRONTO_metadata.txt`.
   
-    - Comment previous run by adding a sharp `#` one line before the first entry of the previous run.
-    
-    - Set all values of the 3rd column (*Create report*) to *N*.
-    
-    - Add the values of current run ID PRONTO metadata to the master table after the header. Double check to not add the header twice.
-    
-    - Replace norsk characters:
-      
+  - Then verify the file `${DURABLE}/software/PRONTO/PRONTO-1.2.0/In/InPreD_PRONTO_metadata.txt.new` was correclty updated with the following points.
+  
+    - Add a sharp `#` in a new line right after the header.
+
+    - In the previous run batch, set all values of the 3rd column (*Create report*) to *N*.
+
+    - Double check to not add the header twice.
+
+    - Replace norwegian characters:
+
       - Æ/æ : AE/ae
       - Ø/ø : OE/oe
       - Å/å : Aa/aa
+
+    - Verify all values of the 2nd columns (*Sequencing_run_id*) in the new batch are filles with the current run ID: ``r paste0(run.id)``.
     
-    - Set all values of the 2nd columns (*Sequencing_run_id*) to the current run ID: ``r paste0(run.id)``.
+  - If all these points were correctly achieved, rename the PRONTO master table file.
+
+<br>
 
 ```{bash, echo=TRUE, eval = FALSE}
-#cp -a 023c_convert_variant_table_forQC_xlsx_to_tsv.sh ${SCRIPTS_AND_LOGS_FOLDER}
-#cp -a config.sh ${SCRIPTS_AND_LOGS_FOLDER}/023_config.sh
+
+# Save a copy of the metadata file.
+cp ${DURABLE}/software/PRONTO/PRONTO-1.2.0/In/InPreD_PRONTO_metadata.txt ${DURABLE}/software/PRONTO/PRONTO-1.2.0/In/InPreD_PRONTO_metadata.txt.bk
+
+# Update the PRONTO metadata master table
+python3 ${SCRIPTS_FOLDER}/update_metadata.py                                             \
+  --new_meta ${DURABLE_DIR}/TSO500_pronto_metadata/PRONTO_metadata_${RUN_DATE}.txt       \
+  --master_meta ${DURABLE}/software/PRONTO/PRONTO-1.2.0/In/InPreD_PRONTO_metadata.txt.bk \
+  --run_id ${RUN_ID}                                                                     \
+  --o ${DURABLE}/software/PRONTO/PRONTO-1.2.0/In/InPreD_PRONTO_metadata.txt.new ;
+```
+
+```{bash, echo=TRUE, eval = FALSE}
+
+mv ${DURABLE}/software/PRONTO/PRONTO-1.2.0/In/InPreD_PRONTO_metadata.txt.new ${DURABLE}/software/PRONTO/PRONTO-1.2.0/In/InPreD_PRONTO_metadata.txt
 ```
 
 ```{r, echo=FALSE, eval = TRUE}
@@ -1081,13 +1100,16 @@ cl.categories <- add.cl.categories("file_manip", cl.categories)
 cl.sections   <- add.cl.section("Add current ID PRONTO metadata to PRONTO master table", cl.sections)
 cl.categories <- add.cl.categories("file_manip", cl.categories)
 
-cl.sections   <- add.cl.section("Replace Æ/æ in PRONTO master table", cl.sections)
+cl.sections   <- add.cl.section("Replace Æ/æ in new PRONTO table", cl.sections)
 cl.categories <- add.cl.categories("file_manip", cl.categories)
 
-cl.sections   <- add.cl.section("Replace Ø/ø in PRONTO master table", cl.sections)
+cl.sections   <- add.cl.section("Replace Ø/ø in new PRONTO table", cl.sections)
 cl.categories <- add.cl.categories("file_manip", cl.categories)
 
-cl.sections   <- add.cl.section("Replace Å/å in PRONTO master table", cl.sections)
+cl.sections   <- add.cl.section("Replace Å/å in new PRONTO table", cl.sections)
+cl.categories <- add.cl.categories("file_manip", cl.categories)
+
+cl.sections   <- add.cl.section("Rename PRONTO master table", cl.sections)
 cl.categories <- add.cl.categories("file_manip", cl.categories)
 ```
 
