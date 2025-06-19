@@ -1073,7 +1073,6 @@ and generate the reports using *PRONTO*.
 <br>
 
 ```{bash, echo=TRUE, eval = FALSE}
-
 # Save a copy of the metadata file.
 cp ${DURABLE}/software/PRONTO/PRONTO-1.2.0/In/InPreD_PRONTO_metadata.txt ${DURABLE}/software/PRONTO/PRONTO-1.2.0/In/InPreD_PRONTO_metadata.txt.bk
 
@@ -1086,7 +1085,6 @@ python3 ${SCRIPTS_FOLDER}/update_metadata.py                                    
 ```
 
 ```{bash, echo=TRUE, eval = FALSE}
-
 mv ${DURABLE}/software/PRONTO/PRONTO-1.2.0/In/InPreD_PRONTO_metadata.txt.new ${DURABLE}/software/PRONTO/PRONTO-1.2.0/In/InPreD_PRONTO_metadata.txt
 ```
 
@@ -1115,22 +1113,61 @@ cl.categories <- add.cl.categories("file_manip", cl.categories)
 
 <br>
 
-#### Generate reports with PRONTO
+#### Generate reports with PRONTO (03)
 
 <br>
 
+  - Launch the command to generate the *PRONTO* reports.
 
+`r emo::ji("hourglass_flowing_sand")` Running time: ~3 minutes per sample.
 
-  - Update PRONTO metadata master table: add the metadata of the current run.
-  - Update column with Ns (previous run)
-  - Add run ID in current IDs (prefilled with 0s)
-  - Double check nork characters: å, ø, æ
-  - Updat the 
+<br>
+
+```{bash, echo=TRUE, eval = FALSE}
+for SAMPLE_ID in ${SAMPLE_IDs[@]}
+do
+      echo "SAMPLE_ID=${SAMPLE_ID}"
+
+      bash 03_generate_and_archive_pronto_report_collect_data_for_export.sh ${RUN_ID} ${SAMPLE_ID} ${SCRIPTS_AND_LOGS_FOLDER}/02_used_scripts/config_${RUN_ID}.sh \
+          > ${SCRIPTS_AND_LOGS_FOLDER}/03_generate_and_archive_pronto_v${PRONTO_VERSION}_report_collect_data_for_export_${SAMPLE_ID}_${RUN_ID}.stdout \
+          2> ${SCRIPTS_AND_LOGS_FOLDER}/03_generate_and_archive_pronto_v${PRONTO_VERSION}_report_collect_data_for_export_${SAMPLE_ID}_${RUN_ID}.stderr 
+
+done
+```
+
+<br>
+
+  - Once this analysis is done, copy the logs and scripts for this sequencing run in
+the `${SCRIPTS_AND_LOGS_FOLDER}` folder.
+
+```{bash, echo=TRUE, eval = FALSE}
+cp -a 03_generate_and_archive_pronto_report_collect_data_for_export.sh ${SCRIPTS_AND_LOGS_FOLDER}
+cp -a config.sh ${SCRIPTS_AND_LOGS_FOLDER}/03_config.sh
+```
+
+```{r, echo=FALSE, eval = TRUE}
+cl.sections   <- add.cl.section("Generate reports with PRONTO (03)", cl.sections)
+cl.categories <- add.cl.categories("analysis", cl.categories)
+
+cl.sections   <- add.cl.section("Copy PRONTO (03) scripts and logs", cl.sections)
+cl.categories <- add.cl.categories("file_manip", cl.categories)
+```
+
+<br>
   
-## Tranfer folders
+### Prepare predisposition tables
 
+  - To be added
+
+<br>
+  
+## Transfer folders
+
+<br>
+
+  - AQUI
   - Move old folders to the respective section
-  - Move foldres of seq ID to RECEN_RUN
+  - Move folders of seq ID to RECEN_RUN
   - 7z encryption in windows VM
   
 
