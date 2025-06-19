@@ -14,6 +14,17 @@ def normalize_norsk_chars(text):
     return text
 
 
+# Note: the 'latin' encoding don't cause issues to read the metadata, however we must verify that other lines are not altered.
+# Solution: use try-except with utf-8 and latin.
+def safe_readlines(file_path):
+    """Try reading a file with utf-8, then fall back to latin1 if needed."""
+    try:
+        with open(file_path, 'r', encoding='utf-8') as f:
+            return f.readlines()
+    except UnicodeDecodeError:
+        with open(file_path, 'r', encoding='latin') as f:
+            return f.readlines()
+
 # This function reads the new PRONTO metadata file, convert the norwegian characters to standard ones and add the run ID values.
 # Returns a string that is ready to be inserted in the master metadata table.
 def process_new_meta(new_meta_path, new_run_id):
@@ -22,10 +33,7 @@ def process_new_meta(new_meta_path, new_run_id):
     def normalize_row(fields):
         return [normalize_norsk_chars(f) for f in fields]
 
-    # Note: the 'latin' encoding don't cause issues to read the metadata, however we must verify that other lines are not altered.
-    #       save a copy of the original metadata, just in case.
-    with open(new_meta_path, 'r', encoding="utf-8") as f:
-        lines = f.readlines()
+    lines = safe_readlines(new_meta_path)
 
     if not lines:
         raise ValueError("File A is empty.")
@@ -51,8 +59,7 @@ def process_new_meta(new_meta_path, new_run_id):
 # - Verify which encoding is the good one.
 def update_meta_master(master_metapath, new_meta_lines, output_path):
 
-    with open(master_metapath, 'r', encoding="utf-8") as f:
-        lines = f.readlines()
+    lines = safe_readlines(master_metapath)
 
     # Save header and commented lines before the header
     header_idx = next(i for i, line in enumerate(lines) if line.strip().startswith('Sample_id'))
