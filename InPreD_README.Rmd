@@ -1159,6 +1159,23 @@ cl.categories <- add.cl.categories("file_manip", cl.categories)
 
   - To be added
 
+```{bash, echo=TRUE, eval = FALSE}
+# Create directory 
+PRED_TABLES="${DURABLE}/TSO500_export_for_interpretation/RECENT_RUN/predisposition_tables"
+mkdir -p ${PRED_TABLES}
+
+ls ${DURABLE}/TSO500_postprocessing/${RUN_ID}_TSOPPI_v0.3.2_main_2022_06_07/*/*_predisposition_gene_variant_table_tumor_RNA.tsv | while IFS= read -r file; do
+  cp "$file" ${PRED_TABLES}/
+done
+```
+
+```{r, echo=FALSE, eval = TRUE}
+cl.sections   <- add.cl.section("Create predisposition_tables folder", cl.sections)
+cl.categories <- add.cl.categories("file_manip", cl.categories)
+
+cl.sections   <- add.cl.section("Copy predisposition tables", cl.sections)
+cl.categories <- add.cl.categories("file_manip", cl.categories)
+```
 <br>
   
 ## Transfer folders
