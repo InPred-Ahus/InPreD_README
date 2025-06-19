@@ -39,9 +39,9 @@ jobs:
     #    pytest
     - name: Update Metadata
       run: |
-        python3 scripts/update_metadata.py         \
-        --new_meta examples/new_meta.txt           \
-        --master_meta examples/metadata_master.txt \
-        --run_id 180625                            \
-        --o TEST.txt ;                             \
+        python3 scripts/update_metadata.py                         \
+        --new_meta examples/update_metadata/new_meta.txt           \
+        --master_meta examples/update_metadata/metadata_master.txt \
+        --run_id 180625                                            \
+        --o TEST.txt ;                                             \
         cat TEST.txt
