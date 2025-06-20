@@ -1211,6 +1211,10 @@ insert.fig.toggle(
 <br>
 
   - Move to one folder above `durable/TSO500_export_for_interpretation/` and left click on the `RECENT_RUN` folder. Select the *7-Zip* tab and click on the *Legg til arkiv ...* option (Figure 14).
+  
+  - Write the encryption password and click on *OK* (Figure 15).
+  
+  - Move the `CURRENT_FOLDER.7z` to the `durable/fire-export/` folder (Figure 16).
 
 ```{r recent_run_7z, echo=FALSE, results='asis'}
 insert.fig.toggle(
@@ -1222,22 +1226,38 @@ insert.fig.toggle(
 )
 ```
 
+```{r recent_run_password, echo=FALSE, results='asis'}
+insert.fig.toggle(
+  fig.id = "recent_run_password",
+  button.label = "Figure 15",
+  img.src = "fig/15_Recent_run_password.png",
+  fig.width = "75%",
+  fig.cap = "Write the password to encrypt the folder"
+)
+```
+
+```{r Move_Recent_run, echo=FALSE, results='asis'}
+insert.fig.toggle(
+  fig.id = "Move_Recent_run",
+  button.label = "Figure 16",
+  img.src = "fig/16_Move_RECENT_RUN.png",
+  fig.width = "75%",
+  fig.cap = "Move the RECENT_RUN.7z file to the fire-export/ folder"
+)
+```
+
 ```{r, echo=FALSE, eval = TRUE}
 cl.sections   <- add.cl.section("Switch to Windows VM", cl.sections)
 cl.categories <- add.cl.categories("file_manip", cl.categories)
 
 cl.sections   <- add.cl.section("Encrypt RECENT_RUN folder", cl.sections)
 cl.categories <- add.cl.categories("file_manip", cl.categories)
+
+cl.sections   <- add.cl.section("Move RECENT_RUN.7z to file-export/ folder", cl.sections)
+cl.categories <- add.cl.categories("file_manip", cl.categories)
 ```
   
   - Log in into the [View UiO portal](https://view.uio.no/portal/webclient/#/home). You must write your *2FA* one time code and your password.
-  
-  - AQUI
-  - Move old folders to the respective section
-  - Move folders of seq ID to RECEN_RUN
-  - 7z encryption in windows VM
-  
-
 
 <br>
 <br>
@@ -1387,17 +1407,17 @@ Jaime
 
   - The run ID is in the name of the sequencing files and it is automatically generated from the sequencer.
   
-  - The run ID has the following format `YYMMDD_AAAAAAAA_BBBB_CCCCCCCCCC` (Figure 12). You can copy the prefix name (i.e., without the file extension) and save the content in the `$RUN_ID` variable.
+  - The run ID has the following format `YYMMDD_AAAAAAAA_BBBB_CCCCCCCCCC` (Figure 17). You can copy the prefix name (i.e., without the file extension) and save the content in the `$RUN_ID` variable.
   
-  - In Figure 12, `RUN_ID="250606_NB552811_0087_AH2T7NBGYX"`.
+  - In Figure 17, `RUN_ID="250606_NB552811_0087_AH2T7NBGYX"`.
 
 <br>
 
 ```{r find_runid, echo=FALSE, results='asis'}
 insert.fig.toggle(
   fig.id = "find_runid",
-  button.label = "Figure 12",
-  img.src = "fig/12_Find_run_ID.png",
+  button.label = "Figure 17",
+  img.src = "fig/17_Find_run_ID.png",
   fig.width = "95%",
   fig.cap = "The run ID is the prefix of the sequencing files, in this example, the file name without the *.md5* extension"
 )
@@ -1413,7 +1433,7 @@ insert.fig.toggle(
   
   - Go to the *FusViz* folder (`$DURABLE/software/fusviz`) and launch the image.
   
-  - Open the http link in a browser, in this example `http://127.0.0.1:5776`, (Figure 13).
+  - Open the http link in a browser, in this example `http://127.0.0.1:5776`, (Figure 18).
 
 ```{bash, echo=TRUE, eval = FALSE}
 # Launch image from fuzviz folder
@@ -1425,8 +1445,8 @@ singularity run fusviz_v1.0.0.sif 4000
 ```{r launch_fusviz, echo=FALSE, results='asis'}
 insert.fig.toggle(
   fig.id = "launch_fusviz",
-  button.label = "Figure 13",
-  img.src = "fig/13_Launch_fusviz_image.png",
+  button.label = "Figure 18",
+  img.src = "fig/18_Launch_fusviz_image.png",
   fig.width = "95%",
   fig.cap = "When launching the fusviz image, you will see the same text in the terminal"
 )
@@ -1434,13 +1454,13 @@ insert.fig.toggle(
 
 <br>
 
-  - Click On the *Home* tab (left-side). Select the genome *hg19 (offline)* and upload your text files with the SV details (Figure 14).
+  - Click On the *Home* tab (left-side). Select the genome *hg19 (offline)* and upload your text files with the SV details (Figure 19).
   
 ```{r load_SV, echo=FALSE, results='asis'}
 insert.fig.toggle(
   fig.id = "load_SV",
-  button.label = "Figure 14",
-  img.src = "fig/14_Load_SV_table.png",
+  button.label = "Figure 19",
+  img.src = "fig/19_Load_SV_table.png",
   fig.width = "100%",
   fig.cap = "Select genome and load SV table"
 )
@@ -1448,15 +1468,15 @@ insert.fig.toggle(
 
 <br>
 
-  - Click On the *Linear* tab (left-side). Click on the *Upload a file* button, and add the `hg19.fasta.fai`, `hg19.fasta`, and `cytoBand.txt`, all of them available in the *fusviz* folder `$DURABLE/software/fusviz` (Figure 15).
+  - Click On the *Linear* tab (left-side). Click on the *Upload a file* button, and add the `hg19.fasta.fai`, `hg19.fasta`, and `cytoBand.txt`, all of them available in the *fusviz* folder `$DURABLE/software/fusviz` (Figure 20).
   
   - Then click on the *Load gene track (offline)* button.
 
 ```{r load_genetrack, echo=FALSE, results='asis'}
 insert.fig.toggle(
   fig.id = "load_genetrack",
-  button.label = "Figure 15",
-  img.src = "fig/15_Load_genome.png",
+  button.label = "Figure 20",
+  img.src = "fig/20_Load_genome.png",
   fig.width = "100%",
   fig.cap = "Load hg19 fasta, index and cytoBand files"
 )
@@ -1466,7 +1486,7 @@ insert.fig.toggle(
   
   - Click On the *Two-way* tab (left-side). Now you will see three tabs in the top. Click on the *Overview_plot* button. 
   
-    - Manually select the two genes involved in the fusion and their breakpoints (position in the genome where the fusion occurred). These numbers are the same values provided in the SV table (Figure 16).
+    - Manually select the two genes involved in the fusion and their breakpoints (position in the genome where the fusion occurred). These numbers are the same values provided in the SV table (Figure 21).
     
     - You will see a plot in the right side with all the transcripts associated to each of the selected genes (upstream: green; downstream: orange), the location in their chromosomes and the parts of the transcript connected through the fusion.
     
@@ -1477,8 +1497,8 @@ insert.fig.toggle(
 ```{r overview_plot, echo=FALSE, results='asis'}
 insert.fig.toggle(
   fig.id = "overview_plot",
-  button.label = "Figure 16",
-  img.src = "fig/16_Overview_plot.png",
+  button.label = "Figure 21",
+  img.src = "fig/21_Overview_plot.png",
   fig.width = "100%",
   fig.cap = "The *Overview_plot* option is located in the *Two-way* tab in the left menu. Select the genes and their breakpoints manually (left side) to see the connected parts in the transcripts (right side). Upstream gene: green; Downstream gene: orange"
 )
@@ -1490,7 +1510,7 @@ insert.fig.toggle(
   
     - Manually select the two genes involved in the fusion, select one transcript for each gene and their breakpoints (position in the genome where the fusion occurred).
     
-    - You will see a plot in the right side with the exons and annotated protein domains across the selected transcripts (upstream: green; downstream: orange). The arrow connecting the two transcripts indicates the place where the fusion occurs (Figure 17).
+    - You will see a plot in the right side with the exons and annotated protein domains across the selected transcripts (upstream: green; downstream: orange). The arrow connecting the two transcripts indicates the place where the fusion occurs (Figure 22).
     
     - Click on the *Download plot* at the bottom to save the figure.
 
@@ -1499,8 +1519,8 @@ insert.fig.toggle(
 ```{r domain_plot, echo=FALSE, results='asis'}
 insert.fig.toggle(
   fig.id = "domain_plot",
-  button.label = "Figure 17",
-  img.src = "fig/17_Domain_plot.png",
+  button.label = "Figure 22",
+  img.src = "fig/22_Domain_plot.png",
   fig.width = "100%",
   fig.cap = "The *Domain_plot* option is located in the *Two-way* tab in the left menu. Select the genes, one transcript per gene and their breakpoints manually (left side) to see the exons and protein domains of the fused transcripts (right side). Upstream gene: green; Downstream gene: orange"
 )
