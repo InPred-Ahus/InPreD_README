@@ -1178,12 +1178,18 @@ cl.categories <- add.cl.categories("file_manip", cl.categories)
 ```
 <br>
   
-## Transfer folders 
+## Transfer Reports (in TSD) to InPreD folder 
 
 <br>
 
   - Good. Now the results are complete and it is time to export them to another machine ([View UiO portal](https://view.uio.no/portal/webclient/#/home)) where the interpretation team can access the reports. We need the *Windows VM* to encrypt and compress the folders in the *.7z* format.
-  
+
+<br>
+
+### Encrypt folder with reports
+
+<br>
+
   - Switch to the Windows VM (*p1150-win02-pool*, Figure 12). The credential to log in are the same for *Ubunutu* and *Windows* VMs.
 
   - Go to the `durable/TSO500_export_for_interpretation/RECENT_RUN/` folder. Verify that there is one folder per sample and one folder for the predisposition table (Figure 13).
@@ -1248,7 +1254,7 @@ insert.fig.toggle(
 
 ```{r, echo=FALSE, eval = TRUE}
 cl.sections   <- add.cl.section("Switch to Windows VM", cl.sections)
-cl.categories <- add.cl.categories("file_manip", cl.categories)
+cl.categories <- add.cl.categories("setup", cl.categories)
 
 cl.sections   <- add.cl.section("Encrypt RECENT_RUN folder", cl.sections)
 cl.categories <- add.cl.categories("file_manip", cl.categories)
@@ -1256,10 +1262,91 @@ cl.categories <- add.cl.categories("file_manip", cl.categories)
 cl.sections   <- add.cl.section("Move RECENT_RUN.7z to file-export/ folder", cl.sections)
 cl.categories <- add.cl.categories("file_manip", cl.categories)
 ```
-  
-  - Log in into the [View UiO portal](https://view.uio.no/portal/webclient/#/home). You must write your *2FA* one time code and your password.
 
 <br>
+
+### Export Reports
+
+<br>
+
+  - Log in into the [View UiO portal](https://view.uio.no/portal/webclient/#/home). You must write your *2FA* one time code and your password.
+  
+  - Click on the *Kontor Fullskjerm* button. This will open a *Windows* machine (Figure 17).
+  
+  - Open an internet browser and open the [TSD Data Portal](https://data.tsd.usit.no/). Click on the *Export Files* button (Figure 18). Log in with your username, password and *2FA* code.
+  
+  - Click on the *RECENT_RUN.7z* file to download it. The file will be downloaded in the *Downloads* folder (Figure 19).
+  
+  - Move the *RECENT_RUN.7z* file from *Downloads* folder to `hypathia.uio.no/Ih-med-klinmed-ahus-inpred/InPreD`.
+  
+  - Right click on the *RECENT_RUN.7z* file, select the *7-Zip* tab and clcik on the *Pakk ut ...* option (Figure 20).
+  
+  - Write the decryption password (Figure 21).
+  
+```{r Kontor_Fullskjerm, echo=FALSE, results='asis'}
+insert.fig.toggle(
+  fig.id = "Kontor_Fullskjerm",
+  button.label = "Figure 17",
+  img.src = "fig/17_Kontor_Fullskjerm.png",
+  fig.width = "75%",
+  fig.cap = "Click on the Kontor Fullskjerm button. This will open a Windows machine"
+)
+```
+
+```{r Open_TSD, echo=FALSE, results='asis'}
+insert.fig.toggle(
+  fig.id = "Open_TSD",
+  button.label = "Figure 18",
+  img.src = "fig/18_Export_TSD.png",
+  fig.width = "75%",
+  fig.cap = "Open the TSD portal, click on the Export Data button"
+)
+```
+
+```{r download_7z, echo=FALSE, results='asis'}
+insert.fig.toggle(
+  fig.id = "download_7z",
+  button.label = "Figure 19",
+  img.src = "fig/19_Download_7z.png",
+  fig.width = "75%",
+  fig.cap = "Click on the RECENT_RUN.7z file to start the download"
+)
+```
+
+```{r recent_run_unpack, echo=FALSE, results='asis'}
+insert.fig.toggle(
+  fig.id = "recent_run_unpack",
+  button.label = "Figure 20",
+  img.src = "fig/20_Unpack_7z.png",
+  fig.width = "75%",
+  fig.cap = "Left click on the RECENT_RUN.7z file, select 7-Zip and Pakk ut option"
+)
+```
+
+```{r recent_run_unpack_pass, echo=FALSE, results='asis'}
+insert.fig.toggle(
+  fig.id = "recent_run_unpack_pass",
+  button.label = "Figure 21",
+  img.src = "fig/21_Unpack_7z_password.png",
+  fig.width = "75%",
+  fig.cap = "Write the decryption password and click on OK"
+)
+```
+
+```{r, echo=FALSE, eval = TRUE}
+cl.sections   <- add.cl.section("Open the View UiO Portal", cl.sections)
+cl.categories <- add.cl.categories("setup", cl.categories)
+
+cl.sections   <- add.cl.section("Download RECENT_RUN.7z from TSD Data Portal", cl.sections)
+cl.categories <- add.cl.categories("file_manip", cl.categories)
+
+cl.sections   <- add.cl.section("Move RECENT_RUN.7z to InPreD folder", cl.sections)
+cl.categories <- add.cl.categories("file_manip", cl.categories)
+
+cl.sections   <- add.cl.section("Decrypt RECENT_RUN.7z file", cl.sections)
+cl.categories <- add.cl.categories("file_manip", cl.categories)
+```
+
 <br>
 <br>
 <br>
@@ -1407,17 +1494,17 @@ Jaime
 
   - The run ID is in the name of the sequencing files and it is automatically generated from the sequencer.
   
-  - The run ID has the following format `YYMMDD_AAAAAAAA_BBBB_CCCCCCCCCC` (Figure 17). You can copy the prefix name (i.e., without the file extension) and save the content in the `$RUN_ID` variable.
+  - The run ID has the following format `YYMMDD_AAAAAAAA_BBBB_CCCCCCCCCC` (Figure 22). You can copy the prefix name (i.e., without the file extension) and save the content in the `$RUN_ID` variable.
   
-  - In Figure 17, `RUN_ID="250606_NB552811_0087_AH2T7NBGYX"`.
+  - In Figure 22, `RUN_ID="250606_NB552811_0087_AH2T7NBGYX"`.
 
 <br>
 
 ```{r find_runid, echo=FALSE, results='asis'}
 insert.fig.toggle(
   fig.id = "find_runid",
-  button.label = "Figure 17",
-  img.src = "fig/17_Find_run_ID.png",
+  button.label = "Figure 22",
+  img.src = "fig/22_Find_run_ID.png",
   fig.width = "95%",
   fig.cap = "The run ID is the prefix of the sequencing files, in this example, the file name without the *.md5* extension"
 )
@@ -1433,7 +1520,7 @@ insert.fig.toggle(
   
   - Go to the *FusViz* folder (`$DURABLE/software/fusviz`) and launch the image.
   
-  - Open the http link in a browser, in this example `http://127.0.0.1:5776`, (Figure 18).
+  - Open the http link in a browser, in this example `http://127.0.0.1:5776`, (Figure 23).
 
 ```{bash, echo=TRUE, eval = FALSE}
 # Launch image from fuzviz folder
@@ -1445,8 +1532,8 @@ singularity run fusviz_v1.0.0.sif 4000
 ```{r launch_fusviz, echo=FALSE, results='asis'}
 insert.fig.toggle(
   fig.id = "launch_fusviz",
-  button.label = "Figure 18",
-  img.src = "fig/18_Launch_fusviz_image.png",
+  button.label = "Figure 23",
+  img.src = "fig/23_Launch_fusviz_image.png",
   fig.width = "95%",
   fig.cap = "When launching the fusviz image, you will see the same text in the terminal"
 )
@@ -1454,13 +1541,13 @@ insert.fig.toggle(
 
 <br>
 
-  - Click On the *Home* tab (left-side). Select the genome *hg19 (offline)* and upload your text files with the SV details (Figure 19).
+  - Click On the *Home* tab (left-side). Select the genome *hg19 (offline)* and upload your text files with the SV details (Figure 24).
   
 ```{r load_SV, echo=FALSE, results='asis'}
 insert.fig.toggle(
   fig.id = "load_SV",
-  button.label = "Figure 19",
-  img.src = "fig/19_Load_SV_table.png",
+  button.label = "Figure 24",
+  img.src = "fig/24_Load_SV_table.png",
   fig.width = "100%",
   fig.cap = "Select genome and load SV table"
 )
@@ -1468,15 +1555,15 @@ insert.fig.toggle(
 
 <br>
 
-  - Click On the *Linear* tab (left-side). Click on the *Upload a file* button, and add the `hg19.fasta.fai`, `hg19.fasta`, and `cytoBand.txt`, all of them available in the *fusviz* folder `$DURABLE/software/fusviz` (Figure 20).
+  - Click On the *Linear* tab (left-side). Click on the *Upload a file* button, and add the `hg19.fasta.fai`, `hg19.fasta`, and `cytoBand.txt`, all of them available in the *fusviz* folder `$DURABLE/software/fusviz` (Figure 25).
   
   - Then click on the *Load gene track (offline)* button.
 
 ```{r load_genetrack, echo=FALSE, results='asis'}
 insert.fig.toggle(
   fig.id = "load_genetrack",
-  button.label = "Figure 20",
-  img.src = "fig/20_Load_genome.png",
+  button.label = "Figure 25",
+  img.src = "fig/25_Load_genome.png",
   fig.width = "100%",
   fig.cap = "Load hg19 fasta, index and cytoBand files"
 )
@@ -1486,7 +1573,7 @@ insert.fig.toggle(
   
   - Click On the *Two-way* tab (left-side). Now you will see three tabs in the top. Click on the *Overview_plot* button. 
   
-    - Manually select the two genes involved in the fusion and their breakpoints (position in the genome where the fusion occurred). These numbers are the same values provided in the SV table (Figure 21).
+    - Manually select the two genes involved in the fusion and their breakpoints (position in the genome where the fusion occurred). These numbers are the same values provided in the SV table (Figure 26).
     
     - You will see a plot in the right side with all the transcripts associated to each of the selected genes (upstream: green; downstream: orange), the location in their chromosomes and the parts of the transcript connected through the fusion.
     
@@ -1497,8 +1584,8 @@ insert.fig.toggle(
 ```{r overview_plot, echo=FALSE, results='asis'}
 insert.fig.toggle(
   fig.id = "overview_plot",
-  button.label = "Figure 21",
-  img.src = "fig/21_Overview_plot.png",
+  button.label = "Figure 26",
+  img.src = "fig/26_Overview_plot.png",
   fig.width = "100%",
   fig.cap = "The *Overview_plot* option is located in the *Two-way* tab in the left menu. Select the genes and their breakpoints manually (left side) to see the connected parts in the transcripts (right side). Upstream gene: green; Downstream gene: orange"
 )
@@ -1510,7 +1597,7 @@ insert.fig.toggle(
   
     - Manually select the two genes involved in the fusion, select one transcript for each gene and their breakpoints (position in the genome where the fusion occurred).
     
-    - You will see a plot in the right side with the exons and annotated protein domains across the selected transcripts (upstream: green; downstream: orange). The arrow connecting the two transcripts indicates the place where the fusion occurs (Figure 22).
+    - You will see a plot in the right side with the exons and annotated protein domains across the selected transcripts (upstream: green; downstream: orange). The arrow connecting the two transcripts indicates the place where the fusion occurs (Figure 27).
     
     - Click on the *Download plot* at the bottom to save the figure.
 
@@ -1519,8 +1606,8 @@ insert.fig.toggle(
 ```{r domain_plot, echo=FALSE, results='asis'}
 insert.fig.toggle(
   fig.id = "domain_plot",
-  button.label = "Figure 22",
-  img.src = "fig/22_Domain_plot.png",
+  button.label = "Figure 27",
+  img.src = "fig/27_Domain_plot.png",
   fig.width = "100%",
   fig.cap = "The *Domain_plot* option is located in the *Two-way* tab in the left menu. Select the genes, one transcript per gene and their breakpoints manually (left side) to see the exons and protein domains of the fused transcripts (right side). Upstream gene: green; Downstream gene: orange"
 )
@@ -1532,6 +1619,4 @@ insert.fig.toggle(
 
   - gpg --import /tsd/p1150/data/durable/gpg-keys/p1150-key1@tsd.usit.no-private-key.asc
   - Check which samplesheet has the invisible character
-  - Add figure about How to get the sequence ID ?
-  - SampleSheet_YYMMDD_info.csv ? Is this automatically generated or imported?
   - What does adapt TSOPII table if needed?
