@@ -271,9 +271,9 @@ cd /ess/p1150/data/durable
 
 <br>
 
-  - Before launching the pipeline, we must generate the SampleSheet and *PRONTO* metadata from the [View UiO TSD portal](https://view.uio.no/portal/webclient/#/home). Note that this is a *Windows* VM.
+  - Before launching the pipeline, we must generate the SampleSheet and *PRONTO* metadata from the [View UiO portal](https://view.uio.no/portal/webclient/#/home). Note that this is a *Windows* VM.
 
-  - Log in into the [View UiO TSD portal](https://view.uio.no/portal/webclient/#/home). You must write your *2FA* one time code and your password.
+  - Log in into the [View UiO portal](https://view.uio.no/portal/webclient/#/home). You must write your *2FA* one time code and your password.
   
   - Click on *Windows icon* -> *This PC* -> *Hypathia.uio.no* (Figure 3).
   
@@ -1178,10 +1178,60 @@ cl.categories <- add.cl.categories("file_manip", cl.categories)
 ```
 <br>
   
-## Transfer folders
+## Transfer folders 
 
 <br>
 
+  - Good. Now the results are complete and it is time to export them to another machine ([View UiO portal](https://view.uio.no/portal/webclient/#/home)) where the interpretation team can access the reports. We need the *Windows VM* to encrypt and compress the folders in the *.7z* format.
+  
+  - Switch to the Windows VM (*p1150-win02-pool*, Figure 12). The credential to log in are the same for *Ubunutu* and *Windows* VMs.
+
+  - Go to the `durable/TSO500_export_for_interpretation/RECENT_RUN/` folder. Verify that there is one folder per sample and one folder for the predisposition table (Figure 13).
+
+```{r switch_VM, echo=FALSE, results='asis'}
+insert.fig.toggle(
+  fig.id = "switch_VM",
+  button.label = "Figure 12",
+  img.src = "fig/12_switch_VM.png",
+  fig.width = "95%",
+  fig.cap = "Switch to the Windows VM"
+)
+```
+
+```{r recent_run, echo=FALSE, results='asis'}
+insert.fig.toggle(
+  fig.id = "recent_run",
+  button.label = "Figure 13",
+  img.src = "fig/13_Recent_run.png",
+  fig.width = "75%",
+  fig.cap = "Verify RECENT_RUN content: one folder per sample and predisposition tables folder"
+)
+```
+
+<br>
+
+  - Move to one folder above `durable/TSO500_export_for_interpretation/` and left click on the `RECENT_RUN` folder. Select the *7-Zip* tab and click on the *Legg til arkiv ...* option (Figure 14).
+
+```{r recent_run_7z, echo=FALSE, results='asis'}
+insert.fig.toggle(
+  fig.id = "recent_run_7z",
+  button.label = "Figure 14",
+  img.src = "fig/14_Recent_run_7z.png",
+  fig.width = "75%",
+  fig.cap = "Encrypt the RECENT_RUN folder"
+)
+```
+
+```{r, echo=FALSE, eval = TRUE}
+cl.sections   <- add.cl.section("Switch to Windows VM", cl.sections)
+cl.categories <- add.cl.categories("file_manip", cl.categories)
+
+cl.sections   <- add.cl.section("Encrypt RECENT_RUN folder", cl.sections)
+cl.categories <- add.cl.categories("file_manip", cl.categories)
+```
+  
+  - Log in into the [View UiO portal](https://view.uio.no/portal/webclient/#/home). You must write your *2FA* one time code and your password.
+  
   - AQUI
   - Move old folders to the respective section
   - Move folders of seq ID to RECEN_RUN
