@@ -1131,7 +1131,7 @@ cl.categories <- add.cl.categories("file_manip", cl.categories)
 
   - Launch the command to generate the *PRONTO* reports.
 
-`r emo::ji("hourglass_flowing_sand")` Running time: ~3 minutes per sample.
+`r emo::ji("hourglass_flowing_sand")` Running time: ~3-5 minutes per sample.
 
 <br>
 
@@ -1196,11 +1196,13 @@ cl.categories <- add.cl.categories("file_manip", cl.categories)
 
 <br>
   
-## Transfer Reports (in TSD) to InPreD folder 
+## Transfer Reports (in TSD) to InPreD/MMOX folder 
 
 <br>
 
   - Good. Now the results are complete and it is time to export them to another machine ([View UiO portal](https://view.uio.no/portal/webclient/#/home)) where the interpretation team can access the reports. We need the *Windows VM* to encrypt and compress the folders in the *.7z* format.
+  
+  - Here we show an example for the InPreD reports. We do exactly the same for *MMOX* samples, except the *.7z* file is located at the *MMOX* folder (instead of the *InPreD* folder, both folders are located in the same path).
 
 <br>
 
