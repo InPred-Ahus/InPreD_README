@@ -90,7 +90,6 @@ make_prepender <- function(prefix_name) {
   }
 }
 
-
 add.cl.section    <- make_prepender("section")
 add.cl.categories <- make_prepender("category")
 ```
@@ -1424,7 +1423,7 @@ html.output <- generate_checklist_html(checklist  = rev(cl.sections),
                                        categories = rev(cl.categories))
 
 # Placeholder list
-checklist.terms[['--runID--']] <- date.checklist
+checklist.terms[['--runID--']] <- run.id
 checklist.terms[['--checklist_buttons--']] <- html.output
 
 
@@ -1433,7 +1432,7 @@ template.to.fill   <- readLines(checklist.ready.file)
 
 for (t in names(checklist.terms)) {
   
-  template.to.fill <- gsub(x          = template.to.fill,
+  template.to.fill <- gsub(x           = template.to.fill,
                            pattern     = t,
                            replacement = checklist.terms[[t]],
                            ignore.case = T, perl = T)
