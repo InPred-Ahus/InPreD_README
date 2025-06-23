@@ -29,7 +29,7 @@ run.id          <- NULL
 
 
 # Force user to define a Run ID
-run.id <- "250620_AAAAAAAA_BBBB_CCCCCCCCCC" # "250606_AAAAAAAA_BBBB_CCCCCCCCCC"
+run.id <- "250619_NB552811_0098_AH77MLBGYX" # "250606_AAAAAAAA_BBBB_CCCCCCCCCC"
 if (is.null(run.id)){
   stop("run.id cannot be NULL")
 }
@@ -204,20 +204,20 @@ cd /ess/p1150/data/durable
 
 <br>
 
-  - **`TSO500_SampleSheets/`** : in this folder we place the Sample sheet files (see Step X) generated in every sequence run. Every sequence run should have three associated files. 
+  - **`TSO500_SampleSheets/`** : in this folder we place the Sample sheet files (see *Prepare sequences and metadata* section) generated in each sequence run. Every sequence run should have three associated files. 
     - ``r paste0(run.date, "_info.csv")`` : Original Samplesheet (for this run ID). Taken from `file-import/` folder, do not modify this file.
     - ``r paste0(run.date, "_info_TSOPPI.csv")`` : Copy of the original Samplesheet, it may be modified. This copy is required by *TSOPPI*, may contain samples from many run IDs or commented samples.
     - ``r paste0(run.id, ".csv")`` : Curated Samplesheet.
 
 <br>
 
-  - **`/TSO500_pronto_metadata/`** : in this folder we place the metadata tables (original and in an encrypted version; see Step X). Every sequence run should have two associated files. 
+  - **`/TSO500_pronto_metadata/`** : in this folder we place the metadata tables (original and in an encrypted version; see *Prepare sequences and metadata* section). Every sequence run should have two associated files. 
     - ``r paste0("PRONTO_metadata_", run.date, ".txt")`` : Original metadata table. 
     - ``r paste0("PRONTO_metadata_", run.date, ".7z")`` : Compressed and encrypted table.
 
 <br>
 
-  - **`TSO500_sequences/`** : in this folder we place the sequence files (see Step X) generated in every run. Every sequence run should have two associated files. 
+  - **`TSO500_sequences/`** : in this folder we place the sequence files (see *Prepare sequences and metadata* section) generated in every run. Every sequence run should have two associated files. 
     - ``r paste0(run.id, "/")`` : Folder with sequences. 
     - ``r paste0(run.id, ".md5")`` : File with checksums.
 
@@ -815,10 +815,16 @@ ALL_SEQUENCING_RUN_IDs+=( "250515_AAAAAAAA_BBBB_CCCCCCCCCC" )
   - **NOTE**: originally this step was done manually, now we added the code below to do it automatically.
 
 ```{bash, echo=TRUE, eval = FALSE}
-ALL_RUN_IDs="${PIPELINE_FOLDER}/all_sequencing_runs.sh"
+ALL_RUN_IDS="${PIPELINE_FOLDER}/all_sequencing_runs.sh"
 
 # Backup copy
-cp $ALL_RUN_IDS ${ALL_RUN_IDS}.bk
+cp "$ALL_RUN_IDS" "${ALL_RUN_IDS}.bk"
+
+# Ensure RUN_ID is not empty
+if [[ -z "$RUN_ID" ]]; then
+    echo "Error: RUN_ID is empty"
+    exit 1
+fi
 
 # Check if the RUN_ID is already present
 if grep -qF "$RUN_ID" "$ALL_RUN_IDS"; then
@@ -826,16 +832,23 @@ if grep -qF "$RUN_ID" "$ALL_RUN_IDS"; then
 else
     # Insert RUN_ID after the initialization line
     TEMP_FILE=$(mktemp)
-    insert_line='ALL_SEQUENCING_RUN_IDs+=( "'"$RUN_ID"'" )'
+    insert_line='ALL_SEQUENCING_RUN_IDS+=( "'"$RUN_ID"'" )'
 
     awk -v line="$insert_line" '
-        $0 ~ /^ALL_SEQUENCING_RUN_IDs=\(\)/ {
+        $0 ~ /^ALL_SEQUENCING_RUN_IDS[[:space:]]*=\(\)/ {
             print
             print line
             next
         }
         { print }
     ' "$ALL_RUN_IDS" > "$TEMP_FILE" && mv "$TEMP_FILE" "$ALL_RUN_IDS"
+
+    # Verify insertion
+    if grep -qF "$RUN_ID" "$ALL_RUN_IDS"; then
+        echo "RUN_ID successfully added to $ALL_RUN_IDS"
+    else
+        echo "Failed to add RUN_ID to $ALL_RUN_IDS"
+    fi
 fi
 ```
 
@@ -909,7 +922,7 @@ SAMPLE_IDs=( "SAMPLE1" "SAMPLE_2" ... "SAMPLE_3" )
 
 ```{bash, echo=TRUE, eval = FALSE}
 # Get sample IDs from SampleSheet
-DNA_TUMOUR_SAMPLE_IDS=$(cut -d',' -f1 ${SAMPLESHEETS_FOLDER}/${INFO_FILE_NAME} | awk -F'-' '$2 == "D01"')
+DNA_TUMOUR_SAMPLE_IDS=$(cut -d';' -f1 ${SAMPLESHEETS_FOLDER}/${INFO_FILE_NAME} | awk -F'-' '$2 == "D01"')
 #DNA_TUMOUR_SAMPLE_IDS=$(cut -d',' -f1 samples.txt | awk -F'-' 'tolower($2) == "d01"') # Case insensitive alternative
 
 # Build array declaration string
@@ -1157,16 +1170,21 @@ cl.categories <- add.cl.categories("file_manip", cl.categories)
   
 ### Prepare predisposition tables
 
-  - To be added
+<br>
+
+  - Collect all predisposition tables in a single folder. These tables will be encrypted and exported with all the reports.
 
 ```{bash, echo=TRUE, eval = FALSE}
 # Create directory 
 PRED_TABLES="${DURABLE}/TSO500_export_for_interpretation/RECENT_RUN/predisposition_tables"
 mkdir -p ${PRED_TABLES}
 
+# 
 ls ${DURABLE}/TSO500_postprocessing/${RUN_ID}_TSOPPI_v0.3.2_main_2022_06_07/*/*_predisposition_gene_variant_table_tumor_RNA.tsv | while IFS= read -r file; do
   cp "$file" ${PRED_TABLES}/
 done
+
+ls ${PRED_TABLES}
 ```
 
 ```{r, echo=FALSE, eval = TRUE}
@@ -1176,6 +1194,7 @@ cl.categories <- add.cl.categories("file_manip", cl.categories)
 cl.sections   <- add.cl.section("Copy predisposition tables", cl.sections)
 cl.categories <- add.cl.categories("file_manip", cl.categories)
 ```
+
 <br>
   
 ## Transfer Reports (in TSD) to InPreD folder 
