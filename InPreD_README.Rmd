@@ -1129,6 +1129,8 @@ cl.categories <- add.cl.categories("file_manip", cl.categories)
 
 <br>
 
+  - Remove the content of the `RECENT_RUN` folder.
+  
   - Launch the command to generate the *PRONTO* reports.
 
 `r emo::ji("hourglass_flowing_sand")` Running time: ~3-5 minutes per sample.
@@ -1136,6 +1138,9 @@ cl.categories <- add.cl.categories("file_manip", cl.categories)
 <br>
 
 ```{bash, echo=TRUE, eval = FALSE}
+# Remove the content of RECEN_RUN folder
+rm -rf ${DURABLE}/TSO500_export_for_interpretation/RECEN_RUN/*
+
 for SAMPLE_ID in ${SAMPLE_IDs[@]}
 do
       echo "SAMPLE_ID=${SAMPLE_ID}"
@@ -1158,6 +1163,9 @@ cp -a config.sh ${SCRIPTS_AND_LOGS_FOLDER}/03_config.sh
 ```
 
 ```{r, echo=FALSE, eval = TRUE}
+cl.sections   <- add.cl.section("Remove the content of RECEN_RUN folder", cl.sections)
+cl.categories <- add.cl.categories("file_manip", cl.categories)
+
 cl.sections   <- add.cl.section("Generate reports with PRONTO (03)", cl.sections)
 cl.categories <- add.cl.categories("analysis", cl.categories)
 
@@ -1491,9 +1499,11 @@ Jaime
 <br>
 
 ```
+Title: Bioinformatic analysis week WW
+
 Dear all, 
 
-The reports and all the related data are now available in the //hypatia/InPred folder. We have sequenced and processed N IPA cases (N1_ID, N2_ID, ... ,NN_ID ). 
+The reports and all the related data are now available in the InPred folder. We have sequenced and processed N IPA cases (IPA0, IPA0, IPA0 ). 
 
 Sequencing went fine. No ctDNA data. 
 
