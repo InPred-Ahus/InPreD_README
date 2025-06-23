@@ -106,17 +106,21 @@
   /* Customize legend */
   /* ---------------- */
   
-  .legend {
-    position: fixed;
-    top: 50%;
-    left: 13rem; /* adjust for padding from left */
-    transform: translateY(-50%);
-    background: var(--card-bg);
-    padding: 1rem;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    z-index: 1000; /* ensure it stays above other elements */
-  }
+.legend {
+  position: fixed;
+  top: 50%;
+  left: 150px;
+  transform: translateY(-50%);
+  min-width: 250px;
+  background: white;
+  padding: 1rem;
+  border-radius: 15px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  font-family: sans-serif;
+}
+
+
 
   
   .legend-item {
@@ -215,19 +219,52 @@
     background: #574dff;        /* slightly darker accent */
   }
 
+
+  /* ------------ */
+  /* Progress bar */
+  /* ------------ */
+  
+  .progress-container {
+    width: 100%;
+    height: 20px;
+    background-color: #e0e0e0;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 1rem;
+  }
+  
+  .progress-bar {
+    height: 100%;
+    width: 0%;
+    background-color: var(--accent);
+    transition: width 0.3s ease;
+  }
+  
+  .progress-text {
+    text-align: right;
+    font-size: 0.9rem;
+    color: var(--muted);
+    margin-bottom: 1.5rem;
+    font-family: 'Roboto Mono', monospace;
+  }
+
   </style>
 </head>
 <body>
 
-  <div class="legend">
-    <div class="legend-item"><span class="color-box prepare_pipeline"></span> Prepare Pipeline</div>
-    <div class="legend-item"><span class="color-box setup"></span> Setup</div>
-    <div class="legend-item"><span class="color-box file_manip"></span> File manipulation</div>
-    <div class="legend-item"><span class="color-box analysis"></span> Launch analysis</div>
-    <div class="legend-item"><span class="color-box important"></span> Important</div>
-    <div class="legend-item"><span class="color-box email"></span> Send Email</div>  
-
+<div class="legend">
+  <div class="progress-container">
+    <div class="progress-bar" id="progressBar"></div>
   </div>
+  <div class="progress-text" id="progressText">0% completed</div>
+
+  <div class="legend-item"><span class="color-box prepare_pipeline"></span> Prepare Pipeline</div>
+  <div class="legend-item"><span class="color-box setup"></span> Setup</div>
+  <div class="legend-item"><span class="color-box file_manip"></span> File manipulation</div>
+  <div class="legend-item"><span class="color-box analysis"></span> Launch analysis</div>
+  <div class="legend-item"><span class="color-box important"></span> Important</div>
+  <div class="legend-item"><span class="color-box email"></span> Send Email</div>
+</div>
   
   <div class="checklist-container">
 
@@ -254,8 +291,20 @@
 
   const makeKey = id => `${runID}_${id}`;
 
+  const checkboxes = document.querySelectorAll('.checklist-item input[type="checkbox"]');
+  const progressBar = document.getElementById('progressBar');
+  const progressText = document.getElementById('progressText');
+
+  function updateProgress() {
+    const total = checkboxes.length;
+    const checked = Array.from(checkboxes).filter(cb => cb.checked).length;
+    const percent = total === 0 ? 0 : Math.round((checked / total) * 100);
+    progressBar.style.width = `${percent}%`;
+    progressText.textContent = `${percent}% completed`;
+  }
+
   // Initialize checklist
-  document.querySelectorAll('.checklist-item input[type="checkbox"]').forEach((checkbox) => {
+  checkboxes.forEach((checkbox) => {
     const id = checkbox.id;
     const saved = localStorage.getItem(makeKey(id));
 
@@ -267,17 +316,22 @@
     checkbox.addEventListener('change', () => {
       localStorage.setItem(makeKey(id), checkbox.checked);
       checkbox.parentElement.classList.toggle("checked", checkbox.checked);
+      updateProgress();
     });
   });
 
   // Reset button logic
   document.getElementById('resetBtn')?.addEventListener('click', () => {
-    document.querySelectorAll('.checklist-item input[type="checkbox"]').forEach((checkbox) => {
+    checkboxes.forEach((checkbox) => {
       localStorage.removeItem(makeKey(checkbox.id));
       checkbox.checked = false;
       checkbox.parentElement.classList.remove("checked");
     });
+    updateProgress();
   });
+
+  // Call once on load to reflect saved state
+  updateProgress();
 </script>
 
 
