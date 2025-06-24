@@ -106,18 +106,12 @@ def parse_fusion_info(fusion_str):
     return gene1, chrom1, pos1, gene2, chrom2, pos2
 
 
-def read_tsv_ignore_comments(path):
-    with open(path, 'r') as f:
-        lines = [line for line in f if not line.startswith('#')]
-    return pl.read_csv(
-        source=lines,
-        separator="\t"
-    )
-
-
-def main(summary_file, sample_mut_file, output_file):
-    
-    # Read files with comment lines skipped
+def process_mutation_summary(summary_file : pl.dataframe = None) -> pl.DataFrame:
+    """
+    Process the summary mutation file and sample mutation file to create a TSV output.
+    """
+     
+    # Read summary mutations
     print(f"; Reading summary mutation table")
     summary = pl.read_csv(summary_file, separator="\t", comment_prefix='#')
 
@@ -125,11 +119,20 @@ def main(summary_file, sample_mut_file, output_file):
     required_columns = ["sample_id", "fusions"]
     columns_exist(summary, required_columns, label="Summary mutations")
     column_noempty(summary, "fusions")
-    
+     
     # Explode the 'fusions' column to separate rows
     print(f"; Exploding 'fusions' column")
     summary = separate_columns(summary, sep="|", colname="fusions")
-    print(summary)
+
+    return summary
+
+
+
+def main(summary_file, sample_mut_file, output_file):
+
+    # Process the summary mutation file
+    summary_df = process_mutation_summary(summary_file)
+    print(summary_df)
     
     
 
