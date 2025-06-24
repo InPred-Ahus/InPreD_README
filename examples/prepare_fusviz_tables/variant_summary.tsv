@@ -1,6 +1,9 @@
-#	Line	1			
-#	Line	2			
-#	Line	3			
-sample_id	TBM	MSI	gene_amplifications	splice_variants	fusions
-Sample1	1.6 (2)	0.94 (1/106)	EGFR (1.467)|BRCA2 (1.712)	NA	NRG1/ATP1B1 (chr8:32474403-chr1:169080608)7/870/231
-Sample2	2.4 (3)	3.36 (4/119)	MYC (3.878)	NA	FGFR3-IGF2 (chr3:1809089-chr11:2153330)7/1020/164
+# Field formats:					
+# - TMB: TMB (elligible_variants)					
+# - MSI: percentage_of_unstable_MSI_sites (unstable_MSI_site_count/usable_MSI_site_count)					
+# - gene_amplifications: gene (fold_change)					
+# - splice_variants: gene[affected_exon] (breakpoint_gene_1-breakpoint_gene_2) splice_supporting_reads/reference_reads					
+# - fusions: gene_1-gene_2 (breakpoint_gene_1-breakpoint_gene_2) fusion_supporting_reads/ref_reads_gene_1/ref_reads_gene_2					
+sample_id	TMB	MSI	gene_amplifications	splice_variants	fusions
+sample1	NA	NA	NA	NA	ATP1B1-NRG1 (chr1:169080734-chr8:32453344) 2152/3/896|NRG1/ATP1B1 (chr8:32474403-chr1:169080608) 34/1543/315
+sample2	NA	NA	NA	NA	ETV5-AE000661.37 (chr3:185775211-chr14:22927117) 120/5063/0
