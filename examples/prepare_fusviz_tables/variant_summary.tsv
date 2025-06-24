@@ -1,0 +1,6 @@
+#	Line	1			
+#	Line	2			
+#	Line	3			
+sample_id	TBM	MSI	gene_amplifications	splice_variants	fusions
+Sample1	1.6 (2)	0.94 (1/106)	EGFR (1.467)|BRCA2 (1.712)	NA	NRG1/ATP1B1 (chr8:32474403-chr1:169080608)7/870/231
+Sample2	2.4 (3)	3.36 (4/119)	MYC (3.878)	NA	FGFR3-IGF2 (chr3:1809089-chr11:2153330)7/1020/164
