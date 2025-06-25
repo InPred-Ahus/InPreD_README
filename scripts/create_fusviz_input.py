@@ -317,8 +317,6 @@ def main(summary_file, sample_mut_file, gene_coord, output_file):
                                     pl.lit("").alias("untemplated_insert"),  # Default untemplated insert
                                     pl.lit("").alias("comment")  # Default comment
                                 ]))
-    print(fusions2export)
-
 
     # Read hg19 protein coding gene table
     hg19_genes = (pl.read_csv(gene_coord, separator="\t")
@@ -335,6 +333,7 @@ def main(summary_file, sample_mut_file, gene_coord, output_file):
 
     # Create DataFrame and write to TSV
     fusions2export.write_csv(output_file, separator="\t")
+    print(fusions2export)
 
 
 
