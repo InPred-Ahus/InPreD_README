@@ -1,0 +1,8 @@
+[project]
+name = "create_fusviz_input"
+version = "0.1.0"
+dependencies = ["polars"]
+
+[build-system]
+requires = ["uv"]
+build-backend = "uv"
