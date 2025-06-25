@@ -199,8 +199,11 @@ def process_mutation_summary(summary_file : pl.dataframe = None) -> pl.DataFrame
     print(f"; Exploding 'fusions' column")
     summary = sep_columns_v(summary, sep="|", colname="fusions")
 
+    # Split the 'fusions' column into multiple columns (genes and coordinates)
+    summary = sep_columns_h(summary, "fusions", delim=" ", keep_column=False, new_cols = ["name", "coord", "other"])
+
     # Select relevant columns
-    summary = summary.select(['sample_id', 'fusions'])
+    summary = summary.select(['sample_id', "name", "coord"])
     return summary
 
 
@@ -281,78 +284,63 @@ def process_mutation_samples(mut_file : str = None) -> pl.DataFrame:
 
 
 
-def main(summary_file, sample_mut_file, output_file):
+def main(summary_file, sample_mut_file, gene_coord, output_file):
 
     # Process the summary mutation file
     summary_df = process_mutation_summary(summary_file)
-    print(summary_df)
+    #print(summary_df)
 
     # Process the sample mutation file
     samples_df = process_mutation_samples(sample_mut_file)
-    print(samples_df)
+    #print(samples_df)
 
-    df = pl.from_repr("""
-    ┌───────────┐
-    │ data      │
-    │ ---       │
-    │ str       │
-    ╞═══════════╡
-    │ apple:23  │
-    │ orange:24 │
-    │ red:25    │
-    └───────────┘
-    """)
+    # Join the summary with the sample mutations
+    fusions2export = (summary_df.join( samples_df,
+                                      left_on  = "coord",
+                                      right_on = "coord",
+                                      how      = "inner")
+                                .select([
+                                    pl.col("chrom1"),
+                                    pl.col("pos1"),
+                                    pl.col("gene1"),
+                                    pl.col("chrom2"),
+                                    pl.col("pos2"),
+                                    pl.col("gene2"),
+                                    pl.col("name"),
+                                    pl.col("split"),
+                                    pl.col("span"),
+                                    pl.lit(".").alias("strand1"),  # Default strand direction
+                                    pl.lit(".").alias("strand2"),  # Default strand direction
+                                    pl.lit("").alias("untemplated_insert"),  # Default untemplated insert
+                                    pl.lit("").alias("comment")  # Default comment
+                                ]))
+    print(fusions2export)
 
-    print(sep_columns_h(df, "data", delim=":", keep_column=False))
+
+    # Read hg19 protein coding gene table
+    hg19_genes = (pl.read_csv(gene_coord, separator="\t")
+                    .select([ pl.col("hgnc_symbol").alias("gene_name"),
+                              pl.col("strand")])
+                    .unique()
+                 )
+    hg19_genes = dict(hg19_genes.select("gene_name", "strand").iter_rows())
 
 
-    # rows = []
+    fusions2export = fusions2export.with_columns( pl.col("gene1").map_elements(lambda g: hg19_genes.get(g), return_dtype=pl.String).alias("strand1"),
+                                                  pl.col("gene2").map_elements(lambda g: hg19_genes.get(g), return_dtype=pl.String).alias("strand2")
+    )
 
-    # for row in summary.iter_rows(named=True):
-    #     sample_id = row["sample_id"]
-    #     fusion_str = row["fusions"]
+    # Create DataFrame and write to TSV
+    fusions2export.write_csv(output_file, separator="\t")
 
-    #     if not fusion_str or fusion_str.strip().lower() == "na":
-    #         continue
-
-    #     gene1, chrom1, pos1, gene2, chrom2, pos2 = parse_fusion_info(fusion_str)
-
-    #     # Find corresponding row in sample mutations
-    #     sample_row = samples.filter(pl.col("Sample_ID") == sample_id)
-    #     if sample_row.is_empty():
-    #         continue
-
-    #     sample_row = sample_row[0]
-    #     split = sample_row.get("Alt_Split_Dedup", 0)
-    #     span = sample_row.get("Alt_Paired_Dedup", 0)
-
-    #     rows.append({
-    #         "chrom1": chrom1,
-    #         "pos1": pos1,
-    #         "gene1": gene1,
-    #         "chrom2": chrom2,
-    #         "pos2": pos2,
-    #         "gene2": gene2,
-    #         "name": sample_id,
-    #         "split": split,
-    #         "span": span,
-    #         "strand1": "+",
-    #         "strand2": "+",
-    #         "untemplated_insert": ".",
-    #         "comment": "."
-    #     })
-
-    # # Create DataFrame and write to TSV
-    # df_out = pl.DataFrame(rows)
-    # df_out.write_csv(output_file, separator="\t")
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Generate SV summary TSV file.")
     parser.add_argument("summary_file", help="Path to summary mutations file")
     parser.add_argument("sample_mut_file", help="Path to sample mutations file")
+    parser.add_argument("gene_coord", help="Path to sample mutations file")
     parser.add_argument("-o", "--output", default="output.tsv", help="Output TSV file name")
 
     args = parser.parse_args()
-    main(args.summary_file, args.sample_mut_file, args.output)
-
+    main(args.summary_file, args.sample_mut_file, args.gene_coord, args.output)
