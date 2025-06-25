@@ -1650,3 +1650,13 @@ insert.fig.toggle(
   - gpg --import /tsd/p1150/data/durable/gpg-keys/p1150-key1@tsd.usit.no-private-key.asc
   - Check which samplesheet has the invisible character
   - What does adapt TSOPII table if needed?
+
+
+
+<!-- 
+
+sudo apptainer build create_fusviz_input.sif Singularity
+
+singularity run create_fusviz_input.sif -s ../../examples/prepare_fusviz_tables/variant_summary.tsv -m ../../examples/prepare_fusviz_tables/sample1_fusion_and_splice_variant_candidates.tsv -o TEST.txt 
+
+-->
