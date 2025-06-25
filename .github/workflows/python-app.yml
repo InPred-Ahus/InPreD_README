@@ -50,6 +50,6 @@ jobs:
       run: |
         python3 scripts/create_fusviz_input.py                                             \
         -s examples/prepare_fusviz_tables/variant_summary.tsv                              \
-        -m examples/prepare_fusviz_tables/sample2_fusion_and_splice_variant_candidates.tsv \
+        -m examples/prepare_fusviz_tables/sample1_fusion_and_splice_variant_candidates.tsv \
         -g examples/prepare_fusviz_tables/pcg_hg19.tab                                     \
         -o examples/prepare_fusviz_tables/sample1_fusviz.txt ;
