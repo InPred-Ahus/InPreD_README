@@ -4,6 +4,9 @@ import re
 import sys
 from typing import List
 
+# For the moment we are using a file with the protein coding genes in hg19.
+# Note that it may be extended to include other type og genes such as lncRNA, miRNA, etc.
+
 
 # ------------------------------ #
 # Utilities and helper functions #
@@ -337,10 +340,10 @@ def main(summary_file, sample_mut_file, gene_coord, output_file):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Generate SV summary TSV file.")
-    parser.add_argument("summary_file", help="Path to summary mutations file")
-    parser.add_argument("sample_mut_file", help="Path to sample mutations file")
-    parser.add_argument("gene_coord", help="Path to sample mutations file")
-    parser.add_argument("-o", "--output", default="output.tsv", help="Output TSV file name")
+    parser.add_argument("-s", "--summary_file", required=True, help="Path to summary mutations file")
+    parser.add_argument("-m", "--sample_mut_file", required=True, help="Path to sample mutations file")
+    parser.add_argument("-g", "--gene_coord", required=True, help="Path to gene coordinate file")
+    parser.add_argument("-o", "--output", default="output.tsv", help="Output TSV file name (default: output.tsv)")
 
     args = parser.parse_args()
     main(args.summary_file, args.sample_mut_file, args.gene_coord, args.output)
