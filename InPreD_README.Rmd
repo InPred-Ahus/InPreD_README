@@ -1571,7 +1571,7 @@ insert.fig.toggle(
 
 <br>
 
-  - Click On the *Home* tab (left-side). Select the genome *hg19 (offline)* and upload your text files with the SV details (Figure 24).
+  - Click On the *Home* tab (left-side). Select the genome *hg19 (offline)* and upload your text files with the SV details (Figure 24). See question 3 to know how to get the SV tables.
   
 ```{r load_SV, echo=FALSE, results='asis'}
 insert.fig.toggle(
@@ -1640,6 +1640,55 @@ insert.fig.toggle(
   img.src = "fig/27_Domain_plot.png",
   fig.width = "100%",
   fig.cap = "The *Domain_plot* option is located in the *Two-way* tab in the left menu. Select the genes, one transcript per gene and their breakpoints manually (left side) to see the exons and protein domains of the fused transcripts (right side). Upstream gene: green; Downstream gene: orange"
+)
+```
+
+<br>
+
+### 3. How to generate the input tables for *FusViz* ?
+
+<br>
+
+*FusViz* requires as input a table with the information of the genes involved in the fusion (gene name, chromosome, position, strand and number of reads supporting the fusion; see [FusViz documentation](https://fusviz-docs.readthedocs.io/en/master/Input.html#input-source-and-format) for a detailed explanation).
+  
+We have created a ready-to-use *image* to generate the input required by *FusViz* from the mutations detected in the pipeline. In a nutshell: it verifies the directionality of the fusion by detecting the upstream gene, then search the genes strands and report the aligned and discordant reads supporting the fusion event.
+
+  - Open a new terminal, but do not acces to the `Colossus` server.
+  
+  - Go to the *create_fusviz_input* folder (`$DURABLE/software/fusviz/create_fusviz_input`) and launch the image.
+  
+  - Launch the image with the following code. The programs require the following files located in the `${DURABLE}/TSO500_postprocessing/${RUN_ID}_TSO500_TSOPPI_v0.3.2_main_2022_06_07` folder..
+  
+    - Variant summary table: this file contains the splice and fusion variants for all the samples in the run.
+    
+    - Splice and fusion sample: this file contains the splice and fusion variants for a particular sample, this also contains the number of aligned and discordant reads supporting the fusion events. 
+
+```{bash, echo=TRUE, eval = FALSE}
+# Launch image from create_fusviz_input folder
+cd $DURABLE/software/fusviz/create_fusviz_input
+
+EXAMPLE_RUN_ID="250619_NB552811_0098_AH77MLBGYX"
+EXAMPLE_SAMPLE_ID_DNA="IPA0492-D01-p01-A15"
+EXAMPLE_SAMPLE_ID_RNA="IPA0492-R03-p01-A15"
+TSOPPI_EXAMPLE_RESULTS="${DURABLE}/TSO500_postprocessing/${EXAMPLE_RUN_ID}_TSOPPI_v0.3.2_main_2022_06_07"
+
+singularity run                                                                \
+  -B ${TSOPPI_EXAMPLE_RESULTS}:/summary                                        \
+  -B ${TSOPPI_EXAMPLE_RESULTS}/${EXAMPLE_SAMPLE_ID_DNA}:/sample                \
+  create_fusviz_input.sif                                                      \
+  -s /summary/${EXAMPLE_RUN_ID}_variant_summary.tsv                            \
+  -m /sample/${EXAMPLE_SAMPLE_ID_RNA}_fusion_and_splice_variant_candidates.tsv \
+  -o ${EXAMPLE_SAMPLE_ID_DNA}_fusviz.txt ;
+```
+
+
+```{r fusviz_SV, echo=FALSE, results='asis'}
+insert.fig.toggle(
+  fig.id = "fusviz_SV",
+  button.label = "Figure 28",
+  img.src = "fig/28_fusviz_SV.png",
+  fig.width = "100%",
+  fig.cap = "Example to run the create_fusviz_input image to create the input table required by fusviz. The second printed table is the fusviz input file"
 )
 ```
 
