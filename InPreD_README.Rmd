@@ -1667,9 +1667,12 @@ We have created a ready-to-use *image* to generate the input required by *FusViz
 # Launch image from create_fusviz_input folder
 cd $DURABLE/software/fusviz/create_fusviz_input
 
+# Replace RUN ID and SAMPLE_ID values
 EXAMPLE_RUN_ID="250619_NB552811_0098_AH77MLBGYX"
 EXAMPLE_SAMPLE_ID_DNA="IPA0492-D01-p01-A15"
-EXAMPLE_SAMPLE_ID_RNA="IPA0492-R03-p01-A15"
+
+EXAMPLE_SAMPLE_ID_RNA="${EXAMPLE_SAMPLE_ID_DNA/-D01-/-R03-}"
+EXAMPLE_SAMPLE_ID_RNA="${EXAMPLE_SAMPLE_ID_RNA/DNA/RNA}"
 TSOPPI_EXAMPLE_RESULTS="${DURABLE}/TSO500_postprocessing/${EXAMPLE_RUN_ID}_TSOPPI_v0.3.2_main_2022_06_07"
 
 singularity run                                                                \
@@ -1699,9 +1702,7 @@ insert.fig.toggle(
   - gpg --import /tsd/p1150/data/durable/gpg-keys/p1150-key1@tsd.usit.no-private-key.asc
   - Check which samplesheet has the invisible character
   - What does adapt TSOPII table if needed?
-
-
-
+  
 <!-- 
 
 sudo apptainer build create_fusviz_input.sif Singularity
