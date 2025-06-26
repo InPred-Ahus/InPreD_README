@@ -190,7 +190,7 @@ def process_mutation_summary(summary_file : pl.dataframe = None) -> pl.DataFrame
     """
      
     # Read summary mutations
-    print(f"; Reading summary mutation table")
+    print(f"; Reading summary mutation table : {summary_file}")
     summary = pl.read_csv(summary_file, separator="\t", comment_prefix='#')
 
     # Check if the required columns are present and not empty
@@ -203,7 +203,10 @@ def process_mutation_summary(summary_file : pl.dataframe = None) -> pl.DataFrame
     summary = sep_columns_v(summary, sep="|", colname="fusions")
 
     # Split the 'fusions' column into multiple columns (genes and coordinates)
+    print(f"; Splitting 'fusions' column into multiple columns")
+    summary = summary.filter( (pl.col("fusions") !=  "NA") )
     summary = sep_columns_h(summary, "fusions", delim=" ", keep_column=False, new_cols = ["name", "coord", "other"])
+    print(summary)
 
     # Select relevant columns
     summary = summary.select(['sample_id', "name", "coord"])
@@ -222,8 +225,8 @@ def process_mutation_samples(mut_file : str = None) -> pl.DataFrame:
         pl.DataFrame: Processed DataFrame containing fusion events.
     """
 
-    print(f"; Reading patient mutation table")
-    samples = pl.read_csv(mut_file, separator="\t", comment_prefix='"')
+    print(f"; Reading patient mutation table : {mut_file}")
+    samples = pl.read_csv(mut_file, separator="\t", comment_prefix='#', null_values="N/A")
 
     # Check if the required columns are present
     required_columns = ["Sample_ID", "Alt_Split_Dedup", "Alt_Paired_Dedup"]
