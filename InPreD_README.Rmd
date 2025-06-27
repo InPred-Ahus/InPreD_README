@@ -29,7 +29,7 @@ run.id          <- NULL
 
 
 # Force user to define a Run ID
-run.id <- "250619_NB552811_0098_AH77MLBGYX" # "250606_AAAAAAAA_BBBB_CCCCCCCCCC"
+run.id <- "250626_NB552811_0099_AH77TCBGYX" # "250606_AAAAAAAA_BBBB_CCCCCCCCCC"
 if (is.null(run.id)){
   stop("run.id cannot be NULL")
 }
@@ -610,7 +610,9 @@ mv ${DURABLE_DIR}/file-import/p1150-member-group/SampleSheet_${RUN_DATE}_info.cs
 <!-- We need to move two files: the .7z and .txt -->
 ```{bash, echo=TRUE, eval = FALSE}
 # Move PRONTO file
-mv ${DURABLE_DIR}/file-import/p1150-member-group/PRONTO_metadata_${RUN_DATE}* ${DURABLE_DIR}/TSO500_pronto_metadata/PRONTO_metadata_${RUN_DATE}*
+mv ${DURABLE_DIR}/file-import/p1150-member-group/PRONTO_metadata_${RUN_DATE}.txt ${DURABLE_DIR}/TSO500_pronto_metadata/PRONTO_metadata_${RUN_DATE}.txt
+
+mv ${DURABLE_DIR}/file-import/p1150-member-group/PRONTO_metadata_${RUN_DATE}.7z ${DURABLE_DIR}/TSO500_pronto_metadata/PRONTO_metadata_${RUN_DATE}.7z
 ```
 
 ```{r, echo=FALSE, eval = TRUE}
