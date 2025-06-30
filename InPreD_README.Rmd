@@ -1012,6 +1012,8 @@ cl.categories <- add.cl.categories("email", cl.categories)
 
 <br>
 
+**NOTE** : wait the confirmation of the curators to proceed with the following sections. 
+
 Convert QC-ed small variables tables, from *xlsx* back to *tsv* format.
 
 `r emo::ji("hourglass_flowing_sand")` Running time: ~3 minutes
@@ -1082,6 +1084,8 @@ and generate the reports using *PRONTO*.
 
     - Verify all values of the 2nd columns (*Sequencing_run_id*) in the new batch are filles with the current run ID: ``r paste0(run.id)``.
     
+  - **NOTE** : verify that the column separators are tabs and not spaces. Also verify the last column *batch* is in the file, many times is not there and if so, fill it with a hyphen '*-*'.
+    
   - If all these points were correctly achieved, rename the PRONTO master table file.
 
 <br>
@@ -1141,7 +1145,7 @@ cl.categories <- add.cl.categories("file_manip", cl.categories)
 
 ```{bash, echo=TRUE, eval = FALSE}
 # Remove the content of RECEN_RUN folder
-rm -rf ${DURABLE}/TSO500_export_for_interpretation/RECEN_RUN/*
+rm -rf ${DURABLE}/TSO500_export_for_interpretation/RECENT_RUN/*
 
 for SAMPLE_ID in ${SAMPLE_IDs[@]}
 do
@@ -1505,9 +1509,11 @@ Title: Bioinformatic analysis week WW
 
 Dear all, 
 
-The reports and all the related data are now available in the InPred folder. We have sequenced and processed N IPA cases (IPA0, IPA0, IPA0 ). 
+The reports and all the related data are now available in the InPred folder. We have sequenced and processed N IPA cases (IPA0, IPA0, IPA0, IPA0, IPA0, IPA0, IPA0, IPA0 ). 
 
 Sequencing went fine. No ctDNA data. 
+
+Torben & Shixiong: there are some fusions reported, which ones should I plot?
 
 We observed some sequencing-related warnings for IPA065, be aware that this may be reflected in the interpretation.
 
