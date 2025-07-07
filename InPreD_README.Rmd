@@ -29,7 +29,9 @@ run.id          <- NULL
 
 
 # Force user to define a Run ID
-run.id <- "250626_NB552811_0099_AH77TCBGYX" # "250606_AAAAAAAA_BBBB_CCCCCCCCCC"
+run.id <- "250703_NB552811_0100_AH7KG3BGYX" 
+#         "250606_AAAAAAAA_BBBB_CCCCCCCCCC"
+
 if (is.null(run.id)){
   stop("run.id cannot be NULL")
 }
@@ -1008,6 +1010,44 @@ cl.categories <- add.cl.categories("email", cl.categories)
 
 <br>
 
+  
+### Prepare predisposition tables
+
+<br>
+
+  - Collect all predisposition tables in a single folder. These tables will be encrypted and exported with all the reports.
+
+```{bash, echo=TRUE, eval = FALSE}
+# Remove the content of RECENT_RUN folder
+rm -rf ${DURABLE}/TSO500_export_for_interpretation/RECENT_RUN/*
+```
+
+```{bash, echo=TRUE, eval = FALSE}
+# Create directory 
+PRED_TABLES="${DURABLE}/TSO500_export_for_interpretation/RECENT_RUN/predisposition_tables"
+mkdir -p ${PRED_TABLES}
+
+# 
+ls ${DURABLE}/TSO500_postprocessing/${RUN_ID}_TSOPPI_v0.3.2_main_2022_06_07/*/*_predisposition_gene_variant_table_tumor_RNA.tsv | while IFS= read -r file; do
+  cp "$file" ${PRED_TABLES}/
+done
+
+ls ${PRED_TABLES}
+```
+
+```{r, echo=FALSE, eval = TRUE}
+cl.sections   <- add.cl.section("Remove the content of RECEN_RUN folder", cl.sections)
+cl.categories <- add.cl.categories("file_manip", cl.categories)
+
+cl.sections   <- add.cl.section("Create predisposition_tables folder", cl.sections)
+cl.categories <- add.cl.categories("file_manip", cl.categories)
+
+cl.sections   <- add.cl.section("Copy predisposition tables", cl.sections)
+cl.categories <- add.cl.categories("file_manip", cl.categories)
+```
+
+<br>
+
 #### Process QC variant tables (023)
 
 <br>
@@ -1144,9 +1184,6 @@ cl.categories <- add.cl.categories("file_manip", cl.categories)
 <br>
 
 ```{bash, echo=TRUE, eval = FALSE}
-# Remove the content of RECEN_RUN folder
-rm -rf ${DURABLE}/TSO500_export_for_interpretation/RECENT_RUN/*
-
 for SAMPLE_ID in ${SAMPLE_IDs[@]}
 do
       echo "SAMPLE_ID=${SAMPLE_ID}"
@@ -1169,42 +1206,10 @@ cp -a config.sh ${SCRIPTS_AND_LOGS_FOLDER}/03_config.sh
 ```
 
 ```{r, echo=FALSE, eval = TRUE}
-cl.sections   <- add.cl.section("Remove the content of RECEN_RUN folder", cl.sections)
-cl.categories <- add.cl.categories("file_manip", cl.categories)
-
 cl.sections   <- add.cl.section("Generate reports with PRONTO (03)", cl.sections)
 cl.categories <- add.cl.categories("analysis", cl.categories)
 
 cl.sections   <- add.cl.section("Copy PRONTO (03) scripts and logs", cl.sections)
-cl.categories <- add.cl.categories("file_manip", cl.categories)
-```
-
-<br>
-  
-### Prepare predisposition tables
-
-<br>
-
-  - Collect all predisposition tables in a single folder. These tables will be encrypted and exported with all the reports.
-
-```{bash, echo=TRUE, eval = FALSE}
-# Create directory 
-PRED_TABLES="${DURABLE}/TSO500_export_for_interpretation/RECENT_RUN/predisposition_tables"
-mkdir -p ${PRED_TABLES}
-
-# 
-ls ${DURABLE}/TSO500_postprocessing/${RUN_ID}_TSOPPI_v0.3.2_main_2022_06_07/*/*_predisposition_gene_variant_table_tumor_RNA.tsv | while IFS= read -r file; do
-  cp "$file" ${PRED_TABLES}/
-done
-
-ls ${PRED_TABLES}
-```
-
-```{r, echo=FALSE, eval = TRUE}
-cl.sections   <- add.cl.section("Create predisposition_tables folder", cl.sections)
-cl.categories <- add.cl.categories("file_manip", cl.categories)
-
-cl.sections   <- add.cl.section("Copy predisposition tables", cl.sections)
 cl.categories <- add.cl.categories("file_manip", cl.categories)
 ```
 
