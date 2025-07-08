@@ -1036,7 +1036,7 @@ ls ${PRED_TABLES}
 ```
 
 ```{r, echo=FALSE, eval = TRUE}
-cl.sections   <- add.cl.section("Remove the content of RECEN_RUN folder", cl.sections)
+cl.sections   <- add.cl.section("Remove the content of RECENT_RUN folder", cl.sections)
 cl.categories <- add.cl.categories("file_manip", cl.categories)
 
 cl.sections   <- add.cl.section("Create predisposition_tables folder", cl.sections)
