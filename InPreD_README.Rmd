@@ -29,7 +29,7 @@ run.id          <- NULL
 
 
 # Force user to define a Run ID
-run.id <- "250703_NB552811_0100_AH7KG3BGYX" 
+run.id <- "250710_NB552811_0101_AH7KCGBGYX" 
 #         "250606_AAAAAAAA_BBBB_CCCCCCCCCC"
 
 if (is.null(run.id)){
@@ -692,12 +692,20 @@ cl.categories <- add.cl.categories("setup", cl.categories)
 
 <br>
 
+`r emo::ji("hourglass_flowing_sand")` Running time: ~10 seconds
+
   - We will generate a sample sheet with metadata for the current run ID.
 
 ```{bash, echo=TRUE, eval = FALSE}
 bash 00_generate_TSO500_sample_sheet.sh ${RUN_ID} ${INPUT_DATA_TYPE} \
   &> ${SCRIPTS_AND_LOGS_FOLDER}/00_generate_TSO500_sample_sheet.log
 ```
+
+<br>
+
+  - Verify that the SampleSheet was correctly generated. If the separator is not the one indicated in the config file or if there is a missing column, you will see an error message in the `${SCRIPTS_AND_LOGS_FOLDER}/00_generate_TSO500_sample_sheet.log`.
+  
+    - If the Samplesheet was created you will see the following message in the last line of the logfile `Generating TSO500 samplesheet is succesfully finished.`
 
 <br>
 
