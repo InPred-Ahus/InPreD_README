@@ -322,6 +322,7 @@ insert.fig.toggle(
   
     - In *Sheet1*, select columns **InPred ID (IPA)** (E), **Tumor content** (R), and  **Barcode** (S).
     - Create a new file with these columns and  **remove the header**. The file must be named `SampleSheet_YYMMDD_info.csv`.
+    - Verify that all entries in the **Barcode** column start with the **UP** prefix. (E.g., UP01, UP16).
     
     - Save the new file in the metadata folder `\\platon.uio.no\med-klinmed-u2\jamondra\pc\Dokumenter\Metadata`.
 
@@ -366,6 +367,9 @@ insert.fig.toggle(
 
 ```{r, echo=FALSE, eval = TRUE}
 cl.sections   <- add.cl.section("Create SampleSheet (View UiO)", cl.sections)
+cl.categories <- add.cl.categories("file_manip", cl.categories)
+
+cl.sections   <- add.cl.section("Verify Barcode column (UP)", cl.sections)
 cl.categories <- add.cl.categories("file_manip", cl.categories)
 
 cl.sections   <- add.cl.section("Create PRONTO metadata (View UiO)", cl.sections)
