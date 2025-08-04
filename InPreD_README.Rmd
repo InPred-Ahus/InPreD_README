@@ -1508,7 +1508,7 @@ Jaime
 Dear all,
 
 TSOPPI and ICNVA analysis are running now.
-The small variant tables should be ready for QC in ̃~30 minutes.
+The small variant tables should be ready for QC in ~30 minutes.
 
 Best,
 
