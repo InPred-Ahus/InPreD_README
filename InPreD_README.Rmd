@@ -29,8 +29,9 @@ run.id          <- NULL
 
 
 # Force user to define a Run ID
+# Replace the old ID for the new one
 run.id <- "250710_NB552811_0101_AH7KCGBGYX" 
-#         "250606_AAAAAAAA_BBBB_CCCCCCCCCC"
+#         "250606_AAAAAAAA_BBBB_CCCCCCCCCC"   # ID template
 
 if (is.null(run.id)){
   stop("run.id cannot be NULL")
@@ -373,6 +374,9 @@ cl.sections   <- add.cl.section("Verify Barcode column (UP)", cl.sections)
 cl.categories <- add.cl.categories("file_manip", cl.categories)
 
 cl.sections   <- add.cl.section("Create PRONTO metadata (View UiO)", cl.sections)
+cl.categories <- add.cl.categories("file_manip", cl.categories)
+
+cl.sections   <- add.cl.section("Verify Batch column ('-')", cl.sections)
 cl.categories <- add.cl.categories("file_manip", cl.categories)
 
 cl.sections   <- add.cl.section("Encrypt PRONTO metadata", cl.sections)
@@ -1396,6 +1400,9 @@ cl.categories <- add.cl.categories("file_manip", cl.categories)
 
 cl.sections   <- add.cl.section("Decrypt RECENT_RUN.7z file", cl.sections)
 cl.categories <- add.cl.categories("file_manip", cl.categories)
+
+cl.sections   <- add.cl.section("Send email to InPreD team", cl.sections)
+cl.categories <- add.cl.categories("email", cl.categories)
 ```
 
 <br>
