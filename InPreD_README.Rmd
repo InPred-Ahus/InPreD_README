@@ -1590,7 +1590,7 @@ insert.fig.toggle(
 # Launch image from fuzviz folder
 cd $DURABLE/software/fusviz
 
-singularity run fusviz_v1.0.0.sif 4000
+singularity run fusviz_v1.9.0.sif 4000
 ```
 
 ```{r launch_fusviz, echo=FALSE, results='asis'}
@@ -1605,7 +1605,8 @@ insert.fig.toggle(
 
 <br>
 
-  - Click On the *Home* tab (left-side). Select the genome *hg19 (offline)* and upload your text files with the SV details (Figure 24). See question 3 to know how to get the SV tables.
+  - On the home page, scroll down after the Welcome and Example modules section.
+  - Select the genome *hg19 (offline)* and upload your text files with the SV details (Figure 24). See question 3 to know how to get the SV tables.
   
 ```{r load_SV, echo=FALSE, results='asis'}
 insert.fig.toggle(
