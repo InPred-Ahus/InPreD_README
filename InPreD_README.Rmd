@@ -565,13 +565,13 @@ The following variables must be set up before launching the pipeline:
   - Sequencing run ID = `RUN_ID`
   - Input data type = `INPUT_DATA_TYPE`
   - Sequencing run date = `RUN_DATE`
-  - Durable folder = `DURABLE_DIR`
+  - Durable folder = `DURABLE`
   
 ```{r env_var, echo=FALSE, eval = TRUE, comment=""}
 cat(glue('RUN_ID="{run.id}"
 RUN_DATE="${{RUN_ID%%_*}}"
 INPUT_DATA_TYPE="RAW"
-DURABLE_DIR="/tsd/p1150/data/durable"'), "\n")
+DURABLE="/tsd/p1150/data/durable"'), "\n")
 ```
 
 ```{bash, echo=TRUE, eval = FALSE}
@@ -579,7 +579,7 @@ DURABLE_DIR="/tsd/p1150/data/durable"'), "\n")
 echo $RUN_ID
 echo $RUN_DATE
 echo $INPUT_DATA_TYPE
-echo $DURABLE_DIR
+echo $DURABLE
 ```
 
 ```{r, echo=FALSE, eval = TRUE}
@@ -592,7 +592,7 @@ cl.categories <- add.cl.categories("setup", cl.categories)
 cl.sections   <- add.cl.section("Set up  ${INPUT_DATA_TYPE}", cl.sections)
 cl.categories <- add.cl.categories("setup", cl.categories)
 
-cl.sections   <- add.cl.section("Set up  ${DURABLE_DIR}", cl.sections)
+cl.sections   <- add.cl.section("Set up  ${DURABLE}", cl.sections)
 cl.categories <- add.cl.categories("setup", cl.categories)
 ```
 
@@ -609,20 +609,20 @@ They must be moved to the `TSO500_sequences`, `TSO500_pronto_metadata`, and `TSO
 
 ```{bash, echo=TRUE, eval = FALSE}
 # Move sequences file
-mv ${DURABLE_DIR}/file-import/p1150-member-group/tsd/${RUN_DATE}* ${DURABLE_DIR}/TSO500_sequences/
+mv ${DURABLE}/file-import/p1150-member-group/tsd/${RUN_DATE}* ${DURABLE}/TSO500_sequences/
 ```
 
 ```{bash, echo=TRUE, eval = FALSE}
 # Move SampleSheet metadata file
-mv ${DURABLE_DIR}/file-import/p1150-member-group/SampleSheet_${RUN_DATE}_info.csv ${DURABLE_DIR}/TSO500_SampleSheets/SampleSheet_${RUN_DATE}_info.csv
+mv ${DURABLE}/file-import/p1150-member-group/SampleSheet_${RUN_DATE}_info.csv ${DURABLE}/TSO500_SampleSheets/SampleSheet_${RUN_DATE}_info.csv
 ```
 
 <!-- We need to move two files: the .7z and .txt -->
 ```{bash, echo=TRUE, eval = FALSE}
 # Move PRONTO file
-mv ${DURABLE_DIR}/file-import/p1150-member-group/PRONTO_metadata_${RUN_DATE}.txt ${DURABLE_DIR}/TSO500_pronto_metadata/PRONTO_metadata_${RUN_DATE}.txt
+mv ${DURABLE}/file-import/p1150-member-group/PRONTO_metadata_${RUN_DATE}.txt ${DURABLE}/TSO500_pronto_metadata/PRONTO_metadata_${RUN_DATE}.txt
 
-mv ${DURABLE_DIR}/file-import/p1150-member-group/PRONTO_metadata_${RUN_DATE}.7z ${DURABLE_DIR}/TSO500_pronto_metadata/PRONTO_metadata_${RUN_DATE}.7z
+mv ${DURABLE}/file-import/p1150-member-group/PRONTO_metadata_${RUN_DATE}.7z ${DURABLE}/TSO500_pronto_metadata/PRONTO_metadata_${RUN_DATE}.7z
 ```
 
 ```{r, echo=FALSE, eval = TRUE}
@@ -1171,7 +1171,7 @@ cp ${DURABLE}/software/PRONTO/PRONTO-1.2.0/In/InPreD_PRONTO_metadata.txt ${DURAB
 
 # Update the PRONTO metadata master table
 python3 ${SCRIPTS_FOLDER}/update_metadata.py                                             \
-  --new_meta ${DURABLE_DIR}/TSO500_pronto_metadata/PRONTO_metadata_${RUN_DATE}.txt       \
+  --new_meta ${DURABLE}/TSO500_pronto_metadata/PRONTO_metadata_${RUN_DATE}.txt           \
   --master_meta ${DURABLE}/software/PRONTO/PRONTO-1.2.0/In/InPreD_PRONTO_metadata.txt.bk \
   --run_id ${RUN_ID}                                                                     \
   --o ${DURABLE}/software/PRONTO/PRONTO-1.2.0/In/InPreD_PRONTO_metadata.txt.new ;
