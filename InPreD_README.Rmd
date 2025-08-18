@@ -886,6 +886,8 @@ else
         echo "Failed to add RUN_ID to $ALL_RUN_IDS"
     fi
 fi
+
+chmod 755 $ALL_RUN_IDS
 ```
 
 ```{r, echo=FALSE, eval = TRUE}
