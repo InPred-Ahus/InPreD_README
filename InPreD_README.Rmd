@@ -30,7 +30,7 @@ run.id          <- NULL
 
 # Force user to define a Run ID
 # Replace the old ID for the new one
-run.id <- "250710_NB552811_0101_AH7KCGBGYX" 
+run.id <- "250814_NB552811_0102_AH7J3JBGYX" 
 #         "250606_AAAAAAAA_BBBB_CCCCCCCCCC"   # ID template
 
 if (is.null(run.id)){
@@ -650,7 +650,26 @@ cl.categories <- add.cl.categories("file_manip", cl.categories)
 SEPARATOR=";"
 
 DECRYPT_UNPACK_CHECKSUM="T"
-REMOVE_DECRYPTED_COMPRESSED_DATA="T"
+REMOVE_ENCRYPTED_COMPRESSED_DATA="T"
+```
+
+<br>
+
+- Use the following command to check those lines without opening the file in a text editor.
+
+<br>
+
+```{bash, echo=TRUE, eval = FALSE}
+echo ' ';
+echo ' ';
+
+grep -e 'SEPARATOR='                        \
+     -e 'DECRYPT_UNPACK_CHECKSUM='          \
+     -e 'REMOVE_ENCRYPTED_COMPRESSED_DATA=' \
+     config.sh
+
+echo ' ';
+echo ' ';
 ```
 
 <br>
@@ -727,7 +746,7 @@ cp -a config.sh ${SCRIPTS_AND_LOGS_FOLDER}/00_config.sh
 
 ```{r, echo=FALSE, eval = TRUE}
 cl.sections   <- add.cl.section("Generate sample sheet", cl.sections)
-cl.categories <- add.cl.categories("setup", cl.categories)
+cl.categories <- add.cl.categories("analysis", cl.categories)
 
 cl.sections   <- add.cl.section("Copy Samplesheet (00) scripts and logs", cl.sections)
 cl.categories <- add.cl.categories("file_manip", cl.categories)
