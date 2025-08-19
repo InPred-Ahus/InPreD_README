@@ -324,8 +324,13 @@ insert.fig.toggle(
     - In *Sheet1*, select columns **InPred ID (IPA)** (E), **Tumor content** (R), and  **Barcode** (S).
     - Create a new file with these columns and  **remove the header**. The file must be named `SampleSheet_YYMMDD_info.csv`.
     - Verify that all entries in the **Barcode** column start with the **UP** prefix. (E.g., UP01, UP16).
+    - Verify that all entries in the **Tumour_content** column have an integer value (0-100).
     
     - Save the new file in the metadata folder `\\platon.uio.no\med-klinmed-u2\jamondra\pc\Dokumenter\Metadata`.
+
+<br>
+
+> **⚠️ Important: report missing Tumor content**. In case any value in the *Tumor content* column is missing, report it with the responsible of this week's sequencing. 
 
 <br>
 
@@ -371,6 +376,9 @@ cl.sections   <- add.cl.section("Create SampleSheet (View UiO)", cl.sections)
 cl.categories <- add.cl.categories("file_manip", cl.categories)
 
 cl.sections   <- add.cl.section("Verify Barcode column (UP)", cl.sections)
+cl.categories <- add.cl.categories("file_manip", cl.categories)
+
+cl.sections   <- add.cl.section("Verify Tumor content", cl.sections)
 cl.categories <- add.cl.categories("file_manip", cl.categories)
 
 cl.sections   <- add.cl.section("Create PRONTO metadata (View UiO)", cl.sections)
@@ -609,20 +617,20 @@ They must be moved to the `TSO500_sequences`, `TSO500_pronto_metadata`, and `TSO
 
 ```{bash, echo=TRUE, eval = FALSE}
 # Move sequences file
-mv ${DURABLE}/file-import/p1150-member-group/tsd/${RUN_DATE}* ${DURABLE}/TSO500_sequences/
+mv -i ${DURABLE}/file-import/p1150-member-group/tsd/${RUN_DATE}* ${DURABLE}/TSO500_sequences/
 ```
 
 ```{bash, echo=TRUE, eval = FALSE}
 # Move SampleSheet metadata file
-mv ${DURABLE}/file-import/p1150-member-group/SampleSheet_${RUN_DATE}_info.csv ${DURABLE}/TSO500_SampleSheets/SampleSheet_${RUN_DATE}_info.csv
+mv -i ${DURABLE}/file-import/p1150-member-group/SampleSheet_${RUN_DATE}_info.csv ${DURABLE}/TSO500_SampleSheets/SampleSheet_${RUN_DATE}_info.csv
 ```
 
 <!-- We need to move two files: the .7z and .txt -->
 ```{bash, echo=TRUE, eval = FALSE}
 # Move PRONTO file
-mv ${DURABLE}/file-import/p1150-member-group/PRONTO_metadata_${RUN_DATE}.txt ${DURABLE}/TSO500_pronto_metadata/PRONTO_metadata_${RUN_DATE}.txt
+mv -i ${DURABLE}/file-import/p1150-member-group/PRONTO_metadata_${RUN_DATE}.txt ${DURABLE}/TSO500_pronto_metadata/PRONTO_metadata_${RUN_DATE}.txt
 
-mv ${DURABLE}/file-import/p1150-member-group/PRONTO_metadata_${RUN_DATE}.7z ${DURABLE}/TSO500_pronto_metadata/PRONTO_metadata_${RUN_DATE}.7z
+mv -i ${DURABLE}/file-import/p1150-member-group/PRONTO_metadata_${RUN_DATE}.7z ${DURABLE}/TSO500_pronto_metadata/PRONTO_metadata_${RUN_DATE}.7z
 ```
 
 ```{r, echo=FALSE, eval = TRUE}
@@ -901,7 +909,7 @@ cl.categories <- add.cl.categories("setup", cl.categories)
 
 <br>
 
-`r emo::ji("hourglass_flowing_sand")` Running time: ~30 minutes
+`r emo::ji("hourglass_flowing_sand")` Running time: ~30 minutes (but may vary up to 1 hour)
 
 ```{bash, echo=TRUE, eval = FALSE}
 bash 02_execute_tsoppi_and_archive_results.sh ${RUN_ID} \
@@ -1054,7 +1062,7 @@ cl.categories <- add.cl.categories("email", cl.categories)
 
 ```{bash, echo=TRUE, eval = FALSE}
 # Remove the content of RECENT_RUN folder
-rm -rf ${DURABLE}/TSO500_export_for_interpretation/RECENT_RUN/*
+rm -rfi ${DURABLE}/TSO500_export_for_interpretation/RECENT_RUN/*
 ```
 
 ```{bash, echo=TRUE, eval = FALSE}
@@ -1083,11 +1091,13 @@ cl.categories <- add.cl.categories("file_manip", cl.categories)
 
 <br>
 
-#### Process QC variant tables (023)
+### Process QC variant tables (023)
 
 <br>
 
-**NOTE** : wait the confirmation of the curators to proceed with the following sections. 
+> **⚠️ Important: wait the confirmation of the curators to proceed with the following sections.**
+
+<br>
 
 Convert QC-ed small variables tables, from *xlsx* back to *tsv* format.
 
@@ -1167,7 +1177,7 @@ and generate the reports using *PRONTO*.
 
 ```{bash, echo=TRUE, eval = FALSE}
 # Save a copy of the metadata file.
-cp ${DURABLE}/software/PRONTO/PRONTO-1.2.0/In/InPreD_PRONTO_metadata.txt ${DURABLE}/software/PRONTO/PRONTO-1.2.0/In/InPreD_PRONTO_metadata.txt.bk
+cp -i ${DURABLE}/software/PRONTO/PRONTO-1.2.0/In/InPreD_PRONTO_metadata.txt ${DURABLE}/software/PRONTO/PRONTO-1.2.0/In/InPreD_PRONTO_metadata.txt.bk
 
 # Update the PRONTO metadata master table
 python3 ${SCRIPTS_FOLDER}/update_metadata.py                                             \
@@ -1178,7 +1188,7 @@ python3 ${SCRIPTS_FOLDER}/update_metadata.py                                    
 ```
 
 ```{bash, echo=TRUE, eval = FALSE}
-mv ${DURABLE}/software/PRONTO/PRONTO-1.2.0/In/InPreD_PRONTO_metadata.txt.new ${DURABLE}/software/PRONTO/PRONTO-1.2.0/In/InPreD_PRONTO_metadata.txt
+mv -i ${DURABLE}/software/PRONTO/PRONTO-1.2.0/In/InPreD_PRONTO_metadata.txt.new ${DURABLE}/software/PRONTO/PRONTO-1.2.0/In/InPreD_PRONTO_metadata.txt
 ```
 
 ```{r, echo=FALSE, eval = TRUE}
@@ -1508,14 +1518,14 @@ Title: Bioinformatic analysis week WW
 
 Dear all,
 
-Sequencing data and all the metadata are now in TSD.
+Sequencing data and its corresponding metadata are now in TSD.
 LocalApp analysis will start in an hour.
 
-We will continue with TSOPPI and ICNVA on monday morning, so data for QC should be available shortly before Monday meeting.
+We will continue with TSOPPI and ICNVA on Monday morning, so data for QC should be available shortly before Monday meeting.
 
 Have a nice weekend
 
-Jaime
+Jaime & Jean-Marc
 ```
 
 <br>
@@ -1534,7 +1544,7 @@ Please, let me know when QC is ready to proceed with the reports.
 
 Best,
 
-Jaime
+Jaime & Jean-Marc
 ```
 
 <br>
@@ -1550,11 +1560,11 @@ Dear all,
 
 The reports and all the related data are now available in the InPred folder. We have sequenced and processed N IPA cases (IPA0, IPA0, IPA0, IPA0, IPA0, IPA0, IPA0, IPA0 ). 
 
-Sequencing went fine. No ctDNA data. 
+Sequencing went fine. 
 
-Torben & Shixiong: there are some fusions reported, which ones should I plot?
+Torben, Shixiong, Andliena: there are some fusions reported, which ones should I plot?
 
-We observed some sequencing-related warnings for IPA065, be aware that this may be reflected in the interpretation.
+We observed some sequencing-related warnings for IPA0, be aware that this may be reflected in the interpretation.
 
 Best,
 
@@ -1751,6 +1761,22 @@ insert.fig.toggle(
 )
 ```
 
+<br>
+
+### 4. What to do when the *Tumor content* values are missing in the *SampleSheet*
+
+<br>
+
+These file is filled up by the person responsible for the sequencing in a given week.
+Note that each week may be a different person within the *InPred team*.
+
+Report the missing data to one of them and wait their answer to proceed with the data transfer.
+
+Usually, the Tumor content values in the *PRONTO metadata* sheet are the same values,
+one option is to manually fill up the missing values copying the values from the
+*PRONTO metadata*. But to be on the safe side, let's wait for the answer.
+
+<br>
 <br>
 
 ## To be added:
