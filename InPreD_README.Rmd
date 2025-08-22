@@ -30,7 +30,7 @@ run.id          <- NULL
 
 # Force user to define a Run ID
 # Replace the old ID for the new one
-run.id <- "250814_NB552811_0102_AH7J3JBGYX" 
+run.id <- "250821_NB552811_0103_AH7LK2BGYX" 
 #         "250606_AAAAAAAA_BBBB_CCCCCCCCCC"   # ID template
 
 if (is.null(run.id)){
@@ -584,10 +584,12 @@ DURABLE="/tsd/p1150/data/durable"'), "\n")
 
 ```{bash, echo=TRUE, eval = FALSE}
 # Check ENV variables content
+echo " "
 echo $RUN_ID
 echo $RUN_DATE
 echo $INPUT_DATA_TYPE
 echo $DURABLE
+echo " "
 ```
 
 ```{r, echo=FALSE, eval = TRUE}
@@ -1777,11 +1779,114 @@ one option is to manually fill up the missing values copying the values from the
 *PRONTO metadata*. But to be on the safe side, let's wait for the answer.
 
 <br>
+
+### 5. What to do when you don't have permissions to decrypt the sequencing files.
+
+<br>
+
+If this is the case, a few minutes after running *localApp* (see section 'Launch *LocalApp* analysis (01)'), you will have an error with the following message:
+
+`Problem with the ${RUN_ID}.md5.log file`
+
+This means you need to register you *RSA* key in the *p1150* project to have the permissions to decrypt the sequencing data.
+
+Run the following command to set this permissions.
+
+```{bash, echo=TRUE, eval = FALSE}
+gpg --import /tsd/p1150/data/durable/gpg-keys/p1150-key1@tsd.usit.no-private-key.asc
+```
+
+> **⚠️ Important: this command just needs to be one time.** It may cause troubles when you run it again. 
+
+<br>
+
+### 6. What to do when *LocalApp* process fails
+
+<br>
+
+It can stop for many reasons, the most likely are:
+
+  - Samplesheet with a different separator
+  - Missing columns in Samplesheet
+  - No write permissions
+  - Not setting your RSA key (see *Q & A*: What to do when you don't have permissions to decrypt the sequencing files)
+
+<br>
+
+For any or other reasons, to re-launch *LocalApp* (see section 'Launch *LocalApp* analysis (01)'), we need to do the follwing steps **before**.
+
+<br>
+
+  1. **Kill process in *slurm* **
+  2. **Kill the bash process**
+  3. **Delete results in *TSO500_analyses* folder**
+
+<br>
+
+#### Stop process in *slurm*
+
+<br>
+
+The *slurm* jobid can be found in the  `${DURABLE}/TSO500_scripts_and_logs}/${RUN_ID}/01_raw_sequencing_data_management_and_TSO500_analysis.stdout`.
+
+Use the command `scancel slurmID` to cancell this process (Figure 29).
+
+```{bash, echo=TRUE, eval = FALSE}
+# The slurm ID is printed in this logfile
+more ${DURABLE}/TSO500_scripts_and_logs}/${RUN_ID}/01_raw_sequencing_data_management_and_TSO500_analysis.stdout
+
+# Example of slurm ID
+scancel 22262551
+```
+
+```{r scancel, echo=FALSE, results='asis'}
+insert.fig.toggle(
+  fig.id = "scancel",
+  button.label = "Figure 29",
+  img.src = "fig/29_scancel.png",
+  fig.width = "100%",
+  fig.cap = "Example to get the slurm ID and cancel it from the terminal"
+)
+```
+
+<br>
+
+#### Stop the bash process
+
+<br>
+
+You can use `htop -u` to list your running jobs, identify the jobid associated to the `01_raw_sequencing_data_management_and_TSO500_analysis.sh` and stop it (Figure 30).
+
+```{bash, echo=TRUE, eval = FALSE}
+# Find the jobid
+htop -u
+
+# Example of slurm ID
+kill -9 123456
+```
+
+<br>
+
+#### Delete results in *TSO500_analyses* folder
+
+<br>
+
+Delete the *LocalApp* output folder for this `${RUN_ID}` : `${DURABLE}/TSO500_analyses/${RUN_ID}_TSO500_LocalApp_analysis_fromRAW`
+
+```{bash, echo=TRUE, eval = FALSE}
+# Verify first this folder exists ...
+ls ${DURABLE}/TSO500_analyses/${RUN_ID}_TSO500_LocalApp_analysis_fromRAW
+
+# Then remove it
+rm -rfi ${DURABLE}/TSO500_analyses/${RUN_ID}_TSO500_LocalApp_analysis_fromRAW
+```
+
+<br>
+<br>
 <br>
 
 ## To be added:
 
-  - gpg --import /tsd/p1150/data/durable/gpg-keys/p1150-key1@tsd.usit.no-private-key.asc
   - Check which samplesheet has the invisible character
   - What does adapt TSOPII table if needed?
   
