@@ -1064,7 +1064,7 @@ cl.categories <- add.cl.categories("email", cl.categories)
 
 ```{bash, echo=TRUE, eval = FALSE}
 # Remove the content of RECENT_RUN folder
-rm -rfi ${DURABLE}/TSO500_export_for_interpretation/RECENT_RUN/*
+rm -rf ${DURABLE}/TSO500_export_for_interpretation/RECENT_RUN/*
 ```
 
 ```{bash, echo=TRUE, eval = FALSE}
