@@ -1885,7 +1885,22 @@ rm -rfi ${DURABLE}/TSO500_analyses/${RUN_ID}_TSO500_LocalApp_analysis_fromRAW
 ```
 
 <br>
+
+### 7. Additional information on undescribed variables in the README: 
+
 <br>
+
+Not all variables are descrbies in this README file as they do not need to be change. Below are the location of folder and files declared by those variables:
+
+```{r undescribed_var, echo=FALSE, eval = TRUE, comment=""}
+cat(glue('SCRIPTS_AND_LOGS_FOLDER="${{DURABLE}}/TSO500_scripts_and_logs/${{RUN_ID}}"
+SAMPLESHEETS_FOLDER="${{DURABLE}}/TSO500_SampleSheets"
+INFO_FILE_NAME="SampleSheet_${{RUN_DATE}}_info.csv"
+INFO_FILE_NAME_TSOPPI="SampleSheet_${{RUN_DATE}}_info_TSOPPI.csv"
+PIPELINE_FOLDER = "${{DURABLE}}/software/pipeline/v003_upgrading_pronto_to_1.2.0"'), "\n")
+```
+
+
 <br>
 
 ## To be added:
