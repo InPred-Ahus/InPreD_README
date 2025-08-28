@@ -12,6 +12,9 @@ output:
       collapsed: true
     self_contained: true
     code_folding: show
+  pdf_document:
+    toc: true
+    toc_depth: '4'
 ---
 
 ```{r setup, include=FALSE}
