@@ -1582,7 +1582,7 @@ Jaime
 
 <br>
 
-### 1. How can I know the run ID `$RUN_ID` ?
+### How can I know the run ID `$RUN_ID` ?
 
   - The run ID is in the name of the sequencing files and it is automatically generated from the sequencer.
   
@@ -1604,7 +1604,7 @@ insert.fig.toggle(
 
 <br>
 
-### 2. Visualize fusions with `FusViz`. 
+### Visualize fusions with `FusViz`. 
 
 <br>
 
@@ -1712,7 +1712,7 @@ insert.fig.toggle(
 
 <br>
 
-### 3. How to generate the input tables for *FusViz* ?
+### How to generate the input tables for *FusViz* ?
 
 <br>
 
@@ -1768,7 +1768,7 @@ insert.fig.toggle(
 
 <br>
 
-### 4. What to do when the *Tumor content* values are missing in the *SampleSheet*
+### What to do when the *Tumor content* values are missing in the *SampleSheet*
 
 <br>
 
@@ -1783,7 +1783,7 @@ one option is to manually fill up the missing values copying the values from the
 
 <br>
 
-### 5. What to do when you don't have permissions to decrypt the sequencing files.
+### What to do when you don't have permissions to decrypt the sequencing files.
 
 <br>
 
@@ -1803,7 +1803,7 @@ gpg --import /tsd/p1150/data/durable/gpg-keys/p1150-key1@tsd.usit.no-private-key
 
 <br>
 
-### 6. What to do when *LocalApp* process fails
+### What to do when *LocalApp* process fails?
 
 <br>
 
@@ -1886,11 +1886,11 @@ rm -rfi ${DURABLE}/TSO500_analyses/${RUN_ID}_TSO500_LocalApp_analysis_fromRAW
 
 <br>
 
-### 7. Additional information on undescribed variables in the README: 
+### Additional information on undescribed variables in the README: 
 
 <br>
 
-Not all variables are descrbies in this README file as they do not need to be change. Below are the location of folder and files declared by those variables:
+Not all variables are described in this README file as they do not need to be change. Below are the location of folder and files declared by those variables:
 
 ```{r undescribed_var, echo=FALSE, eval = TRUE, comment=""}
 cat(glue('SCRIPTS_AND_LOGS_FOLDER="${{DURABLE}}/TSO500_scripts_and_logs/${{RUN_ID}}"
