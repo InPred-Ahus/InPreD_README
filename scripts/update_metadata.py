@@ -1,5 +1,4 @@
 import argparse
-import re
 
 
 # Replace norwegian characters (upper and lower cases) by standard characters
@@ -54,9 +53,6 @@ def process_new_meta(new_meta_path, new_run_id):
 
 # Updates the PRONTO metadata master table
 # Comment the previous run, create a new batch with the PRONTO metadata of the current run ID
-# 
-# To do:
-# - Verify which encoding is the good one.
 def update_meta_master(master_metapath, new_meta_lines, output_path):
 
     lines = safe_readlines(master_metapath)
@@ -75,9 +71,10 @@ def update_meta_master(master_metapath, new_meta_lines, output_path):
         if not stripped or stripped.startswith('#'):
             updated_post_header.append(stripped)
         else:
-            parts = re.split(r'\t+|\s{2,}|\s(?=\S)', stripped)
+            parts = stripped.split('\t')
             if len(parts) >= 3:
                 parts[2] = 'N'
+                print(parts)
                 updated_post_header.append('\t'.join(parts))
             else:
                 updated_post_header.append(stripped)
