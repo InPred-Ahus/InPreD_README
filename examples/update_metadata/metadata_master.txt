@@ -2,13 +2,10 @@
 # Line 2
 # Line 3
 Sample_id	Sequencing_run_id	Create_report	Comments
-Sample4	RUN_1	Y	Æ
-Sample5 RUN_1	Y	Ø
-Sample6 RUN_1	Y	Å
+Sample4	RUN_1	Y	Æ comment1
+Sample5	RUN_1	Y	Ø comment2
+Sample6	RUN_1	Y	Å comment3
 #
 Sample7	RUN_2	N	Æ
 Sample8	RUN_2	N	Ø
 Sample9	RUN_2	N	Å
-
-
-
