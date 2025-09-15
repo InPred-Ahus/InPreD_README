@@ -973,7 +973,7 @@ SAMPLE_IDs=( "SAMPLE1" "SAMPLE_2" ... "SAMPLE_3" )
 
 ```{bash, echo=TRUE, eval = FALSE}
 # Get sample IDs from SampleSheet
-DNA_TUMOUR_SAMPLE_IDS=$(cut -d';' -f1 ${SAMPLESHEETS_FOLDER}/${INFO_FILE_NAME} | awk -F'-' '$2 == "D01"')
+DNA_TUMOUR_SAMPLE_IDS=$(cut -d';' -f1 ${SAMPLESHEETS_FOLDER}/${INFO_FILE_NAME} | awk -F'-' '$2 ~ /D0[[:digit:]]+/')
 #DNA_TUMOUR_SAMPLE_IDS=$(cut -d',' -f1 samples.txt | awk -F'-' 'tolower($2) == "d01"') # Case insensitive alternative
 
 # Build array declaration string
