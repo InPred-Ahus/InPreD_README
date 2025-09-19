@@ -664,6 +664,8 @@ SEPARATOR=";"
 
 DECRYPT_UNPACK_CHECKSUM="T"
 REMOVE_ENCRYPTED_COMPRESSED_DATA="T"
+
+MAKE_TSOPPI_CONFIG="T"
 ```
 
 <br>
@@ -679,6 +681,8 @@ echo ' ';
 grep -e 'SEPARATOR='                        \
      -e 'DECRYPT_UNPACK_CHECKSUM='          \
      -e 'REMOVE_ENCRYPTED_COMPRESSED_DATA=' \
+     -e 'MAKE_TSOPPI_CONFIG='               \
+     -e 'EXECUTE_TSOPPI_SCRIPTS='           \
      config.sh
 
 echo ' ';
@@ -701,6 +705,12 @@ cl.sections   <- add.cl.section("config.sh : DECRYPT_UNPACK_CHECKSUM", cl.sectio
 cl.categories <- add.cl.categories("setup", cl.categories)
 
 cl.sections   <- add.cl.section("config.sh : REMOVE_DECRYPTED_COMPRESSED_DATA", cl.sections)
+cl.categories <- add.cl.categories("setup", cl.categories)
+
+cl.sections   <- add.cl.section("config.sh : MAKE_TSOPPI_CONFIG", cl.sections)
+cl.categories <- add.cl.categories("setup", cl.categories)
+
+cl.sections   <- add.cl.section("config.sh : EXECUTE_TSOPPI_SCRIPTS", cl.sections)
 cl.categories <- add.cl.categories("setup", cl.categories)
 
 cl.sections   <- add.cl.section("Source config.sh", cl.sections)
