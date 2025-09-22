@@ -2,7 +2,7 @@
 
 &nbsp;
 
-In this repository you will find a detailed explanation of all the steps required to run the InPreD bioinformatics pipeline, this includes the followings points:
+In this repository you will find a detailed explanation of all the steps required to run the InPreD bioinformatics pipeline (*Ahus* node), this includes the followings points:
 
 &nbsp;
 
@@ -78,3 +78,12 @@ The interactive README file can be created in two ways:
   - Command line
     1.  Requires `pandoc` to be installed in your machine. Installation in Ubuntu: `sudo apt-get install pandoc`
     2. `Rscript -e "rmarkdown::render('InPreD_README.Rmd')"`
+
+&nbsp;
+
+## Contributors
+
+&nbsp;
+
+- [Jaime A Castro-Mondragon](https://jaimicore.github.io/)  : jamondra@uio.no
+- [Jean-Marc Costanzi](https://github.com/jean-marc-costanzi)
