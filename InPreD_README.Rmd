@@ -666,6 +666,7 @@ DECRYPT_UNPACK_CHECKSUM="T"
 REMOVE_ENCRYPTED_COMPRESSED_DATA="T"
 
 MAKE_TSOPPI_CONFIG="T"
+EXECUTE_TSOPPI_SCRIPTS="T"
 ```
 
 <br>
@@ -1896,6 +1897,106 @@ rm -rfi ${DURABLE}/TSO500_analyses/${RUN_ID}_TSO500_LocalApp_analysis_fromRAW
 
 <br>
 
+### : Add *normal* samples in the TSOPPI table.
+
+<br>
+
+In many cases, one sample can have both *tumor* and *normal* samples that were sequenced in different `$RUN_ID`. In such cases, we have to manually
+adapt the *TSOPPI* config table, add the `$RUN_ID`s of tumor *tumor* and *normal* and launch *TSOPPI* two times: (1) to generate the config table and adapt it manually and (2) to launch the TSOPPI analysis.
+
+
+1. Update `config.sh` file in the following variables. By default both variables are set to `"T"`.
+This will tell *TSOPPI* to generate the config table only, without launching the analysis.
+
+```{bash, echo=TRUE, eval = FALSE}
+MAKE_TSOPPI_CONFIG="T"
+EXECUTE_TSOPPI_SCRIPTS="F"
+```
+
+<br>
+
+2. Source the config file before launching *TSOPPI*. Once we changed and sourced this configuration, *TSOPPI* will stop after creating the config table.
+
+```{bash, echo=TRUE, eval = FALSE}
+source config.sh ${RUN_ID}
+```
+
+<br>
+
+3. Launch *TSOPPI* as usual.
+
+```{bash, echo=TRUE, eval = FALSE}
+bash 02_execute_tsoppi_and_archive_results.sh ${RUN_ID} \
+  > ${SCRIPTS_AND_LOGS_FOLDER}/02_execute_tsoppi_and_archive_results.stdout \
+  2> ${SCRIPTS_AND_LOGS_FOLDER}/02_execute_tsoppi_and_archive_results.stderr &
+```
+
+<br>
+
+4. Open the `${SCRIPTS_AND_LOGS_FOLDER}/02_used_scripts/config_${RUN_ID}.sh` file with a text editor.
+This file contains a variable declared as in the following chunk. The following (0-based) columns must be updated
+with the *normal* sample information.
+
+  - 3 : NORMAL_AVAILABLE
+  - 4 : NORMAL_ID_DNA
+  - 5 : RUN_ID_NORMAL_DNA
+
+```{bash, echo=TRUE, eval = FALSE}
+# SAMPLE_ID,TUMOR_ID_DNA,RUN_ID_TUMOR_DNA,NORMAL_AVAILABLE,NORMAL_ID_DNA,RUN_ID_NORMAL_DNA,TUMOR_ID_RNA,RUN_ID_TUMOR_RNA,TUMOR_PURITY,TUMOR_SITE
+SAMPLE_INFO=(\
+  "IPA0123,IPA0123-D00-P00-A00,250821_AAAAAAAA_BBB_CCCCCCCCCC,False,NA,NA,IPA0523-R00-P00-A00,250821_AAAAAAAA_BBB_CCCCCCCCCC,0.9,0" \
+)
+```
+
+<br>
+
+5. Modify the aforementioned variables. The updated version of the config file must look like in the 
+following chunk. The `NORMAL_ID_DNA` and `RUN_ID_NORMAL_DNA` can be obtained from the *PRONTO* metadata table.
+
+  - 3 : Replace the default `False` by `True` (this will tell *TSOPPI* that this sample has a *normal* counterpart).
+  - 4 : Replace the default `NA` by the complete `${SAMPLE_ID}` of the *normal* sample (IPA0124-D00-P00-A00 in the example).
+  - 5 : Replace the default `NA` by the `${RUN_ID}` of the *normal* sample (250822_AAAAAAAA_BBB_CCCCCCCCCC in the example).
+
+```{bash, echo=TRUE, eval = FALSE}
+# SAMPLE_ID,TUMOR_ID_DNA,RUN_ID_TUMOR_DNA,NORMAL_AVAILABLE,NORMAL_ID_DNA,RUN_ID_NORMAL_DNA,TUMOR_ID_RNA,RUN_ID_TUMOR_RNA,TUMOR_PURITY,TUMOR_SITE
+SAMPLE_INFO=(\
+  "IPA0123,IPA0123-D00-P00-A00,250821_AAAAAAAA_BBB_CCCCCCCCCC,True,IPA0124-D00-P00-A00,250822_AAAAAAAA_BBB_CCCCCCCCCC,IPA0523-R00-P00-A00,250821_AAAAAAAA_BBB_CCCCCCCCCC,0.9,0" \
+)
+```
+
+<br>
+
+6. Update again the `config.sh` file in the following variables.
+This will tell *TSOPPI* to skip the generation of the config table and will launching the analysis immediately.
+
+```{bash, echo=TRUE, eval = FALSE}
+MAKE_TSOPPI_CONFIG="F"
+EXECUTE_TSOPPI_SCRIPTS="T"
+``` 
+
+<br>
+
+> **⚠️ Important: update *TSOPPI* config**. If the `MAKE_TSOPPI_CONFIG` is not set to "F", *TSOPPI* will overwrite the changes in the config file and we will have to repeat this process.  
+
+7. Launch again *TSOPPI*. This time will launch the analysis without generating a new config file
+
+```{bash, echo=TRUE, eval = FALSE}
+bash 02_execute_tsoppi_and_archive_results.sh ${RUN_ID} \
+  > ${SCRIPTS_AND_LOGS_FOLDER}/02_execute_tsoppi_and_archive_results.stdout \
+  2> ${SCRIPTS_AND_LOGS_FOLDER}/02_execute_tsoppi_and_archive_results.stderr &
+```
+
+<br>
+
+8. Revert the *TSOPPI* config variables to their default values in the `config.sh` file.
+
+```{bash, echo=TRUE, eval = FALSE}
+MAKE_TSOPPI_CONFIG="T"
+EXECUTE_TSOPPI_SCRIPTS="T"
+```
+
+<br>
+
 ### Additional information on undescribed variables in the README: 
 
 <br>
@@ -1911,12 +2012,6 @@ PIPELINE_FOLDER = "${{DURABLE}}/software/pipeline/v003_upgrading_pronto_to_1.2.0
 ```
 
 
-<br>
-
-## To be added:
-
-  - Check which samplesheet has the invisible character
-  - What does adapt TSOPII table if needed?
   
 <!-- 
 
