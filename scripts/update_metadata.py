@@ -44,7 +44,7 @@ def process_new_meta(new_meta_path, new_run_id):
         fields = line.strip().split('\t')
         if len(fields) < len(header):
             continue  # Skip malformed lines
-        fields = normalize_row(fields)
+        fields    = normalize_row(fields)
         fields[1] = new_run_id # Add run ID value in 2nd column
         data_lines.append('\t'.join(fields))
 
@@ -58,9 +58,9 @@ def update_meta_master(master_metapath, new_meta_lines, output_path):
     lines = safe_readlines(master_metapath)
 
     # Save header and commented lines before the header
-    header_idx = next(i for i, line in enumerate(lines) if line.strip().startswith('Sample_id'))
-    pre_header = lines[:header_idx]
-    header = lines[header_idx].strip()
+    header_idx        = next(i for i, line in enumerate(lines) if line.strip().startswith('Sample_id'))
+    pre_header        = lines[:header_idx]
+    header            = lines[header_idx].strip()
     post_header_lines = lines[header_idx + 1:]
 
     # Update previous run batch
@@ -74,7 +74,7 @@ def update_meta_master(master_metapath, new_meta_lines, output_path):
             parts = stripped.split('\t')
             if len(parts) >= 3:
                 parts[2] = 'N'
-                print(parts)
+                # print(parts)
                 updated_post_header.append('\t'.join(parts))
             else:
                 updated_post_header.append(stripped)
