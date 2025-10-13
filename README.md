@@ -85,5 +85,5 @@ The interactive README file can be created in two ways:
 
 &nbsp;
 
-- [Jaime A Castro-Mondragon](https://jaimicore.github.io/). Email: jamondra@uio.no
-- [Jean-Marc Costanzi](https://github.com/jean-marc-costanzi)
+- [Jaime A Castro-Mondragon](https://jaimicore.github.io/) (jamondra@uio.no)
+- [Jean-Marc Costanzi](https://github.com/jean-marc-costanzi) (jean-marc.costanzi@ahus.no)
