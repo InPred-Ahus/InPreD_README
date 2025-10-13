@@ -33,7 +33,7 @@ run.id          <- NULL
 
 # Force user to define a Run ID
 # Replace the old ID for the new one
-run.id <- "250904_NB552811_0104_AH75GKBGYX" 
+run.id <- "251009_NB552811_0108_AHHVC2BGYX" 
 #         "250606_AAAAAAAA_BBBB_CCCCCCCCCC"   # ID template
 
 if (is.null(run.id)){
@@ -327,7 +327,7 @@ insert.fig.toggle(
     - In *Sheet1*, select columns **InPred ID (IPA)** (E), **Tumor content** (R), and  **Barcode** (S).
     - Create a new file with these columns and  **remove the header**. The file must be named `SampleSheet_YYMMDD_info.csv`.
     - Verify that all entries in the **Barcode** column start with the **UP** prefix. (E.g., UP01, UP16).
-    - Verify that all entries in the **Tumour_content** column have an integer value (0-100).
+    - Verify that all entries in the **Tumor content** column have an integer value (0-100). In case there is no value, leave it empty (avoid '-' or other characters)
     
     - Save the new file in the metadata folder `\\platon.uio.no\med-klinmed-u2\jamondra\pc\Dokumenter\Metadata`.
 
@@ -381,7 +381,7 @@ cl.categories <- add.cl.categories("file_manip", cl.categories)
 cl.sections   <- add.cl.section("Verify Barcode column (UP)", cl.sections)
 cl.categories <- add.cl.categories("file_manip", cl.categories)
 
-cl.sections   <- add.cl.section("Verify Tumor content", cl.sections)
+cl.sections   <- add.cl.section("Verify Tumor content (numeric or empty)", cl.sections)
 cl.categories <- add.cl.categories("file_manip", cl.categories)
 
 cl.sections   <- add.cl.section("Create PRONTO metadata (View UiO)", cl.sections)
@@ -1954,8 +1954,10 @@ SAMPLE_INFO=(\
 following chunk. The `NORMAL_ID_DNA` and `RUN_ID_NORMAL_DNA` can be obtained from the *PRONTO* metadata table.
 
   - 3 : Replace the default `False` by `True` (this will tell *TSOPPI* that this sample has a *normal* counterpart).
-  - 4 : Replace the default `NA` by the complete `${SAMPLE_ID}` of the *normal* sample (IPA0124-D00-P00-A00 in the example).
+  - 4 : Replace the default `NA` by the complete `${SAMPLE_ID}` of the *normal* sample (IPA0124-D00-N00-A00 in the example).
   - 5 : Replace the default `NA` by the `${RUN_ID}` of the *normal* sample (250822_AAAAAAAA_BBB_CCCCCCCCCC in the example).
+  
+*NOTE* : the normal samples have the prefix followed by a number. Example: IPA0124-D00**-N00-**A00.
 
 ```{bash, echo=TRUE, eval = FALSE}
 # SAMPLE_ID,TUMOR_ID_DNA,RUN_ID_TUMOR_DNA,NORMAL_AVAILABLE,NORMAL_ID_DNA,RUN_ID_NORMAL_DNA,TUMOR_ID_RNA,RUN_ID_TUMOR_RNA,TUMOR_PURITY,TUMOR_SITE
