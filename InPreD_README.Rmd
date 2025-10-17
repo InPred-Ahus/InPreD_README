@@ -506,7 +506,7 @@ Before launching the pipeline we must verify if there is enough space in the dis
 
 ### Verify disk space availability
 
-  - **Disk space** : we need at least **200GB of free space**. If this is not the case, contact people involved in the project to release some space.
+  - **Disk space** : we need at least **300GB of free space**. If this is not the case, contact the persone responsible for the *p1150* project in TSD to release some space.
 
 ```{bash, echo=TRUE, eval = FALSE}
 # Check disk space
@@ -1996,6 +1996,17 @@ bash 02_execute_tsoppi_and_archive_results.sh ${RUN_ID} \
 MAKE_TSOPPI_CONFIG="T"
 EXECUTE_TSOPPI_SCRIPTS="T"
 ```
+
+<br>
+
+### TSD *p1150* responsible
+
+<br>
+
+Contact Torben Lüders (torben.luders@medisin.uio.no) for any issue related to this project,
+such as disk space left, errors in the pipeline or question regarding the samplesheets.
+
+Also, you can contact him to any iossue related the metadata (missing fields, wrong IDs or other stuff).
 
 <br>
 
