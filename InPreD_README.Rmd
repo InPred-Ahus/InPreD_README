@@ -752,6 +752,10 @@ bash 00_generate_TSO500_sample_sheet.sh ${RUN_ID} ${INPUT_DATA_TYPE} \
   &> ${SCRIPTS_AND_LOGS_FOLDER}/00_generate_TSO500_sample_sheet.log
 ```
 
+```{bash, echo=TRUE, eval = FALSE}
+more ${SCRIPTS_AND_LOGS_FOLDER}/00_generate_TSO500_sample_sheet.log
+```
+
 <br>
 
   - Verify that the SampleSheet was correctly generated. If the separator is not the one indicated in the config file or if there is a missing column, you will see an error message in the `${SCRIPTS_AND_LOGS_FOLDER}/00_generate_TSO500_sample_sheet.log`.
@@ -799,6 +803,11 @@ in many steps, and many of them require manual intervention.
 bash 01_raw_sequencing_data_management_and_TSO500_analysis.sh ${RUN_ID} ${INPUT_DATA_TYPE} \
   > ${SCRIPTS_AND_LOGS_FOLDER}/01_raw_sequencing_data_management_and_TSO500_analysis.stdout \
   2> ${SCRIPTS_AND_LOGS_FOLDER}/01_raw_sequencing_data_management_and_TSO500_analysis.stderr &
+```
+
+```{bash, echo=TRUE, eval = FALSE}
+more ${SCRIPTS_AND_LOGS_FOLDER}/01_raw_sequencing_data_management_and_TSO500_analysis.stdout
+more ${SCRIPTS_AND_LOGS_FOLDER}/01_raw_sequencing_data_management_and_TSO500_analysis.stderr
 ```
 
 <br>
@@ -983,8 +992,8 @@ SAMPLE_IDs=( "SAMPLE1" "SAMPLE_2" ... "SAMPLE_3" )
   - **NOTE**: originally this step was done manually, now we added the code below to do it automatically.
 
 ```{bash, echo=TRUE, eval = FALSE}
-# Get sample IDs from SampleSheet
-DNA_TUMOUR_SAMPLE_IDS=$(cut -d';' -f1 ${SAMPLESHEETS_FOLDER}/${INFO_FILE_NAME} | awk -F'-' '$2 ~ /D0[[:digit:]]+/')
+# Get sorted sample IDs from SampleSheet
+DNA_TUMOUR_SAMPLE_IDS=$(cut -d';' -f1 ${SAMPLESHEETS_FOLDER}/${INFO_FILE_NAME} | awk -F'-' '$2 ~ /D0[[:digit:]]+/' | sort)
 #DNA_TUMOUR_SAMPLE_IDS=$(cut -d',' -f1 samples.txt | awk -F'-' 'tolower($2) == "d01"') # Case insensitive alternative
 
 # Build array declaration string
@@ -1751,10 +1760,10 @@ cd $DURABLE/software/fusviz/create_fusviz_input
 
 # Fill in the RUN ID and SAMPLE_ID values to create the FusViz plot
 FVPLOT_RUN_ID=${RUN_ID}
-FVPLOT_SAMPLE_ID_RNA="IPA0511-R03-p01-A15"
+FVPLOT_SAMPLE_ID_DNA="IPA0511-D01-p01-A15"
 
-FVPLOT_SAMPLE_ID_DNA="${FVPLOT_SAMPLE_ID_DNA/-R03-/-D01-}"
-FVPLOT_SAMPLE_ID_DNA="${FVPLOT_SAMPLE_ID_RNA/RNA/DNA}"
+FVPLOT_SAMPLE_ID_RNA="${FVPLOT_SAMPLE_ID_DNA/-D01-/-R03-}"
+FVPLOT_SAMPLE_ID_RNA="${FVPLOT_SAMPLE_ID_RNA/DNA/RNA}"
 TSOPPI_RESULTS="${DURABLE}/TSO500_postprocessing/${FVPLOT_RUN_ID}_TSOPPI_v0.3.2_main_2022_06_07"
 
 singularity run                                                               \
