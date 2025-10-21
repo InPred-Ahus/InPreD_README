@@ -2019,6 +2019,50 @@ Also, you can contact him to any iossue related the metadata (missing fields, wr
 
 <br>
 
+### I cannot see results after running PRONTO (03)
+
+<br>
+
+It may happen that you launched *PRONTO* and ir ran succesfully, however you didn't
+find any results in the `${DURABLE}/TSO500_export_for_interpretation/RECENT_RUN/` folder.
+
+You can verify in 2 places.
+
+1. In *PRONTO* *Out* folder (`${DURABLE}/software/PRONTO/PRONTO-1.2.0/Out/${RUN_ID}/`) : here you should see a folder for each sample ID.
+
+2. In case the `${DURABLE}/software/PRONTO/PRONTO-1.2.0/Out/${RUN_ID}/` folder does not exist or is empty, the issue may come directly from the master metadata table (`${DURABLE}/software/PRONTO/PRONTO-1.2.0/In/InPreD_PRONTO_metadata.txt`). The problem may be a separator-related issue. You have to manually check that the separator bewteen columns is a tab and not single spaces.
+
+<br>
+
+### Generate *TSOPPI* config file when a sample has only its RNA component
+
+<br>
+
+It may happen that in a sequencing run we sequence only RNA for a given sample
+(and the DNA was sequenced in a previous run).
+
+In such cases we have to manually adapt the *TSOPPI* config file, however the script 
+assumes the *DNA* sample ID is known, which is not true in these cases, and it will
+generate an error when launching *TSOPPI*.
+
+As a temporary solution, you have to uncomment the following lines in the 
+`${SCRIPTS_FOLDER}/generate_config_file.py` script.
+
+```{bash, echo=TRUE, eval = FALSE}
+#info[patient_id]['DNA_tumor'] = sample_id
+#info[patient_id]['run_id_dna_tumor'] = seq_run_id
+```
+
+<br>
+
+This will create the *TSOPPI* config file however you have to replace the run ID and 
+sample ID for the DNA sample, follow the instructions in the Question *Add normal samples in the TSOPPI table*
+within this section of the README.
+
+Don't forget to comment this lines again after the *TSOPPI* config file was succesfully created. 
+
+<br>
+
 ### Additional information on undescribed variables in the README: 
 
 <br>
