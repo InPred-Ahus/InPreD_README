@@ -2034,16 +2034,150 @@ You can verify in 2 places.
 
 <br>
 
-### Generate *TSOPPI* config file when a sample has only its RNA component
+### How to run the pipeline when there are samples with RNA data only
 
 <br>
-
 It may happen that in a sequencing run we sequence only RNA for a given sample
 (and the DNA was sequenced in a previous run).
 
+1. *LocalApp* and *icnva* run as usual, so no need to update them
+2. *TSOPPI* and *PRONTO* runs have to be manually adapted to properly run the analysis for all samples.
+
+Here we explain what to do in *TSOPPI* and *PRONTO*, respectively.
+
+<br>
+
+#### Generate *TSOPPI* config file when a sample has only its RNA component
+
+<br>
+
 In such cases we have to manually adapt the *TSOPPI* config file, however the script 
-assumes the *DNA* sample ID is known, which is not true in these cases, and it will
-generate an error when launching *TSOPPI*.
+that creates this config file assumes the *DNA* sample ID is known, which is not
+true in these cases, and it will generate an error when launching *TSOPPI*.
+
+<br>
+
+1. Update `config.sh` file in the following variables. By default both variables are set to `"T"`.
+This will tell *TSOPPI* to generate the config table only, without launching the analysis.
+
+```{bash, echo=TRUE, eval = FALSE}
+MAKE_TSOPPI_CONFIG="T"
+EXECUTE_TSOPPI_SCRIPTS="F"
+```
+
+<br>
+
+2. As a temporary solution, you have to uncomment the following lines in the 
+`${SCRIPTS_FOLDER}/generate_config_file.py` script (the chunk show them uncommented 
+but they are commented in the script).
+
+This will create the *TSOPPI* config file however you have to replace the run ID and 
+sample ID for the DNA sample.
+
+```{bash, echo=TRUE, eval = FALSE}
+info[patient_id]['DNA_tumor'] = sample_id
+info[patient_id]['run_id_dna_tumor'] = seq_run_id
+```
+
+<br>
+
+3. Launch *TSOPPI* as usual.
+
+```{bash, echo=TRUE, eval = FALSE}
+bash 02_execute_tsoppi_and_archive_results.sh ${RUN_ID} \
+  > ${SCRIPTS_AND_LOGS_FOLDER}/02_execute_tsoppi_and_archive_results.stdout \
+  2> ${SCRIPTS_AND_LOGS_FOLDER}/02_execute_tsoppi_and_archive_results.stderr &
+```
+
+<br>
+
+4. Open the `${SCRIPTS_AND_LOGS_FOLDER}/02_used_scripts/config_${RUN_ID}.sh` file with a text editor.
+This file contains a variable declared as in the following chunk. The following (0-based) columns must be updated
+with the *DNA* sample information, with the step 2 these values correspond to the RNA data and they have to be corrected.
+
+  - 1 : TUMOR_ID_DNA
+  - 2 : RUN_ID_TUMOR_DNA
+
+Note that the column 1 and 2 are identical to columns 6 and 7. This is incorrect
+and has to be updated.
+
+```{bash, echo=TRUE, eval = FALSE}
+# SAMPLE_ID,TUMOR_ID_DNA,RUN_ID_TUMOR_DNA,NORMAL_AVAILABLE,NORMAL_ID_DNA,RUN_ID_NORMAL_DNA,TUMOR_ID_RNA,RUN_ID_TUMOR_RNA,TUMOR_PURITY,TUMOR_SITE
+SAMPLE_INFO=(\
+  "IPA0123,IPA0523-R00-P00-A00,250821_AAAAAAAA_BBB_CCCCCCCCCC,False,NA,NA,IPA0523-R00-P00-A00,250821_AAAAAAAA_BBB_CCCCCCCCCC,0.9,0" \
+)
+```
+
+<br>
+
+5. Modify the aforementioned variables. The updated version of the config file must look like in the 
+following chunk. The `TUMOR_ID_DNA` and `RUN_ID_TUMOR_DNA` can be obtained from the *PRONTO* metadata table.
+
+  - 1 : Replace the value by the corresponding DNA sample ID (IPA0123-D00-P00-A00 in the example below).
+  - 2 : Replace the value by the corresponding run ID associated to the DNA sample (250828_AAAAAAAA_BBB_CCCCCCCCCC in the example below).
+  
+*NOTE* : the DNA samples contain the string `-D01-`. Example: IPA0124**-D01-**P00-A00.
+
+```{bash, echo=TRUE, eval = FALSE}
+# SAMPLE_ID,TUMOR_ID_DNA,RUN_ID_TUMOR_DNA,NORMAL_AVAILABLE,NORMAL_ID_DNA,RUN_ID_NORMAL_DNA,TUMOR_ID_RNA,RUN_ID_TUMOR_RNA,TUMOR_PURITY,TUMOR_SITE
+SAMPLE_INFO=(\
+  "IPA0123,IPA0123-D00-P00-A00,250828_AAAAAAAA_BBB_CCCCCCCCCC,False,NA,NA,IPA0523-R00-P00-A00,250821_AAAAAAAA_BBB_CCCCCCCCCC,0.9,0" \
+)
+```
+
+<br>
+
+6. Update again the `config.sh` file in the following variables.
+This will tell *TSOPPI* to skip the generation of the config table and will launching the analysis immediately.
+
+```{bash, echo=TRUE, eval = FALSE}
+MAKE_TSOPPI_CONFIG="F"
+EXECUTE_TSOPPI_SCRIPTS="T"
+``` 
+
+<br>
+
+> **⚠️ Important: update *TSOPPI* config**. If the `MAKE_TSOPPI_CONFIG` is not set to "F", *TSOPPI* will overwrite the changes in the config file and we will have to repeat this process.  
+
+7. Launch again *TSOPPI*. This time will launch the analysis without generating a new config file
+
+```{bash, echo=TRUE, eval = FALSE}
+bash 02_execute_tsoppi_and_archive_results.sh ${RUN_ID} \
+  > ${SCRIPTS_AND_LOGS_FOLDER}/02_execute_tsoppi_and_archive_results.stdout \
+  2> ${SCRIPTS_AND_LOGS_FOLDER}/02_execute_tsoppi_and_archive_results.stderr &
+```
+
+<br>
+
+8. Revert the *TSOPPI* config variables to their default values in the `config.sh` file.
+
+```{bash, echo=TRUE, eval = FALSE}
+MAKE_TSOPPI_CONFIG="T"
+EXECUTE_TSOPPI_SCRIPTS="T"
+```
+
+<br>
+
+9. Comment these lines again (in `${SCRIPTS_FOLDER}/generate_config_file.py`)
+after the *TSOPPI* config file was successfully created. 
+
+```{bash, echo=TRUE, eval = FALSE}
+#info[patient_id]['DNA_tumor'] = sample_id
+#info[patient_id]['run_id_dna_tumor'] = seq_run_id
+```
+
+<br>
+
+#### Generate reports for samples containing only RNA data
+
+<br>
+
+*PRONTO* takes many parameters including the `${RUN_ID}`, the `config.sh` and the 
+`${SCRIPTS_AND_LOGS_FOLDER}/02_used_scripts/config_${RUN_ID}.sh` (the *TSOPPI* config file).
+
+
+
+<br>
 
 As a temporary solution, you have to uncomment the following lines in the 
 `${SCRIPTS_FOLDER}/generate_config_file.py` script.
@@ -2055,11 +2189,7 @@ As a temporary solution, you have to uncomment the following lines in the
 
 <br>
 
-This will create the *TSOPPI* config file however you have to replace the run ID and 
-sample ID for the DNA sample, follow the instructions in the Question *Add normal samples in the TSOPPI table*
-within this section of the README.
-
-Don't forget to comment this lines again after the *TSOPPI* config file was succesfully created. 
+T
 
 <br>
 
