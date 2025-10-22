@@ -2230,7 +2230,9 @@ insert.fig.toggle(
 <br>
 
 5. Rename the *TOSPPI* results folders from the DNA_RUN by adding the suffix **_ORIGINAL**.
-We keep this renamed folders as a backup.
+We keep this renamed folders as a backup. Then copy the *TSOPPI* results containing 
+*DNA* and *RNA* analysis (i.e. RNA_RUN) in the folders from the DNA_RUN (the run 
+where DNA (but not RNA) was sequences).
 
 ```{r Rename_old_run_TSOPPI_files, echo=FALSE, results='asis'}
 insert.fig.toggle(
