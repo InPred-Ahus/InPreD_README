@@ -1565,7 +1565,7 @@ Dear all,
 TSOPPI and ICNVA analysis are running now.
 The small variant tables should be ready for QC in ~30 minutes.
 
-Please, let me know when QC is ready to proceed with the reports.
+Please, let us know when QC is ready to proceed with the reports.
 
 Best,
 
@@ -1593,7 +1593,7 @@ We observed some sequencing-related warnings for IPA0, be aware that this may be
 
 Best,
 
-Jaime
+Jaime & Jean-Marc
 ```
 
 <br>
@@ -2234,7 +2234,7 @@ insert.fig.toggle(
 5. Rename the *TOSPPI* results folders from the DNA_RUN by adding the suffix **_ORIGINAL**.
 We keep this renamed folders as a backup. Then copy the *TSOPPI* results containing 
 *DNA* and *RNA* analysis (i.e. RNA_RUN) in the folders from the DNA_RUN (the run 
-where DNA (but not RNA) was sequences).
+where DNA (but not RNA) was sequenced).
 
 ```{r Rename_old_run_TSOPPI_files, echo=FALSE, results='asis'}
 insert.fig.toggle(
