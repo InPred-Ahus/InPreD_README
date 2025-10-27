@@ -5,7 +5,7 @@ import sys
 from typing import List
 
 # For the moment we are using a file with the protein coding genes in hg19.
-# Note that it may be extended to include other type og genes such as lncRNA, miRNA, etc.
+# Note that it may be extended to include other type of genes such as lncRNA, miRNA, etc.
 
 
 # ------------------------------ #
@@ -298,13 +298,13 @@ def main(summary_file, sample_mut_file, gene_coord, output_file):
 
     # Process the sample mutation file
     samples_df = process_mutation_samples(sample_mut_file)
-    #print(samples_df)
+    print("After process_mutation_samples()")
+    print(samples_df)
 
     # Join the summary with the sample mutations
     fusions2export = (summary_df.join( samples_df,
-                                      left_on  = "coord",
-                                      right_on = "coord",
-                                      how      = "inner")
+                                       on  = "coord",
+                                       how = "inner")
                                 .select([
                                     pl.col("chrom1"),
                                     pl.col("pos1"),
