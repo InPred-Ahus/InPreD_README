@@ -1,6 +1,6 @@
 ---
 title: "InPreD_README"
-author: "Jaime Abraham Castro-Mondragon"
+author: "Jaime Abraham Castro-Mondragon & Jean-Marc Costanzi"
 date: 'Last update: `r Sys.Date()`'
 output:
   html_document:
@@ -1598,27 +1598,59 @@ Jaime
 
 <br>
 
-## Q & A
+## FusViz
+
+### How to generate the input tables for *FusViz* ?
 
 <br>
 
-### How can I know the run ID `$RUN_ID` ?
+*FusViz* requires as input a table with the information of the genes involved in the fusion (gene name, chromosome, position, strand and number of reads supporting the fusion; see [FusViz documentation](https://fusviz-docs.readthedocs.io/en/master/Input.html#input-source-and-format) for a detailed explanation).
+  
+We have created a ready-to-use *image* to generate the input required by *FusViz* from the mutations detected in the pipeline. In a nutshell: it verifies the directionality of the fusion by detecting the upstream gene, then search the genes strands and report the aligned and discordant reads supporting the fusion event.
 
-  - The run ID is in the name of the sequencing files and it is automatically generated from the sequencer.
-  
-  - The run ID has the following format `YYMMDD_AAAAAAAA_BBBB_CCCCCCCCCC` (Figure 22). You can copy the prefix name (i.e., without the file extension) and save the content in the `$RUN_ID` variable.
-  
-  - In Figure 22, `RUN_ID="250606_NB552811_0087_AH2T7NBGYX"`.
+The gene *strand* is provided in the resulting table because this image already contains a file with the gene strand of each human gene (genome version: hg19).
 
 <br>
 
-```{r find_runid, echo=FALSE, results='asis'}
+  - Open a new terminal, but do not acces to the `Colossus` server.
+  
+  - Go to the *create_fusviz_input* folder (`$DURABLE/software/fusviz/create_fusviz_input`) and launch the image.
+  
+  - Launch the image with the following code. The programs require the following files located in the `${DURABLE}/TSO500_postprocessing/${RUN_ID}_TSO500_TSOPPI_v0.3.2_main_2022_06_07` folder.
+  
+    - Variant summary table: this file contains the splice and fusion variants for all the samples in the run: `${DURABLE}/TSO500_postprocessing/${RUN_ID}/${RUN_ID}_variant_summary.tsv`
+    
+    - Splice and fusion sample: this file contains the splice and fusion variants for a particular sample, this also contains the number of aligned and discordant reads supporting the fusion events: `${DURABLE}/TSO500_postprocessing/${RUN_ID}/${SAMPLE_ID}/${SAMPLE_ID}_fusion_and_splice_variant_candidates.tsv`
+
+```{bash, echo=TRUE, eval = FALSE}
+# Launch image from create_fusviz_input folder
+cd $DURABLE/software/fusviz/create_fusviz_input
+
+# Fill in the RUN ID and SAMPLE_ID values to create the FusViz plot
+FVPLOT_RUN_ID=${RUN_ID}
+FVPLOT_SAMPLE_ID_DNA="IPA0511-D01-p01-A15"
+
+FVPLOT_SAMPLE_ID_RNA="${FVPLOT_SAMPLE_ID_DNA/-D01-/-R03-}"
+FVPLOT_SAMPLE_ID_RNA="${FVPLOT_SAMPLE_ID_RNA/DNA/RNA}"
+TSOPPI_RESULTS="${DURABLE}/TSO500_postprocessing/${FVPLOT_RUN_ID}_TSOPPI_v0.3.2_main_2022_06_07"
+
+singularity run                                                               \
+  -B ${TSOPPI_RESULTS}:/summary                                               \
+  -B ${TSOPPI_RESULTS}/${FVPLOT_SAMPLE_ID_DNA}:/sample                        \
+  create_fusviz_input.sif                                                     \
+  -s /summary/${FVPLOT_RUN_ID}_variant_summary.tsv                            \
+  -m /sample/${FVPLOT_SAMPLE_ID_RNA}_fusion_and_splice_variant_candidates.tsv \
+  -o ${FVPLOT_SAMPLE_ID_DNA}_fusviz.txt ;
+```
+
+
+```{r fusviz_SV, echo=FALSE, results='asis'}
 insert.fig.toggle(
-  fig.id = "find_runid",
+  fig.id = "fusviz_SV",
   button.label = "Figure 22",
-  img.src = "fig/22_Find_run_ID.png",
-  fig.width = "95%",
-  fig.cap = "The run ID is the prefix of the sequencing files, in this example, the file name without the *.md5* extension"
+  img.src = "fig/22_fusviz_SV.png",
+  fig.width = "100%",
+  fig.cap = "Example to run the create_fusviz_input image to create the input table required by fusviz. The second printed table is the fusviz input file"
 )
 ```
 
@@ -1732,57 +1764,27 @@ insert.fig.toggle(
 
 <br>
 
-### How to generate the input tables for *FusViz* ?
+## Q & A
 
 <br>
 
-*FusViz* requires as input a table with the information of the genes involved in the fusion (gene name, chromosome, position, strand and number of reads supporting the fusion; see [FusViz documentation](https://fusviz-docs.readthedocs.io/en/master/Input.html#input-source-and-format) for a detailed explanation).
-  
-We have created a ready-to-use *image* to generate the input required by *FusViz* from the mutations detected in the pipeline. In a nutshell: it verifies the directionality of the fusion by detecting the upstream gene, then search the genes strands and report the aligned and discordant reads supporting the fusion event.
+### How can I know the run ID `$RUN_ID` ?
 
-The gene *strand* is provided in the resulting table because this image already contains a file with the gene strand of each human gene (genome version: hg19).
+  - The run ID is in the name of the sequencing files and it is automatically generated from the sequencer.
+  
+  - The run ID has the following format `YYMMDD_AAAAAAAA_BBBB_CCCCCCCCCC` (Figure 28). You can copy the prefix name (i.e., without the file extension) and save the content in the `$RUN_ID` variable.
+  
+  - In Figure 22, `RUN_ID="250606_NB552811_0087_AH2T7NBGYX"`.
 
 <br>
 
-  - Open a new terminal, but do not acces to the `Colossus` server.
-  
-  - Go to the *create_fusviz_input* folder (`$DURABLE/software/fusviz/create_fusviz_input`) and launch the image.
-  
-  - Launch the image with the following code. The programs require the following files located in the `${DURABLE}/TSO500_postprocessing/${RUN_ID}_TSO500_TSOPPI_v0.3.2_main_2022_06_07` folder.
-  
-    - Variant summary table: this file contains the splice and fusion variants for all the samples in the run: `${DURABLE}/TSO500_postprocessing/${RUN_ID}/${RUN_ID}_variant_summary.tsv`
-    
-    - Splice and fusion sample: this file contains the splice and fusion variants for a particular sample, this also contains the number of aligned and discordant reads supporting the fusion events: `${DURABLE}/TSO500_postprocessing/${RUN_ID}/${SAMPLE_ID}/${SAMPLE_ID}_fusion_and_splice_variant_candidates.tsv`
-
-```{bash, echo=TRUE, eval = FALSE}
-# Launch image from create_fusviz_input folder
-cd $DURABLE/software/fusviz/create_fusviz_input
-
-# Fill in the RUN ID and SAMPLE_ID values to create the FusViz plot
-FVPLOT_RUN_ID=${RUN_ID}
-FVPLOT_SAMPLE_ID_DNA="IPA0511-D01-p01-A15"
-
-FVPLOT_SAMPLE_ID_RNA="${FVPLOT_SAMPLE_ID_DNA/-D01-/-R03-}"
-FVPLOT_SAMPLE_ID_RNA="${FVPLOT_SAMPLE_ID_RNA/DNA/RNA}"
-TSOPPI_RESULTS="${DURABLE}/TSO500_postprocessing/${FVPLOT_RUN_ID}_TSOPPI_v0.3.2_main_2022_06_07"
-
-singularity run                                                               \
-  -B ${TSOPPI_RESULTS}:/summary                                               \
-  -B ${TSOPPI_RESULTS}/${FVPLOT_SAMPLE_ID_DNA}:/sample                        \
-  create_fusviz_input.sif                                                     \
-  -s /summary/${FVPLOT_RUN_ID}_variant_summary.tsv                            \
-  -m /sample/${FVPLOT_SAMPLE_ID_RNA}_fusion_and_splice_variant_candidates.tsv \
-  -o ${FVPLOT_SAMPLE_ID_DNA}_fusviz.txt ;
-```
-
-
-```{r fusviz_SV, echo=FALSE, results='asis'}
+```{r find_runid, echo=FALSE, results='asis'}
 insert.fig.toggle(
-  fig.id = "fusviz_SV",
+  fig.id = "find_runid",
   button.label = "Figure 28",
-  img.src = "fig/28_fusviz_SV.png",
-  fig.width = "100%",
-  fig.cap = "Example to run the create_fusviz_input image to create the input table required by fusviz. The second printed table is the fusviz input file"
+  img.src = "fig/28_Find_run_ID.png",
+  fig.width = "95%",
+  fig.cap = "The run ID is the prefix of the sequencing files, in this example, the file name without the *.md5* extension"
 )
 ```
 
