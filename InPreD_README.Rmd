@@ -2234,11 +2234,20 @@ insert.fig.toggle(
 <br>
 
 5. Rename the *TOSPPI* results folders of the samples to be updated from the DNA_RUN
-by adding the suffix *_ORIGINAL*. We keep this renamed folders as a backup.
+by adding the prefix *ORIGINAL_*. We keep this renamed folders as a backup.
 
 <br>
 
-6. Copy the *TSOPPI* results of the samples to be updated (the ones containing both
+6. We need to rename the *LocalApp* results folders by adding the prefix *ORIGINAL_*.
+This is important to avoid results from previous *LocalApp* runs with the same ID
+to appear in the results of the new version.
+
+As alternative, in case you don'y need to create a backup, delete the old *LocalApp* folder.
+
+
+<br>
+
+7. Copy the *TSOPPI* results of the samples to be updated (the ones containing both
 *DNA* and *RNA* analysis, i.e. RNA_RUN) in the folders from the DNA_RUN (the run 
 where DNA (but not RNA) was sequenced).
 
@@ -2254,7 +2263,7 @@ insert.fig.toggle(
 
 <br>
 
-6. Update the `${RUN_ID}` variable with the previous run (DNA_RUN), source it and launch *PRONTO*.
+8. Update the `${RUN_ID}` variable with the previous run (DNA_RUN), source it and launch *PRONTO*.
 
 ```{bash, echo=TRUE, eval = FALSE}
 
