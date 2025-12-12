@@ -33,7 +33,7 @@ run.id          <- NULL
 
 # Force user to define a Run ID
 # Replace the old ID for the new one
-run.id <- "251204_NB552811_0116_AHTJKLBGYX" 
+run.id <- "251211_NB552811_0117_AHTJM2BGYX" 
 #         "250606_AAAAAAAA_BBBB_CCCCCCCCCC"   # ID template
 
 if (is.null(run.id)){
