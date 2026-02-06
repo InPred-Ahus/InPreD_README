@@ -1,0 +1,2348 @@
+---
+title: "InPreD_README"
+author: "Jaime Abraham Castro-Mondragon & Jean-Marc Costanzi"
+date: 'Last update: `r Sys.Date()`'
+output:
+  html_document:
+    number_sections: true
+    theme: cosmo
+    toc: true
+    toc_depth: 4
+    toc_float:
+      collapsed: true
+    self_contained: true
+    code_folding: show
+  pdf_document:
+    toc: true
+    toc_depth: '4'
+---
+
+```{r setup, include=FALSE}
+library(emo)
+library(glue)
+library(broom)
+library(klippy)
+
+knitr::opts_chunk$set(echo = TRUE)
+
+date.checklist <- substr(gsub(x = Sys.Date(), pattern = "-", ""), start = 3, 8)
+
+checklist.terms <- list()
+run.id          <- ""
+run.id.date     <- ""
+
+# Force user to define a Run ID
+# Replace the old ID for the new one
+run.id <- "260129_NB552811_0122_AHL7KYBGYX" 
+#         "250606_AAAAAAAA_BBBB_CCCCCCCCCC"   # ID template
+
+# 260123_NB552811_0121_AHL7KWBGYX
+# 260115_NB552811_0120_AHW5KKBGYX
+
+if (is.null(run.id)){
+  stop("run.id cannot be NULL")
+}
+run.date <- unlist(strsplit(run.id, split = "_"))[1]
+
+
+# JACM: to check
+# if (file.exists("InPreD_README.html")) {
+#   file.remove("InPreD_README.html")
+# }
+# 
+# 
+# checklist.file <- paste0(run.date, "_InPreD_pipeline_Checklist.html")
+# if (file.exists(checklist.file)) {
+#   file.remove(checklist.file)
+# }
+```
+
+```{r klippy, echo=FALSE, include=TRUE}
+klippy::klippy(lang     = c('r', 'python', 'bash'),
+               position = c('top', 'right'),
+               color    = '#253494')
+```
+
+```{r functions, include=FALSE}
+# ----------------------- #
+# Show/Hide figure botton #
+# ----------------------- #
+
+insert.fig.toggle <- function(
+  fig.id,        # Unique id for the div/button (e.g. "figVMWare")
+  button.label,  # Label for the button (e.g. "Toggle Figure 1")
+  img.src,       # Path to image (e.g. "fig/01_VMWare_login.png")
+  fig.width = "45%",  # Width style for image
+  fig.cap = "Caption text"  # Figure caption text
+) {
+  safe_fig_id <- gsub("'", "\\'", fig.id)
+  safe_button_label <- gsub("'", "\\'", button.label)
+  safe_img_src <- gsub("'", "\\'", img.src)
+  safe_fig_cap <- gsub("'", "\\'", fig.cap)
+  
+  cat(sprintf('
+<div style="margin-bottom: 10px; text-align: right;">
+  <button class="btn-toggle" onclick="toggleFigure(\'%s\')">%s</button>
+</div>
+<div id="%s" style="display:block; text-align: center; margin-bottom: 20px;">
+  <img src="%s" style="width:%s;" class="img-fluid"/>
+  <p><strong>%s.</strong> %s</p>
+</div>
+', safe_fig_id, safe_button_label, safe_fig_id, safe_img_src, fig.width, safe_button_label, safe_fig_cap))
+}
+
+# ------------------------------ #
+# Checklist names and categories #
+# ------------------------------ #
+make_prepender <- function(prefix_name) {
+  function(label, v) {
+    c(label, v)
+  }
+}
+
+add.cl.section    <- make_prepender("section")
+add.cl.categories <- make_prepender("category")
+```
+
+
+
+```{r checklist, include=FALSE}
+
+checklist.template.file <- "templates/InPreD_pipeline_Checklist.html"
+checklist.ready.file    <- paste0(run.date, "_InPreD_pipeline_Checklist.html")
+
+# ------------------------------- #
+# Prepare CheckList section names #
+# ------------------------------- #
+
+# CheckList section names
+cl.sections   <- vector()
+cl.categories <- vector()
+
+# Check List item
+generate_checklist_html <- function(checklist, categories) {
+  if (length(checklist) != length(categories)) {
+    stop("Checklist and categories must have the same length.")
+  }
+  
+  html_items <- mapply(function(item, i, category) {
+    sprintf(
+      '<div class="checklist-item %s">\n  <input type="checkbox" id="item%d">\n  <label for="item%d">%d. %s</label>\n</div>',
+      category, i, i, i, item
+    )
+  }, checklist, seq_along(checklist), categories, USE.NAMES = FALSE)
+  
+  paste(html_items, collapse = "\n")
+}
+
+
+## Copy template and read copy
+file.copy(from = checklist.template.file,
+          to   = checklist.ready.file)
+
+```
+
+<br>
+
+## Introduction
+
+<br>
+
+This document explains how to run the *InPreD* pipeline to detect small variants, CNAs, gene fusions and other mutations from an *Illumina TS0500* panel. Every week we sequence a batch of max 8 samples (hereafter referred as *sequencing run*), with its corresponding unique run ID (*RUN_ID*).
+
+As the *MolPat* group at *Ahus* is gradually taking charge of the *InPreD* project. In the upcoming months the sequencing is done by *OUS*, they will send us the sequencing results of *Ahus* samples and we (*Ahus*) will do the postprocessing, QC and report generation.
+
+<br>
+
+```{r runID, echo=FALSE, eval = TRUE, comment=""}
+cat(run.id)
+```
+
+<br>
+
+## Connect to the TSD and UiO Virtual Machines
+
+<br>
+
+### TSD (Tjenester for Sensitive Data)
+
+
+  - In your browser, open the [View TSD Portal](https://view.tsd.usit.no/portal/webclient/#/home) website. Log in with your *username* and *2FA* first, then VMWare will ask your *password* (Figure 1).
+
+```{r figVMWare, echo=FALSE, results='asis'}
+
+insert.fig.toggle(
+  fig.id = "figVMWare",
+  button.label = "Figure 1",
+  img.src = "fig_v2/01_VMWare_login.png",
+  fig.width = "45%",
+  fig.cap = "Log in in the VMWare Horizon portal"
+)
+
+```
+
+  - Click on the **p1150-rhel8-01-pool** icon, this will open the Linux VM (Figure 2). The other icon (*p1150-win02-pool*) will open the Windows VM.
+
+```{r figVMs, echo=FALSE, results='asis'}
+
+insert.fig.toggle(
+  fig.id = "figVMs",
+  button.label = "Figure 2",
+  img.src = "fig_v2//02_VMs.png",
+  fig.width = "45%",
+  fig.cap = "Available VMs. Left: Linux, Right: Windows"
+)
+
+```
+
+<br>
+
+### UiO machine (Hypathia)
+
+
+  - In your browser, open the [View UiO Portal - Hypathia](https://view.uio.no/portal/webclient/#/launchitems) website. Log in with your *username* and  your *UiO user password* (Figure 3).
+
+```{r figVMWare_uio, echo=FALSE, results='asis'}
+
+insert.fig.toggle(
+  fig.id = "figVMWare",
+  button.label = "Figure 3",
+  img.src = "fig_v2/03_WMWare_UiO.png",
+  fig.width = "45%",
+  fig.cap = "Log in in the VMWare Horizon portal"
+)
+
+```
+
+  - Click on the **UiO Linux Desktop** icon, this will open the Linux VM (Figure 3). The other icon (*Kontor Fullsjerm*) will open the Windows VM.
+
+<br>
+
+
+<!-- ## Folder structure -->
+
+<!-- <br> -->
+
+<!-- We will be working in the following directory: `/ess/p1150/data/durable`. We have a list of subfolders that will be constantly used during the analysis, from now on, **the file paths are relative to the working directory `durable`**. -->
+
+
+<!-- ```{bash, echo=TRUE, eval = FALSE} -->
+<!-- cd /ess/p1150/data/durable -->
+<!-- ``` -->
+
+<!-- <br> -->
+
+<!--   - **`file-import/p1150-member-group/`** : all uploaded files through the [*TSD Data Portal*](data.tsd.usit.no) will be located here (e.g., sequencing raw files, sample sheets and metadata). The files are uploaded usually every friday afternoon. See section *4 Import Samplesheets to TSD*. -->
+
+<!-- <br> -->
+
+<!--   - **`file-export/`** : this is the folder where files can be exported outside the [TSD](https://selfservice.tsd.usit.no/) framework. Any file in this folder is visible outside the *TSD* framework and can be downloaded, so we must be cautious about its content. -->
+
+<!-- <br> -->
+
+<!--   - **`TSO500_SampleSheets/`** : in this folder we place the Sample sheet files (see *Prepare sequences and metadata* section) generated in each sequence run. Every sequence run should have three associated files.  -->
+<!--     - ``r paste0(run.date, "_info.csv")`` : Original Samplesheet (for this run ID). Taken from `file-import/` folder, do not modify this file. -->
+<!--     - ``r paste0(run.date, "_info_TSOPPI.csv")`` : Copy of the original Samplesheet, it may be modified. This copy is required by *TSOPPI*, may contain samples from many run IDs or commented samples. -->
+<!--     - ``r paste0(run.id, ".csv")`` : Curated Samplesheet. -->
+
+<!-- <br> -->
+
+<!--   - **`TSO500_pronto_metadata/`** : in this folder we place the metadata tables (original and in an encrypted version; see *Prepare sequences and metadata* section). Every sequence run should have two associated files.  -->
+<!--     - ``r paste0("PRONTO_metadata_", run.date, ".txt")`` : Original metadata table.  -->
+<!--     - ``r paste0("PRONTO_metadata_", run.date, ".7z")`` : Compressed and encrypted table. -->
+
+<!-- <br> -->
+
+<!--   - **`TSO500_sequences/`** : in this folder we place the sequence files (see *Prepare sequences and metadata* section) generated in every run. Every sequence run should have two associated files.  -->
+<!--     - ``r paste0(run.id, "/")`` : Folder with sequences.  -->
+<!--     - ``r paste0(run.id, ".md5")`` : File with checksums. -->
+
+<!-- <br> -->
+
+<!--   - **`TSO500_scripts_and_logs/`** : in this folder we will place the logs and error messages of each analysis launched in the pipeline. One folder per run ID. -->
+
+<!-- <br> -->
+
+<!--   - **`TSO500_analyses/`** : here we will find the results after running *LocalApp*. Every sequence run should have one associated folder.  -->
+<!--     - ``r paste0(run.id, "_LocalApp_analysis/")`` : this is a link.  -->
+<!--     - ``r paste0(run.id, "_LocalApp_analysis_fromRAW/")`` : *LocalApp* results :  -->
+<!--         - `results/${SAMPLE_ID}/` : Sample ID results are in individual folders -->
+<!--         - `results/MetricsOutput.tsv` : Table with sequencing metrics -->
+
+<!-- <br> -->
+
+<!--   - **`TSO500_postprocessing/`** : here we find the results after running *LocalApp* and *TSOPPI*, two folders per run ID. Both folders follow the same structure. -->
+
+<!--     - ``r paste0(run.id, "_TSO500_LocalApp_postprocessing_results/")`` : *LocalApp*.  -->
+<!--         - `${SAMPLE_ID}` : One folder per sample. -->
+<!--         - ``r paste0(run.id, "_metrics_plots")`` : Sequencing QC-related plots. -->
+<!--         - ``r paste0(run.id, "_variant_summary.csv")`` : Table with variants. -->
+
+<!--     - ``r paste0(run.id, "_TSO500_TSOPPI_v0.3.2_main_2022_06_07/")`` : *TSOPPI*. -->
+
+<!-- <br> -->
+
+<!--   - **`TSO500_icnva/`** : here we find the [*PureCN*](https://scfbm.biomedcentral.com/articles/10.1186/s13029-016-0060-z) results. One folder per run ID, and one folder per sample ID. -->
+
+<!--     - ``r paste0(run.id, "/${SAMPLE_ID}_icnva/")`` -->
+<!--         - `PureCN_results_default/` : *PureCN* results of each patient. Including the local optima solutions for ploidy/purity. -->
+<!--         - `PureCN_results_custom/` : *PureCN* results of each patient. -->
+<!--         - `${SAMPLE_ID}_NRC_plots.pdf` : Tumor vs Normal samples comparison plots. -->
+
+<!-- <br> -->
+
+<!--   - **`TSO500_export_for_interpretation/`** : this is the folder where the results are stored before the interpretation of variants, mutations and fusions. -->
+
+<!--     - `RECENT_RUN/` : here we will find the 8 samples corresponding to the current sequencing run. The content is similar to `TSO500_icnva/`. -->
+<!--     - `IPA001-IPA100` : there are many folders with a similar pattern in their name. After interpretation the `RECENT_RUN/` content must be moved to their corresponding folder. -->
+
+<!-- <br> -->
+
+<!--   - **`software/`** : here we find the bioinformatic analysis pipeline scripts and the source code for all the software required.  -->
+<!--     - **`pipeline/v003_upgrading_pronto_to_1.2.0`** -->
+
+<!-- <br> -->
+
+## Import Samplesheets to TSD
+
+<br>
+
+Before launching the pipeline, we must generate the *SampleSheet* and *PRONTO* metadata from the [View UiO Portal - Hypathia](https://view.uio.no/portal/webclient/#/home), these files must be transfered
+to *TSD*.
+
+Once in *TSD*, these files muts be located at specific folder for the *TSO500* results and
+the *SampleSheet* must be transfered to *OUS* via an *OUS-Ahus* shared folder in *TSD* (see later).
+
+  - Log in into the [View UiO portal](https://view.uio.no/portal/webclient/#/home). You must write your *2FA* one time code and your password.
+  
+  - Click on *Windows icon* -> *This PC* -> *Hypathia.uio.no* (Figure 3).
+  
+  - **SampleSheet** file: 
+    
+    - `hypathia.uio.no/Ih-med-klinmed-ahus-inpred/TS0500/Samples_YYYY_wWW.xlsx` (where *YYYY* = Year and *wWW* = week. Example: *w22* for week 22; see Figure 4).
+
+```{r ViewUiO, echo=FALSE, results='asis'}
+
+insert.fig.toggle(
+  fig.id = "Hypathia",
+  button.label = "Figure 3",
+  img.src = "fig/03_Hypatia.png",
+  fig.width = "75%",
+  fig.cap = "Access the Hypathia server thorugh UiO View Portal"
+)
+
+```
+
+<br>
+
+```{r ViewUiO_SampleSheet, echo=FALSE, results='asis'}
+
+insert.fig.toggle(
+  fig.id = "ViewUiO_SampleSheet ",
+  button.label = "Figure 4",
+  img.src = "fig/04_SampleSheet.png",
+  fig.width = "75%",
+  fig.cap = "Original SampleSheet in View UiO portal"
+)
+
+```
+
+<br>
+
+### Generate *SampleSheet* and *PRONTO* metadata
+
+<br>
+
+  - Open the *SampleSheet file* with *Microsoft Excel*. You will see two sheets, namely **Sheet1** and **PRONTO**.
+
+<br>
+
+  - **SampleSheet**:
+  
+    - In *Sheet1*, select columns **InPred ID (IPA)** (E), **Tumor content** (R), and  **Barcode** (S).
+    - Create a new file with these columns and  **remove the header**. The file must be named `SampleSheet_YYMMDD_info.csv`.
+    - Verify that all entries in the **Barcode** column start with the **UP** prefix. (E.g., UP01, UP16).
+    - Verify that all entries in the **Tumor content** column have an integer value (0-100). In case there is no value, leave it empty (avoid '-' or other characters)
+    
+    - Save the new file in the metadata folder `\\platon.uio.no\med-klinmed-u2\jamondra\pc\Dokumenter\Metadata`.
+
+<br>
+
+> **⚠️ Important: report missing Tumor content**. In case any value in the *Tumor content* column is missing, report it with the responsible of this week's sequencing. 
+
+<br>
+
+  - **PRONTO metadata**:
+  
+    - In *PRONTO* sheet. Save the content as it is in a new **tab separated file (.txt)**. The file must be named `PRONTO_metadata_YYMMDD.txt`.
+    
+    - Save the new file in the metadata folder `\\platon.uio.no\med-klinmed-u2\jamondra\pc\Dokumenter\Metadata`.
+    
+    - **Encrypt this file in *7z* format.** *Right click* on the file and select the *7-zip* option, select the *Leff til arkiv* option (Figure 5). This will open a window, write and repeat your encryption password in the *Angi passord* and *Bekreft passord* text boxes (Figure 6). Do not modify the other parameters.
+
+```{r Encrypt_PRONTO_pt1, echo=FALSE, results='asis'}
+
+insert.fig.toggle(
+  fig.id = "Encrypt_PRONTO_pt1",
+  button.label = "Figure 5",
+  img.src = "fig/05_Encrypt_pt1.png",
+  fig.width = "85%",
+  fig.cap = "Right click on the PRONTO metadata file to display encryption options"
+)
+
+```
+
+```{r Encrypt_PRONTO_pt2, echo=FALSE, results='asis'}
+
+insert.fig.toggle(
+  fig.id = "Encrypt_PRONTO_pt2",
+  button.label = "Figure 6",
+  img.src = "fig/06_Encrypt_pt2.png",
+  fig.width = "65%",
+  fig.cap = "Write and repeat your encryption password"
+)
+
+```
+
+<br>
+
+  - **NOTE:** both *SampleSheet* and *PRONTO* metadata file **must** have the exact same date *YYMMDD*.
+  
+
+```{r, echo=FALSE, eval = TRUE}
+cl.sections   <- add.cl.section("Create SampleSheet (View UiO)", cl.sections)
+cl.categories <- add.cl.categories("file_manip", cl.categories)
+
+cl.sections   <- add.cl.section("Verify Barcode column (UP)", cl.sections)
+cl.categories <- add.cl.categories("file_manip", cl.categories)
+
+cl.sections   <- add.cl.section("Verify Tumor content (numeric or empty)", cl.sections)
+cl.categories <- add.cl.categories("file_manip", cl.categories)
+
+cl.sections   <- add.cl.section("Create PRONTO metadata (View UiO)", cl.sections)
+cl.categories <- add.cl.categories("file_manip", cl.categories)
+
+cl.sections   <- add.cl.section("Verify Batch column ('-')", cl.sections)
+cl.categories <- add.cl.categories("file_manip", cl.categories)
+
+cl.sections   <- add.cl.section("Encrypt PRONTO metadata", cl.sections)
+cl.categories <- add.cl.categories("important", cl.categories)
+```
+
+<br>
+
+### Import *SampleSheet* and *PRONTO* metadata (Uio View -> TSD)
+
+<br>
+
+  - **NOTE**: the TSD import must be done through the *UiO View portal* only, never through a personal computer.
+  
+  - Open *Chrome* or any internet browser.
+  
+  - Go to the [*TSD / Data Portal*](data.tsd.usit.no) and click on *Import Files* button (Figure 7).
+  
+  - Log in with your *username*, *2F2 one time code*. and *password*.
+  
+  - Upload the `SampleSheet_YYMMDD.csv` and `PRONTO_metadata_YYMMDD.7z` files. Verify both files are listed and checked, and click on the *import button* (Figure 8).
+  
+  - **NOTE**: only import the encrypted *PRONTO metadata* file, never the *.txt (non-encrypted)* version.
+
+<br>
+
+```{r TSD_import, echo=FALSE, results='asis'}
+
+insert.fig.toggle(
+  fig.id = "TSD_import",
+  button.label = "Figure 7",
+  img.src = "fig/07_TSD_DP.png",
+  fig.width = "65%",
+  fig.cap = "Import Files in TSD Data Portal"
+)
+
+```
+
+<br>
+
+```{r TSD_import_button, echo=FALSE, results='asis'}
+
+insert.fig.toggle(
+  fig.id = "TSD_import_button",
+  button.label = "Figure 8",
+  img.src = "fig/08_TSD_import_button.png",
+  fig.width = "85%",
+  fig.cap = "Verify SampleSheet and encrypted PRONTO metadata are listed and checked. Then click on the import button"
+)
+
+```
+
+<br>
+
+  - Open the [View TSD Portal](https://view.tsd.usit.no/portal/webclient/#/home) with the *Windows VM*.
+  
+  - Verify that `SampleSheet_YYMMDD.csv` and `PRONTO_metadata_YYMMDD.7z` files are in the *file-import* folder (Figure 9): **`file-import/p1150-member-group/`**.
+  
+  - Right click on the `PRONTO_metadata_YYMMDD.7z` file, select the *7-zip* option and *Pakk ut ...* (Figure 10).
+  
+  - Write the encryption password and click on *OK* (Figure 11).
+  
+<br>
+
+```{r TSD_import_files_windows, echo=FALSE, results='asis'}
+
+insert.fig.toggle(
+  fig.id = "TSD_import_files_windows",
+  button.label = "Figure 9",
+  img.src = "fig/09_TSD_import-files.png",
+  fig.width = "85%",
+  fig.cap = "In the import-files folder you will see the SampleSheet and the encrypted PRONTO metadata"
+)
+
+```
+
+<br>
+
+```{r Decrytp_PRONTO_pt1, echo=FALSE, results='asis'}
+insert.fig.toggle(
+  fig.id = "Decrytp_PRONTO_pt1",
+  button.label = "Figure 10",
+  img.src = "fig/10_Decrypt_pt1.png",
+  fig.width = "85%",
+  fig.cap = "Right click on the .7z file to show the decryption options."
+)
+```
+
+<br>
+
+```{r Decrytp_PRONTO_pt2, echo=FALSE, results='asis'}
+insert.fig.toggle(
+  fig.id = "Decrytp_PRONTO_pt2",
+  button.label = "Figure 11",
+  img.src = "fig/11_Decrypt_pt2.png",
+  fig.width = "85%",
+  fig.cap = "Write the decryption password"
+)
+```
+
+```{r, echo=FALSE, eval = TRUE}
+cl.sections   <- add.cl.section("Import files in TSD Data Portal", cl.sections)
+cl.categories <- add.cl.categories("file_manip", cl.categories)
+
+cl.sections   <- add.cl.section("Decrypt PRONTO metadata", cl.sections)
+cl.categories <- add.cl.categories("file_manip", cl.categories)
+```
+
+## Prepare pipeline
+
+<br>
+
+Before launching the pipeline we must verify if there is enough space in the disk and the size of the sequencing data.
+
+<br>
+
+### Verify disk space availability
+
+  - **Disk space** : we need at least **300GB of free space**. If this is not the case, contact the persone responsible for the *p1150* project in TSD to release some space.
+
+```{bash, echo=TRUE, eval = FALSE}
+# Check disk space
+df -h /ess/p1150
+```
+
+```{r, echo=FALSE, eval = TRUE}
+cl.sections   <- add.cl.section("Verify disk space availability", cl.sections)
+cl.categories <- add.cl.categories("prepare_pipeline", cl.categories)
+```
+
+<br>
+
+### Verify size of sequencing run
+
+  - **Size of files from current run ID**: usually a sequencing run produces a folder with size varying from **~30-60 GB**. If this number is outside this range, please contact the people involved in sequencing.
+
+```{bash, echo=TRUE, eval = FALSE}
+# Check size of sequencing results
+du -csh /ess/p1150/data/durable/file-import/p1150-member-group/tsd
+```
+
+```{r, echo=FALSE, eval = TRUE}
+cl.sections   <- add.cl.section("Verify size of sequencing run", cl.sections)
+cl.categories <- add.cl.categories("prepare_pipeline", cl.categories)
+```
+
+<br>
+
+### Connect to hpc (*Colossus*) server.
+
+  - **NOTE**: we must be connected to the *Colossus* server to launch the pipeline. Data manipulation can be done outside.
+
+```{bash, echo=TRUE, eval = FALSE}
+# Connect to hpc
+ssh p1150-hpc-01
+```
+
+```{r, echo=FALSE, eval = TRUE}
+cl.sections   <- add.cl.section("Connect to hpc (Colossus) server", cl.sections)
+cl.categories <- add.cl.categories("prepare_pipeline", cl.categories)
+```
+
+<br>
+
+### Pipeline run directory.
+
+  - **NOTE**: the pipeline must be launched from this folder.
+
+```{bash, echo=TRUE, eval = FALSE}
+cd  /ess/p1150/data/durable/software/pipeline/v003_upgrading_pronto_to_1.2.0
+```
+
+```{r, echo=FALSE, eval = TRUE}
+cl.sections   <- add.cl.section("Pipeline run directory", cl.sections)
+cl.categories <- add.cl.categories("prepare_pipeline", cl.categories)
+```
+
+<br>
+
+### Set up global variables.
+
+<br>
+
+The following variables must be set up before launching the pipeline:
+
+  - Sequencing run ID = `RUN_ID`
+  - Input data type = `INPUT_DATA_TYPE`
+  - Sequencing run date = `RUN_DATE`
+  - Durable folder = `DURABLE`
+  
+```{r env_var, echo=FALSE, eval = TRUE, comment=""}
+cat(glue('RUN_ID="{run.id}"
+RUN_DATE="${{RUN_ID%%_*}}"
+INPUT_DATA_TYPE="RAW"
+DURABLE="/tsd/p1150/data/durable"'), "\n")
+```
+
+```{bash, echo=TRUE, eval = FALSE}
+# Check ENV variables content
+echo " "
+echo $RUN_ID
+echo $RUN_DATE
+echo $INPUT_DATA_TYPE
+echo $DURABLE
+echo " "
+```
+
+```{r, echo=FALSE, eval = TRUE}
+cl.sections   <- add.cl.section("Set up  ${RUN_ID}", cl.sections)
+cl.categories <- add.cl.categories("setup", cl.categories)
+
+cl.sections   <- add.cl.section("Set up  ${RUN_DATA}", cl.sections)
+cl.categories <- add.cl.categories("setup", cl.categories)
+
+cl.sections   <- add.cl.section("Set up  ${INPUT_DATA_TYPE}", cl.sections)
+cl.categories <- add.cl.categories("setup", cl.categories)
+
+cl.sections   <- add.cl.section("Set up  ${DURABLE}", cl.sections)
+cl.categories <- add.cl.categories("setup", cl.categories)
+```
+
+<br>
+
+### Prepare sequences and metadata
+
+<br>
+
+The sequences, the *PRONTO* metadata, and the *SampleSheet* for the current run ID are located in the `file-import` folder.
+They must be moved to the `TSO500_sequences`, `TSO500_pronto_metadata`, and `TSO500_SampleSheets` folders, respectively, before launching the analysis.
+
+**NOTE**: An invisible character is inserted in the header of the `SampleSheet_$DATE.csv` metadata file. This character must be removed because the table cannot be properly read by other software and crash the analysis. Once this issue is solved, proceed to move the folders.
+
+```{bash, echo=TRUE, eval = FALSE}
+# Move sequences file
+mv -i ${DURABLE}/file-import/p1150-member-group/tsd/${RUN_DATE}* ${DURABLE}/TSO500_sequences/
+```
+
+```{bash, echo=TRUE, eval = FALSE}
+# Move SampleSheet metadata file
+mv -i ${DURABLE}/file-import/p1150-member-group/SampleSheet_${RUN_DATE}_info.csv ${DURABLE}/TSO500_SampleSheets/SampleSheet_${RUN_DATE}_info.csv
+```
+
+<!-- We need to move two files: the .7z and .txt -->
+```{bash, echo=TRUE, eval = FALSE}
+# Move PRONTO file
+mv -i ${DURABLE}/file-import/p1150-member-group/PRONTO_metadata_${RUN_DATE}.txt ${DURABLE}/TSO500_pronto_metadata/PRONTO_metadata_${RUN_DATE}.txt
+
+mv -i ${DURABLE}/file-import/p1150-member-group/PRONTO_metadata_${RUN_DATE}.7z ${DURABLE}/TSO500_pronto_metadata/PRONTO_metadata_${RUN_DATE}.7z
+```
+
+```{r, echo=FALSE, eval = TRUE}
+cl.sections   <- add.cl.section("Remove invisible character in ShampleSheet file", cl.sections)
+cl.categories <- add.cl.categories("important", cl.categories)
+
+cl.sections   <- add.cl.section("Move sequences files", cl.sections)
+cl.categories <- add.cl.categories("file_manip", cl.categories)
+
+cl.sections   <- add.cl.section("Move ShampleSheet", cl.sections)
+cl.categories <- add.cl.categories("file_manip", cl.categories)
+
+cl.sections   <- add.cl.section("Move PRONTO metadata", cl.sections)
+cl.categories <- add.cl.categories("file_manip", cl.categories)
+```
+
+<br>
+
+### Verify flags and source `config.sh`
+
+ - Verify the three following flags in the config file.
+  
+```{bash, echo=TRUE, eval = FALSE}
+# Default ';' but other separator (',', '-', '/') can be used
+SEPARATOR=";"
+
+DECRYPT_UNPACK_CHECKSUM="T"
+REMOVE_ENCRYPTED_COMPRESSED_DATA="T"
+
+MAKE_TSOPPI_CONFIG="T"
+EXECUTE_TSOPPI_SCRIPTS="T"
+```
+
+<br>
+
+- Use the following command to check those lines without opening the file in a text editor.
+
+<br>
+
+```{bash, echo=TRUE, eval = FALSE}
+echo ' ';
+echo ' ';
+
+grep -e 'SEPARATOR='                        \
+     -e 'DECRYPT_UNPACK_CHECKSUM='          \
+     -e 'REMOVE_ENCRYPTED_COMPRESSED_DATA=' \
+     -e 'MAKE_TSOPPI_CONFIG='               \
+     -e 'EXECUTE_TSOPPI_SCRIPTS='           \
+     config.sh
+
+echo ' ';
+echo ' ';
+```
+
+<br>
+
+ - Then source the `config` file
+
+```{bash, echo=TRUE, eval = FALSE}
+source config.sh ${RUN_ID}
+```
+
+```{r, echo=FALSE, eval = TRUE}
+cl.sections   <- add.cl.section("config.sh : SEPARATOR", cl.sections)
+cl.categories <- add.cl.categories("setup", cl.categories)
+
+cl.sections   <- add.cl.section("config.sh : DECRYPT_UNPACK_CHECKSUM", cl.sections)
+cl.categories <- add.cl.categories("setup", cl.categories)
+
+cl.sections   <- add.cl.section("config.sh : REMOVE_DECRYPTED_COMPRESSED_DATA", cl.sections)
+cl.categories <- add.cl.categories("setup", cl.categories)
+
+cl.sections   <- add.cl.section("config.sh : MAKE_TSOPPI_CONFIG", cl.sections)
+cl.categories <- add.cl.categories("setup", cl.categories)
+
+cl.sections   <- add.cl.section("config.sh : EXECUTE_TSOPPI_SCRIPTS", cl.sections)
+cl.categories <- add.cl.categories("setup", cl.categories)
+
+cl.sections   <- add.cl.section("Source config.sh", cl.sections)
+cl.categories <- add.cl.categories("setup", cl.categories)
+
+```
+
+<br>
+
+### Prepare folder structure
+
+<br>
+
+ - Prepare the folder structure for a new run, this will create all folders to store
+results and logs.
+
+```{bash, echo=TRUE, eval = FALSE}
+bash 00_setup_folder_structure_for_new_run.sh ${RUN_ID}
+```
+
+```{r, echo=FALSE, eval = TRUE}
+cl.sections   <- add.cl.section("Prepare folder structure", cl.sections)
+cl.categories <- add.cl.categories("setup", cl.categories)
+```
+
+<br>
+
+### Generate SampleSheet (00)
+
+<br>
+
+`r emo::ji("hourglass_flowing_sand")` Running time: ~10 seconds
+
+  - We will generate a sample sheet with metadata for the current run ID.
+
+```{bash, echo=TRUE, eval = FALSE}
+bash 00_generate_TSO500_sample_sheet.sh ${RUN_ID} ${INPUT_DATA_TYPE} \
+  &> ${SCRIPTS_AND_LOGS_FOLDER}/00_generate_TSO500_sample_sheet.log
+```
+
+```{bash, echo=TRUE, eval = FALSE}
+more ${SCRIPTS_AND_LOGS_FOLDER}/00_generate_TSO500_sample_sheet.log
+```
+
+<br>
+
+  - Verify that the SampleSheet was correctly generated. If the separator is not the one indicated in the config file or if there is a missing column, you will see an error message in the `${SCRIPTS_AND_LOGS_FOLDER}/00_generate_TSO500_sample_sheet.log`.
+  
+    - If the Samplesheet was created you will see the following message in the last line of the logfile `Generating TSO500 samplesheet is succesfully finished.`
+
+<br>
+
+  - Copy the logs and scripts for this sequencing run in
+the `${SCRIPTS_AND_LOGS_FOLDER}` folder.
+
+```{bash, echo=TRUE, eval = FALSE}
+cp -a 00_generate_TSO500_sample_sheet.sh ${SCRIPTS_AND_LOGS_FOLDER}
+cp -a config.sh ${SCRIPTS_AND_LOGS_FOLDER}/00_config.sh
+```
+
+```{r, echo=FALSE, eval = TRUE}
+cl.sections   <- add.cl.section("Generate sample sheet", cl.sections)
+cl.categories <- add.cl.categories("analysis", cl.categories)
+
+cl.sections   <- add.cl.section("Copy Samplesheet (00) scripts and logs", cl.sections)
+cl.categories <- add.cl.categories("file_manip", cl.categories)
+```
+
+<br>
+
+## Launch TSO500 pipeline
+
+<br>
+
+  - Now we are ready to launch the *TSO500* analysis pipeline. It has to be launched
+in many steps, and many of them require manual intervention.
+
+<br>
+
+### Launch *LocalApp* analysis (01)
+
+<br>
+
+  - This analysis performs the data QC for the sequencing results.
+
+`r emo::ji("hourglass_flowing_sand")` Running time: ~13 hours
+
+```{bash, echo=TRUE, eval = FALSE}
+bash 01_raw_sequencing_data_management_and_TSO500_analysis.sh ${RUN_ID} ${INPUT_DATA_TYPE} \
+  > ${SCRIPTS_AND_LOGS_FOLDER}/01_raw_sequencing_data_management_and_TSO500_analysis.stdout \
+  2> ${SCRIPTS_AND_LOGS_FOLDER}/01_raw_sequencing_data_management_and_TSO500_analysis.stderr &
+```
+
+```{bash, echo=TRUE, eval = FALSE}
+more ${SCRIPTS_AND_LOGS_FOLDER}/01_raw_sequencing_data_management_and_TSO500_analysis.stdout
+more ${SCRIPTS_AND_LOGS_FOLDER}/01_raw_sequencing_data_management_and_TSO500_analysis.stderr
+```
+
+<br>
+
+> **⚠️ Important: Send an email to the local InPreD team** to tell them that the *LocalApp* analyses have been launched. You can find a draft in the *Email Drafts* section below in this document.
+
+<br>
+
+  - Once this analysis is done, copy the logs and scripts for this sequencing run in
+the `${SCRIPTS_AND_LOGS_FOLDER}` folder.
+
+```{bash, echo=TRUE, eval = FALSE}
+cp -a 01_raw_sequencing_data_management_and_TSO500_analysis.sh ${SCRIPTS_AND_LOGS_FOLDER}
+cp -a config.sh ${SCRIPTS_AND_LOGS_FOLDER}/01_config.sh
+```
+
+```{r, echo=FALSE, eval = TRUE}
+cl.sections   <- add.cl.section("Launch LocalApp", cl.sections)
+cl.categories <- add.cl.categories("analysis", cl.categories)
+
+cl.sections   <- add.cl.section("Send LocalApp email", cl.sections)
+cl.categories <- add.cl.categories("email", cl.categories)
+
+cl.sections   <- add.cl.section("Copy LocalApp (01) scripts and logs", cl.sections)
+cl.categories <- add.cl.categories("file_manip", cl.categories)
+```
+
+<br>
+
+### Launch *TSOPPI* analysis
+
+<br>
+
+This analysis performs different analysis included in the  [TSOPPI](https://tsoppi.readthedocs.io/en/latest/index.html) tool, such as:
+
+ - Quality control (QC) metrics for samples
+ - Fusion and splice variant output for RNA samples;
+ - Small variant output, copy number variant output (CNV) and microsatellite status (MS status) information for DNA samples.
+
+<br>
+
+#### Create SampleSheet info *TSOPPI*
+
+<br>
+
+  - Create the *TSOPPI* samplesheet.
+
+```{bash, echo=TRUE, eval = FALSE}
+cp ${SAMPLESHEETS_FOLDER}/${INFO_FILE_NAME} ${SAMPLESHEETS_FOLDER}/${INFO_FILE_NAME_TSOPPI}
+```
+
+```{r, echo=FALSE, eval = TRUE}
+cl.sections   <- add.cl.section("Copy SampleSheet info TSOPPI", cl.sections)
+cl.categories <- add.cl.categories("file_manip", cl.categories)
+```
+
+<br>
+
+#### Adapt ALL_SEQUENCING_RUN_IDs global variable
+
+<br>
+
+  - Update the file `$ALL_RUN_IDS` and add the new `$RUN_ID` in the second line. See the example below.
+
+```{bash, echo=TRUE, eval = FALSE}
+ALL_SEQUENCING_RUN_IDs=()
+#  -->    HERE       <---        # Insert new SEQ_ID in this line #
+ALL_SEQUENCING_RUN_IDs+=( "250522_AAAAAAAA_BBBB_CCCCCCCCCC" )
+ALL_SEQUENCING_RUN_IDs+=( "250515_AAAAAAAA_BBBB_CCCCCCCCCC" )
+```
+
+<br>
+
+  - **NOTE**: originally this step was done manually, now we added the code below to do it automatically.
+
+```{bash, echo=TRUE, eval = FALSE}
+ALL_RUN_IDS="${PIPELINE_FOLDER}/all_sequencing_runs.sh"
+
+# Backup copy
+cp "$ALL_RUN_IDS" "${ALL_RUN_IDS}.bk"
+
+# Ensure RUN_ID is not empty
+if [[ -z "$RUN_ID" ]]; then
+    echo "Error: RUN_ID is empty"
+    exit 1
+fi
+
+# Check if the RUN_ID is already present
+if grep -qF "$RUN_ID" "$ALL_RUN_IDS"; then
+    echo "RUN_ID already present in $ALL_RUN_IDS"
+else
+    # Insert RUN_ID after the initialization line
+    TEMP_FILE=$(mktemp)
+    insert_line='ALL_SEQUENCING_RUN_IDS+=( "'"$RUN_ID"'" )'
+
+    awk -v line="$insert_line" '
+        $0 ~ /^ALL_SEQUENCING_RUN_IDS[[:space:]]*=\(\)/ {
+            print
+            print line
+            next
+        }
+        { print }
+    ' "$ALL_RUN_IDS" > "$TEMP_FILE" && mv "$TEMP_FILE" "$ALL_RUN_IDS"
+
+    # Verify insertion
+    if grep -qF "$RUN_ID" "$ALL_RUN_IDS"; then
+        echo "RUN_ID successfully added to $ALL_RUN_IDS"
+    else
+        echo "Failed to add RUN_ID to $ALL_RUN_IDS"
+    fi
+fi
+
+chmod 755 $ALL_RUN_IDS
+```
+
+```{r, echo=FALSE, eval = TRUE}
+cl.sections   <- add.cl.section("Update ${ALL_RUN_IDs} variable", cl.sections)
+cl.categories <- add.cl.categories("setup", cl.categories)
+```
+
+<br>
+
+#### Launch *TSOPPI* (02)
+
+<br>
+
+`r emo::ji("hourglass_flowing_sand")` Running time: ~30 minutes (but may vary up to 1 hour)
+
+```{bash, echo=TRUE, eval = FALSE}
+bash 02_execute_tsoppi_and_archive_results.sh ${RUN_ID} \
+  > ${SCRIPTS_AND_LOGS_FOLDER}/02_execute_tsoppi_and_archive_results.stdout \
+  2> ${SCRIPTS_AND_LOGS_FOLDER}/02_execute_tsoppi_and_archive_results.stderr &
+```
+
+<br>
+
+  - Once this analysis is done, copy the logs and scripts for this sequencing run in
+the `${SCRIPTS_AND_LOGS_FOLDER}` folder.
+
+```{bash, echo=TRUE, eval = FALSE}
+cp -a 02_execute_tsoppi_and_archive_results.sh ${SCRIPTS_AND_LOGS_FOLDER}
+cp -a config.sh ${SCRIPTS_AND_LOGS_FOLDER}/02_config.sh
+```
+
+```{r, echo=FALSE, eval = TRUE}
+cl.sections   <- add.cl.section("Launch TSOPPI", cl.sections)
+cl.categories <- add.cl.categories("analysis", cl.categories)
+
+cl.sections   <- add.cl.section("Copy TSOPPI (02) scripts and logs", cl.sections)
+cl.categories <- add.cl.categories("file_manip", cl.categories)
+```
+
+<br>
+
+### Launch *ICNVA* analysis
+
+<br>
+
+[*ICNVA*](https://tsoppi.readthedocs.io/en/latest/ICNVA.html) runs two types of analysis on each input sample:
+
+  - Allele-specific copy number analysis performed by *PureCN* (LoH assessment.)
+  - Normalized read coverage (NRC) profile plotting for selected genes (identify/confirm intra-genic duplications/losses).
+
+  - An in-house set of controls is utilized during both analyses.
+
+<br>
+
+#### Select DNA tumour samples
+
+<br>
+
+  - Adapt the `$SAMPLE_IDs` array to contain only DNA tumour samples, those ones containing **-D01-** in the second field in their sample ID.
+
+  - Be aware to adapt the variable according to the example below. Keep in mind the spacing, quotations and no separators.
+
+```{bash, echo=TRUE, eval = FALSE}
+SAMPLE_IDs=( "SAMPLE1" "SAMPLE_2" ... "SAMPLE_3" )
+```
+
+<br>
+
+  - **NOTE**: originally this step was done manually, now we added the code below to do it automatically.
+
+```{bash, echo=TRUE, eval = FALSE}
+# Get sorted sample IDs from SampleSheet
+DNA_TUMOUR_SAMPLE_IDS=$(cut -d';' -f1 ${SAMPLESHEETS_FOLDER}/${INFO_FILE_NAME} | awk -F'-' '$2 ~ /D0[[:digit:]]+/' | sort)
+#DNA_TUMOUR_SAMPLE_IDS=$(cut -d',' -f1 samples.txt | awk -F'-' 'tolower($2) == "d01"') # Case insensitive alternative
+
+# Build array declaration string
+ARRAY_STRING="SAMPLE_IDs=("
+while IFS= read -r id; do
+    ARRAY_STRING+=" \"$id\""
+done <<< "$DNA_TUMOUR_SAMPLE_IDS"
+ARRAY_STRING+=" )"
+
+# Evaluate the string to create the array variable
+eval "$ARRAY_STRING"
+```
+
+<br>
+
+  - Verify `SAMPLE_IDs` size and content.
+
+```{bash, echo=TRUE, eval = FALSE}
+# Optional: check the array content
+declare -p SAMPLE_IDs
+
+# Print array size and content in screen
+echo ${#SAMPLE_IDs[@]}
+printf "%s\n" "${SAMPLE_IDs[@]}"
+```
+
+```{r, echo=FALSE, eval = TRUE}
+cl.sections   <- add.cl.section("Update ${SAMPLE_IDs} variable", cl.sections)
+cl.categories <- add.cl.categories("setup", cl.categories)
+
+cl.sections   <- add.cl.section("Verify ${SAMPLE_IDs} size and content", cl.sections)
+cl.categories <- add.cl.categories("setup", cl.categories)
+```
+
+<br>
+
+#### Launch *ICNVA* (025)
+
+`r emo::ji("hourglass_flowing_sand")` Running time: ~30 minutes
+
+```{bash, echo=TRUE, eval = FALSE}
+for SAMPLE_ID in ${SAMPLE_IDs[@]}
+do
+      echo "SAMPLE_ID=${SAMPLE_ID}"
+      echo "RUN_ID=${RUN_ID}"
+      
+      bash 025_run_initial_icnva.sh \
+          config.sh                 \
+          ${RUN_ID}                 \
+          ${SAMPLE_ID}              \
+          > ${SCRIPTS_AND_LOGS_FOLDER}/025_run_initial_icnva_${SAMPLE_ID}_${RUN_ID}.stdout \
+          2> ${SCRIPTS_AND_LOGS_FOLDER}/025_run_initial_icnva_${SAMPLE_ID}_${RUN_ID}.stderr &
+done
+```
+
+<br>
+
+  - Once this analysis is done, copy the logs and scripts for this sequencing run in
+the `${SCRIPTS_AND_LOGS_FOLDER}` folder.
+
+```{bash, echo=TRUE, eval = FALSE}
+cp -a 025_run_initial_icnva.sh ${SCRIPTS_AND_LOGS_FOLDER}
+cp -a config.sh ${SCRIPTS_AND_LOGS_FOLDER}/025_config.sh
+```
+
+<br>
+
+> **⚠️ Important: Send an email to the local InPreD team** to tell them that *TSOPPI* and *ICNVA* analyses are ready and they can proceed with QC. You can find a draft in the *Email Drafts* section below in this document.
+
+
+```{r, echo=FALSE, eval = TRUE}
+cl.sections   <- add.cl.section("Launch ICNVA", cl.sections)
+cl.categories <- add.cl.categories("analysis", cl.categories)
+
+cl.sections   <- add.cl.section("Copy ICNVA (025) scripts and logs", cl.sections)
+cl.categories <- add.cl.categories("file_manip", cl.categories)
+
+cl.sections   <- add.cl.section("Send TSOPPI + ICNVA email", cl.sections)
+cl.categories <- add.cl.categories("email", cl.categories)
+
+```
+
+<br>
+
+  
+### Prepare predisposition tables
+
+<br>
+
+  - Collect all predisposition tables in a single folder. These tables will be encrypted and exported with all the reports.
+
+```{bash, echo=TRUE, eval = FALSE}
+# Remove the content of RECENT_RUN folder
+rm -rf ${DURABLE}/TSO500_export_for_interpretation/RECENT_RUN/*
+```
+
+```{bash, echo=TRUE, eval = FALSE}
+# Create directory
+WEEK=`date +"%U"`
+PRED_TABLES="${DURABLE}/TSO500_export_for_interpretation/RECENT_RUN/predisposition_tables_w${WEEK}"
+mkdir -p ${PRED_TABLES}
+
+# 
+ls ${DURABLE}/TSO500_postprocessing/${RUN_ID}_TSOPPI_v0.3.2_main_2022_06_07/*/*_predisposition_gene_variant_table_tumor_RNA.tsv | while IFS= read -r file; do
+  cp "$file" ${PRED_TABLES}/
+done
+
+ls ${PRED_TABLES}
+```
+
+```{r, echo=FALSE, eval = TRUE}
+cl.sections   <- add.cl.section("Remove the content of RECENT_RUN folder", cl.sections)
+cl.categories <- add.cl.categories("file_manip", cl.categories)
+
+cl.sections   <- add.cl.section("Create predisposition_tables folder", cl.sections)
+cl.categories <- add.cl.categories("file_manip", cl.categories)
+
+cl.sections   <- add.cl.section("Copy predisposition tables", cl.sections)
+cl.categories <- add.cl.categories("file_manip", cl.categories)
+```
+
+<br>
+
+### Process QC variant tables (023)
+
+<br>
+
+> **⚠️ Important: wait the confirmation of the curators to proceed with the following sections.**
+
+<br>
+
+Convert QC-ed small variables tables, from *xlsx* back to *tsv* format.
+
+`r emo::ji("hourglass_flowing_sand")` Running time: ~3 minutes
+
+```{bash, echo=TRUE, eval = FALSE}
+for SAMPLE_ID in ${SAMPLE_IDs[@]}
+do
+      echo "SAMPLE_ID=${SAMPLE_ID}"
+      echo "RUN_ID=${RUN_ID}"
+      
+      bash 023c_convert_variant_table_forQC_xlsx_to_tsv.sh \
+          config.sh                 \
+          ${RUN_ID}                 \
+          ${SAMPLE_ID}              \
+          > ${SCRIPTS_AND_LOGS_FOLDER}/023c_convert_variant_table_forQC_xlsx_to_tsv_${SAMPLE_ID}_${RUN_ID}.stdout \
+          2> ${SCRIPTS_AND_LOGS_FOLDER}/023c_convert_variant_table_forQC_xlsx_to_tsv_${SAMPLE_ID}_${RUN_ID}.stderr &
+done
+```
+
+<br>
+
+  - Once this analysis is done, copy the logs and scripts for this sequencing run in
+the `${SCRIPTS_AND_LOGS_FOLDER}` folder.
+
+```{bash, echo=TRUE, eval = FALSE}
+cp -a 023c_convert_variant_table_forQC_xlsx_to_tsv.sh ${SCRIPTS_AND_LOGS_FOLDER}
+cp -a config.sh ${SCRIPTS_AND_LOGS_FOLDER}/023_config.sh
+```
+
+```{r, echo=FALSE, eval = TRUE}
+cl.sections   <- add.cl.section("Convert tables: xlsx -> tsv", cl.sections)
+cl.categories <- add.cl.categories("analysis", cl.categories)
+
+cl.sections   <- add.cl.section("Copy xlsx -> tsv (023) scripts and logs", cl.sections)
+cl.categories <- add.cl.categories("file_manip", cl.categories)
+```
+
+<br>
+
+### Generate reports
+
+<br>
+
+Once the list of mutations was filtered by the curators, we are ready to proceed
+and generate the reports using *PRONTO*.
+
+<br>
+
+#### Update *PRONTO* metadata master table
+
+<br>
+
+  - Update the *PRONTO* master table metadata: `${DURABLE}/software/PRONTO/PRONTO-1.2.0/In/InPreD_PRONTO_metadata.txt`.
+  
+  - Then verify the file `${DURABLE}/software/PRONTO/PRONTO-1.2.0/In/InPreD_PRONTO_metadata.txt.new` was correclty updated with the following points.
+  
+    - Add a sharp `#` in a new line right after the header.
+
+    - In the previous run batch, set all values of the 3rd column (*Create report*) to *N*.
+
+    - Double check to not add the header twice.
+
+    - Replace norwegian characters:
+
+      - Æ/æ : AE/ae
+      - Ø/ø : OE/oe
+      - Å/å : Aa/aa
+
+    - Verify all values of the 2nd columns (*Sequencing_run_id*) in the new batch are filles with the current run ID: ``r paste0(run.id)``.
+    
+  - **NOTE** : verify that the column separators are tabs and not spaces. Also verify the last column *batch* is in the file, many times is not there and if so, fill it with a hyphen '*-*'.
+    
+  - If all these points were correctly achieved, rename the PRONTO master table file.
+
+<br>
+
+```{bash, echo=TRUE, eval = FALSE}
+# Save a copy of the metadata file.
+cp -i ${DURABLE}/software/PRONTO/PRONTO-1.2.0/In/InPreD_PRONTO_metadata.txt ${DURABLE}/software/PRONTO/PRONTO-1.2.0/In/InPreD_PRONTO_metadata.txt.bk
+
+# Update the PRONTO metadata master table
+python3 ${SCRIPTS_FOLDER}/update_metadata.py                                             \
+  --new_meta ${DURABLE}/TSO500_pronto_metadata/PRONTO_metadata_${RUN_DATE}.txt           \
+  --master_meta ${DURABLE}/software/PRONTO/PRONTO-1.2.0/In/InPreD_PRONTO_metadata.txt.bk \
+  --run_id ${RUN_ID}                                                                     \
+  --o ${DURABLE}/software/PRONTO/PRONTO-1.2.0/In/InPreD_PRONTO_metadata.txt.new ;
+```
+
+```{bash, echo=TRUE, eval = FALSE}
+mv -i ${DURABLE}/software/PRONTO/PRONTO-1.2.0/In/InPreD_PRONTO_metadata.txt.new ${DURABLE}/software/PRONTO/PRONTO-1.2.0/In/InPreD_PRONTO_metadata.txt
+```
+
+```{r, echo=FALSE, eval = TRUE}
+cl.sections   <- add.cl.section("Comment previous run in PRONTO master table", cl.sections)
+cl.categories <- add.cl.categories("file_manip", cl.categories)
+
+cl.sections   <- add.cl.section("Set 'N' in 3rd column in PRONTO master table", cl.sections)
+cl.categories <- add.cl.categories("file_manip", cl.categories)
+
+cl.sections   <- add.cl.section("Add current ID PRONTO metadata to PRONTO master table", cl.sections)
+cl.categories <- add.cl.categories("file_manip", cl.categories)
+
+cl.sections   <- add.cl.section("Replace Æ/æ in new PRONTO table", cl.sections)
+cl.categories <- add.cl.categories("file_manip", cl.categories)
+
+cl.sections   <- add.cl.section("Replace Ø/ø in new PRONTO table", cl.sections)
+cl.categories <- add.cl.categories("file_manip", cl.categories)
+
+cl.sections   <- add.cl.section("Replace Å/å in new PRONTO table", cl.sections)
+cl.categories <- add.cl.categories("file_manip", cl.categories)
+
+cl.sections   <- add.cl.section("Rename PRONTO master table", cl.sections)
+cl.categories <- add.cl.categories("file_manip", cl.categories)
+```
+
+<br>
+
+#### Generate reports with PRONTO (03)
+
+<br>
+
+  - Remove the content of the `RECENT_RUN` folder.
+  
+  - Launch the command to generate the *PRONTO* reports.
+
+`r emo::ji("hourglass_flowing_sand")` Running time: ~3-5 minutes per sample.
+
+<br>
+
+```{bash, echo=TRUE, eval = FALSE}
+for SAMPLE_ID in ${SAMPLE_IDs[@]}
+do
+      echo "SAMPLE_ID=${SAMPLE_ID}"
+
+      bash 03_generate_and_archive_pronto_report_collect_data_for_export.sh ${RUN_ID} ${SAMPLE_ID} ${SCRIPTS_AND_LOGS_FOLDER}/02_used_scripts/config_${RUN_ID}.sh \
+          > ${SCRIPTS_AND_LOGS_FOLDER}/03_generate_and_archive_pronto_v${PRONTO_VERSION}_report_collect_data_for_export_${SAMPLE_ID}_${RUN_ID}.stdout \
+          2> ${SCRIPTS_AND_LOGS_FOLDER}/03_generate_and_archive_pronto_v${PRONTO_VERSION}_report_collect_data_for_export_${SAMPLE_ID}_${RUN_ID}.stderr 
+
+done
+```
+
+<br>
+
+  - Once this analysis is done, copy the logs and scripts for this sequencing run in
+the `${SCRIPTS_AND_LOGS_FOLDER}` folder.
+
+```{bash, echo=TRUE, eval = FALSE}
+cp -a 03_generate_and_archive_pronto_report_collect_data_for_export.sh ${SCRIPTS_AND_LOGS_FOLDER}
+cp -a config.sh ${SCRIPTS_AND_LOGS_FOLDER}/03_config.sh
+```
+
+```{r, echo=FALSE, eval = TRUE}
+cl.sections   <- add.cl.section("Generate reports with PRONTO (03)", cl.sections)
+cl.categories <- add.cl.categories("analysis", cl.categories)
+
+cl.sections   <- add.cl.section("Copy PRONTO (03) scripts and logs", cl.sections)
+cl.categories <- add.cl.categories("file_manip", cl.categories)
+```
+
+<br>
+  
+## Transfer Reports (in TSD) to InPreD/MMOX folder 
+
+<br>
+
+  - Good. Now the results are complete and it is time to export them to another machine ([View UiO portal](https://view.uio.no/portal/webclient/#/home)) where the interpretation team can access the reports. We need the *Windows VM* to encrypt and compress the folders in the *.7z* format.
+  
+  - Here we show an example for the InPreD reports. We do exactly the same for *MMOX* samples, except the *.7z* file is located at the *MMOX* folder (instead of the *InPreD* folder, both folders are located in the same path).
+
+<br>
+
+### Encrypt folder with reports
+
+<br>
+
+  - Switch to the Windows VM (*p1150-win02-pool*, Figure 12). The credential to log in are the same for *Ubunutu* and *Windows* VMs.
+
+  - Go to the `durable/TSO500_export_for_interpretation/RECENT_RUN/` folder. Verify that there is one folder per sample and one folder for the predisposition table (Figure 13).
+
+```{r switch_VM, echo=FALSE, results='asis'}
+insert.fig.toggle(
+  fig.id = "switch_VM",
+  button.label = "Figure 12",
+  img.src = "fig/12_switch_VM.png",
+  fig.width = "95%",
+  fig.cap = "Switch to the Windows VM"
+)
+```
+
+```{r recent_run, echo=FALSE, results='asis'}
+insert.fig.toggle(
+  fig.id = "recent_run",
+  button.label = "Figure 13",
+  img.src = "fig/13_Recent_run.png",
+  fig.width = "75%",
+  fig.cap = "Verify RECENT_RUN content: one folder per sample and predisposition tables folder"
+)
+```
+
+<br>
+
+  - Move to one folder above `durable/TSO500_export_for_interpretation/` and left click on the `RECENT_RUN` folder. Select the *7-Zip* tab and click on the *Legg til arkiv ...* option (Figure 14).
+  
+  - Write the encryption password and click on *OK* (Figure 15).
+  
+  - Move the `CURRENT_FOLDER.7z` to the `durable/fire-export/` folder (Figure 16).
+
+```{r recent_run_7z, echo=FALSE, results='asis'}
+insert.fig.toggle(
+  fig.id = "recent_run_7z",
+  button.label = "Figure 14",
+  img.src = "fig/14_Recent_run_7z.png",
+  fig.width = "75%",
+  fig.cap = "Encrypt the RECENT_RUN folder"
+)
+```
+
+```{r recent_run_password, echo=FALSE, results='asis'}
+insert.fig.toggle(
+  fig.id = "recent_run_password",
+  button.label = "Figure 15",
+  img.src = "fig/15_Recent_run_password.png",
+  fig.width = "75%",
+  fig.cap = "Write the password to encrypt the folder"
+)
+```
+
+```{r Move_Recent_run, echo=FALSE, results='asis'}
+insert.fig.toggle(
+  fig.id = "Move_Recent_run",
+  button.label = "Figure 16",
+  img.src = "fig/16_Move_RECENT_RUN.png",
+  fig.width = "75%",
+  fig.cap = "Move the RECENT_RUN.7z file to the fire-export/ folder"
+)
+```
+
+```{r, echo=FALSE, eval = TRUE}
+cl.sections   <- add.cl.section("Switch to Windows VM", cl.sections)
+cl.categories <- add.cl.categories("setup", cl.categories)
+
+cl.sections   <- add.cl.section("Encrypt RECENT_RUN folder", cl.sections)
+cl.categories <- add.cl.categories("file_manip", cl.categories)
+
+cl.sections   <- add.cl.section("Move RECENT_RUN.7z to file-export/ folder", cl.sections)
+cl.categories <- add.cl.categories("file_manip", cl.categories)
+```
+
+<br>
+
+### Export Reports
+
+<br>
+
+  - Log in into the [View UiO portal](https://view.uio.no/portal/webclient/#/home). You must write your *2FA* one time code and your password.
+  
+  - Click on the *Kontor Fullskjerm* button. This will open a *Windows* machine (Figure 17).
+  
+  - Open an internet browser and open the [TSD Data Portal](https://data.tsd.usit.no/). Click on the *Export Files* button (Figure 18). Log in with your username, password and *2FA* code.
+  
+  - Click on the *RECENT_RUN.7z* file to download it. The file will be downloaded in the *Downloads* folder (Figure 19).
+  
+  - Move the *RECENT_RUN.7z* file from *Downloads* folder to `hypathia.uio.no/Ih-med-klinmed-ahus-inpred/InPreD`.
+  
+  - Right click on the *RECENT_RUN.7z* file, select the *7-Zip* tab and clcik on the *Pakk ut ...* option (Figure 20).
+  
+  - Write the decryption password (Figure 21).
+  
+> **⚠️ Important: Send an email to the local InPreD team** to tell them that the reports are ready in the *InPreD* folder. You can find a draft in the *Email Drafts* section below in this document.
+
+  
+```{r Kontor_Fullskjerm, echo=FALSE, results='asis'}
+insert.fig.toggle(
+  fig.id = "Kontor_Fullskjerm",
+  button.label = "Figure 17",
+  img.src = "fig/17_Kontor_Fullskjerm.png",
+  fig.width = "75%",
+  fig.cap = "Click on the Kontor Fullskjerm button. This will open a Windows machine"
+)
+```
+
+```{r Open_TSD, echo=FALSE, results='asis'}
+insert.fig.toggle(
+  fig.id = "Open_TSD",
+  button.label = "Figure 18",
+  img.src = "fig/18_Export_TSD.png",
+  fig.width = "75%",
+  fig.cap = "Open the TSD portal, click on the Export Data button"
+)
+```
+
+```{r download_7z, echo=FALSE, results='asis'}
+insert.fig.toggle(
+  fig.id = "download_7z",
+  button.label = "Figure 19",
+  img.src = "fig/19_Download_7z.png",
+  fig.width = "75%",
+  fig.cap = "Click on the RECENT_RUN.7z file to start the download"
+)
+```
+
+```{r recent_run_unpack, echo=FALSE, results='asis'}
+insert.fig.toggle(
+  fig.id = "recent_run_unpack",
+  button.label = "Figure 20",
+  img.src = "fig/20_Unpack_7z.png",
+  fig.width = "75%",
+  fig.cap = "Left click on the RECENT_RUN.7z file, select 7-Zip and Pakk ut option"
+)
+```
+
+```{r recent_run_unpack_pass, echo=FALSE, results='asis'}
+insert.fig.toggle(
+  fig.id = "recent_run_unpack_pass",
+  button.label = "Figure 21",
+  img.src = "fig/21_Unpack_7z_password.png",
+  fig.width = "75%",
+  fig.cap = "Write the decryption password and click on OK"
+)
+```
+
+```{r, echo=FALSE, eval = TRUE}
+cl.sections   <- add.cl.section("Open the View UiO Portal", cl.sections)
+cl.categories <- add.cl.categories("setup", cl.categories)
+
+cl.sections   <- add.cl.section("Download RECENT_RUN.7z from TSD Data Portal", cl.sections)
+cl.categories <- add.cl.categories("file_manip", cl.categories)
+
+cl.sections   <- add.cl.section("Move RECENT_RUN.7z to InPreD folder", cl.sections)
+cl.categories <- add.cl.categories("file_manip", cl.categories)
+
+cl.sections   <- add.cl.section("Decrypt RECENT_RUN.7z file", cl.sections)
+cl.categories <- add.cl.categories("file_manip", cl.categories)
+
+cl.sections   <- add.cl.section("Send email to InPreD team", cl.sections)
+cl.categories <- add.cl.categories("email", cl.categories)
+```
+
+<br>
+<br>
+
+<!-- # ---------- # -->
+<!-- # Extra code # -->
+<!-- # ---------- # -->
+
+```{r toggle, echo=FALSE, results='asis'}
+
+cat('
+<style>
+.btn-toggle {
+  background-color: #0275d8;
+  border: none;
+  color: white;
+  padding: 8px 16px;
+  font-size: 14px;
+  border-radius: 12px;       /* Rounded corners */
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+}
+.btn-toggle:hover {
+  background-color: #025aa5;
+}
+</style>
+
+<script>
+function toggleFigure(id) {
+  var fig = document.getElementById(id);
+  if (fig.style.display === "none" || fig.style.display === "") {
+    fig.style.display = "block";
+  } else {
+    fig.style.display = "none";
+  }
+}
+</script>
+')
+```
+
+
+
+```{r fill_template, echo = FALSE, eval = TRUE}
+
+# Generate CheckList entries
+html.output <- generate_checklist_html(checklist  = rev(cl.sections),
+                                       categories = rev(cl.categories))
+
+# Placeholder list
+checklist.terms[['--runID--']] <- run.id
+checklist.terms[['--checklist_buttons--']] <- html.output
+
+
+# Fill CheckList template
+template.to.fill   <- readLines(checklist.ready.file)
+
+for (t in names(checklist.terms)) {
+  
+  template.to.fill <- gsub(x           = template.to.fill,
+                           pattern     = t,
+                           replacement = checklist.terms[[t]],
+                           ignore.case = T, perl = T)
+} 
+
+# Export ready-to-use CheckList
+writeLines(text = template.to.fill, con = checklist.ready.file)
+```
+
+## Email Drafts
+
+<br>
+
+### After launching *LocalApp*
+
+<br>
+
+```
+Title: Bioinformatic analysis week WW
+
+Dear all,
+
+Sequencing data and its corresponding metadata are now in TSD.
+LocalApp analysis will start in an hour.
+
+We will continue with TSOPPI and ICNVA on Monday morning, so data for QC should be available shortly before Monday meeting.
+
+Have a nice weekend
+
+Jaime & Jean-Marc
+```
+
+<br>
+
+### When *TSOPPI* and *ICNVA* are ready
+
+<br>
+
+```
+Dear all,
+
+TSOPPI and ICNVA analysis are running now.
+The small variant tables should be ready for QC in ~30 minutes.
+
+Please, let us know when QC is ready to proceed with the reports.
+
+Best,
+
+Jaime & Jean-Marc
+```
+
+<br>
+
+### When reports are ready in TSD
+
+<br>
+
+```
+Title: Bioinformatic analysis week WW
+
+Dear all, 
+
+The reports and all the related data are now available in the InPred folder. We have sequenced and processed N IPA cases (IPA0, IPA0, IPA0, IPA0, IPA0, IPA0, IPA0, IPA0 ). 
+
+Sequencing went fine. 
+
+Torben, Shixiong, Andliena: there are some fusions reported, which ones should I plot?
+
+We observed some sequencing-related warnings for IPA0, be aware that this may be reflected in the interpretation.
+
+Best,
+
+Jaime & Jean-Marc
+```
+
+<br>
+
+## FusViz
+
+### How to generate the input tables for *FusViz* ?
+
+<br>
+
+*FusViz* requires as input a table with the information of the genes involved in the fusion (gene name, chromosome, position, strand and number of reads supporting the fusion; see [FusViz documentation](https://fusviz-docs.readthedocs.io/en/master/Input.html#input-source-and-format) for a detailed explanation).
+  
+We have created a ready-to-use *image* to generate the input required by *FusViz* from the mutations detected in the pipeline. In a nutshell: it verifies the directionality of the fusion by detecting the upstream gene, then search the genes strands and report the aligned and discordant reads supporting the fusion event.
+
+The gene *strand* is provided in the resulting table because this image already contains a file with the gene strand of each human gene (genome version: hg19).
+
+<br>
+
+  - Open a new terminal, but do not acces to the `Colossus` server.
+  
+  - Go to the *create_fusviz_input* folder (`$DURABLE/software/fusviz/create_fusviz_input`) and launch the image.
+  
+  - Launch the image with the following code. The programs require the following files located in the `${DURABLE}/TSO500_postprocessing/${RUN_ID}_TSO500_TSOPPI_v0.3.2_main_2022_06_07` folder.
+  
+    - Variant summary table: this file contains the splice and fusion variants for all the samples in the run: `${DURABLE}/TSO500_postprocessing/${RUN_ID}/${RUN_ID}_variant_summary.tsv`
+    
+    - Splice and fusion sample: this file contains the splice and fusion variants for a particular sample, this also contains the number of aligned and discordant reads supporting the fusion events: `${DURABLE}/TSO500_postprocessing/${RUN_ID}/${SAMPLE_ID}/${SAMPLE_ID}_fusion_and_splice_variant_candidates.tsv`
+
+```{bash, echo=TRUE, eval = FALSE}
+# Launch image from create_fusviz_input folder
+cd $DURABLE/software/fusviz/create_fusviz_input
+
+# Fill in the RUN ID and SAMPLE_ID values to create the FusViz plot
+FVPLOT_RUN_ID=${RUN_ID}
+FVPLOT_SAMPLE_ID_DNA="IPA0511-D01-p01-A15"
+
+FVPLOT_SAMPLE_ID_RNA="${FVPLOT_SAMPLE_ID_DNA/-D01-/-R03-}"
+FVPLOT_SAMPLE_ID_RNA="${FVPLOT_SAMPLE_ID_RNA/DNA/RNA}"
+TSOPPI_RESULTS="${DURABLE}/TSO500_postprocessing/${FVPLOT_RUN_ID}_TSOPPI_v0.3.2_main_2022_06_07"
+
+singularity run                                                               \
+  -B ${TSOPPI_RESULTS}:/summary                                               \
+  -B ${TSOPPI_RESULTS}/${FVPLOT_SAMPLE_ID_DNA}:/sample                        \
+  create_fusviz_input.sif                                                     \
+  -s /summary/${FVPLOT_RUN_ID}_variant_summary.tsv                            \
+  -m /sample/${FVPLOT_SAMPLE_ID_RNA}_fusion_and_splice_variant_candidates.tsv \
+  -o ~/${FVPLOT_SAMPLE_ID_DNA}_fusviz.txt ;                                   
+
+mv  ~/${FVPLOT_SAMPLE_ID_DNA}_fusviz.txt .
+```
+
+
+```{r fusviz_SV, echo=FALSE, results='asis'}
+insert.fig.toggle(
+  fig.id = "fusviz_SV",
+  button.label = "Figure 22",
+  img.src = "fig/22_fusviz_SV.png",
+  fig.width = "100%",
+  fig.cap = "Example to run the create_fusviz_input image to create the input table required by fusviz. The second printed table is the fusviz input file"
+)
+```
+
+<br>
+
+### Visualize fusions with `FusViz`. 
+
+<br>
+
+  - Open a new terminal, but do not acces to the `Colossus` server.
+  
+  - Go to the *FusViz* folder (`$DURABLE/software/fusviz`) and launch the image.
+  
+  - Open the http link in a browser, in this example `http://127.0.0.1:5776`, (Figure 23).
+
+```{bash, echo=TRUE, eval = FALSE}
+# Launch image from fuzviz folder
+cd $DURABLE/software/fusviz
+
+singularity run fusviz_v1.9.0.sif 4000
+```
+
+```{r launch_fusviz, echo=FALSE, results='asis'}
+insert.fig.toggle(
+  fig.id = "launch_fusviz",
+  button.label = "Figure 23",
+  img.src = "fig/23_Launch_fusviz_image.png",
+  fig.width = "95%",
+  fig.cap = "When launching the fusviz image, you will see the same text in the terminal"
+)
+```
+
+<br>
+
+  - On the home page, scroll down after the Welcome and Example modules section.
+  - Select the genome *hg19 (offline)* and upload your text files with the SV details (Figure 24). See question 3 to know how to get the SV tables.
+  
+```{r load_SV, echo=FALSE, results='asis'}
+insert.fig.toggle(
+  fig.id = "load_SV",
+  button.label = "Figure 24",
+  img.src = "fig/24_Load_SV_table.png",
+  fig.width = "100%",
+  fig.cap = "Select genome and load SV table"
+)
+```
+
+<br>
+
+  - Click On the *Linear* tab (left-side). Click on the *Upload a file* button, and add the `hg19.fasta.fai`, `hg19.fasta`, and `cytoBand.txt`, all of them available in the *fusviz* folder `$DURABLE/software/fusviz` (Figure 25).
+  
+  - Then click on the *Load gene track (offline)* button.
+
+```{r load_genetrack, echo=FALSE, results='asis'}
+insert.fig.toggle(
+  fig.id = "load_genetrack",
+  button.label = "Figure 25",
+  img.src = "fig/25_Load_genome.png",
+  fig.width = "100%",
+  fig.cap = "Load hg19 fasta, index and cytoBand files"
+)
+```
+
+<br>
+  
+  - Click On the *Two-way* tab (left-side). Now you will see three tabs in the top. Click on the *Overview_plot* button. 
+  
+    - Manually select the two genes involved in the fusion and their breakpoints (position in the genome where the fusion occurred). These numbers are the same values provided in the SV table (Figure 26).
+    
+    - You will see a plot in the right side with all the transcripts associated to each of the selected genes (upstream: green; downstream: orange), the location in their chromosomes and the parts of the transcript connected through the fusion.
+    
+    - Click on the *Download plot* at the bottom to save the figure.
+    
+    - Rename downloaded plot: `${SAMPLE_ID}_Gene1-Gene2_overview.pdf`
+
+<br>
+
+```{r overview_plot, echo=FALSE, results='asis'}
+insert.fig.toggle(
+  fig.id = "overview_plot",
+  button.label = "Figure 26",
+  img.src = "fig/26_Overview_plot.png",
+  fig.width = "100%",
+  fig.cap = "The *Overview_plot* option is located in the *Two-way* tab in the left menu. Select the genes and their breakpoints manually (left side) to see the connected parts in the transcripts (right side). Upstream gene: green; Downstream gene: orange"
+)
+```
+
+<br>
+
+  - Click On the *Two-way* tab (left-side). Now you will see three tabs in the top. Click on the *Domain_plot* button. 
+  
+    - Manually select the two genes involved in the fusion, select one transcript for each gene and their breakpoints (position in the genome where the fusion occurred).
+    
+    - You will see a plot in the right side with the exons and annotated protein domains across the selected transcripts (upstream: green; downstream: orange). The arrow connecting the two transcripts indicates the place where the fusion occurs (Figure 27).
+    
+    - Click on the *Download plot* at the bottom to save the figure.
+    
+    - Rename downloaded plot: `${SAMPLE_ID}_Gene1-Gene2_domain.pdf`
+
+<br>
+
+```{r domain_plot, echo=FALSE, results='asis'}
+insert.fig.toggle(
+  fig.id = "domain_plot",
+  button.label = "Figure 27",
+  img.src = "fig/27_Domain_plot.png",
+  fig.width = "100%",
+  fig.cap = "The *Domain_plot* option is located in the *Two-way* tab in the left menu. Select the genes, one transcript per gene and their breakpoints manually (left side) to see the exons and protein domains of the fused transcripts (right side). Upstream gene: green; Downstream gene: orange"
+)
+```
+
+<br>
+
+## Q & A
+
+<br>
+
+### How can I know the run ID `$RUN_ID` ?
+
+  - The run ID is in the name of the sequencing files and it is automatically generated from the sequencer.
+  
+  - The run ID has the following format `YYMMDD_AAAAAAAA_BBBB_CCCCCCCCCC` (Figure 28). You can copy the prefix name (i.e., without the file extension) and save the content in the `$RUN_ID` variable.
+  
+  - In Figure 22, `RUN_ID="250606_NB552811_0087_AH2T7NBGYX"`.
+
+<br>
+
+```{r find_runid, echo=FALSE, results='asis'}
+insert.fig.toggle(
+  fig.id = "find_runid",
+  button.label = "Figure 28",
+  img.src = "fig/28_Find_run_ID.png",
+  fig.width = "95%",
+  fig.cap = "The run ID is the prefix of the sequencing files, in this example, the file name without the *.md5* extension"
+)
+```
+
+<br>
+
+### What to do when the *Tumor content* values are missing in the *SampleSheet*
+
+<br>
+
+These file is filled up by the person responsible for the sequencing in a given week.
+Note that each week may be a different person within the *InPred team*.
+
+Report the missing data to one of them and wait their answer to proceed with the data transfer.
+
+Usually, the Tumor content values in the *PRONTO metadata* sheet are the same values,
+one option is to manually fill up the missing values copying the values from the
+*PRONTO metadata*. But to be on the safe side, let's wait for the answer.
+
+<br>
+
+### What to do when you don't have permissions to decrypt the sequencing files.
+
+<br>
+
+If this is the case, a few minutes after running *localApp* (see section 'Launch *LocalApp* analysis (01)'), you will have an error with the following message:
+
+`Problem with the ${RUN_ID}.md5.log file`
+
+This means you need to register you *RSA* key in the *p1150* project to have the permissions to decrypt the sequencing data.
+
+Run the following command to set this permissions.
+
+```{bash, echo=TRUE, eval = FALSE}
+gpg --import /tsd/p1150/data/durable/gpg-keys/p1150-key1@tsd.usit.no-private-key.asc
+```
+
+> **⚠️ Important: this command just needs to be one time.** It may cause troubles when you run it again. 
+
+<br>
+
+### What to do when *LocalApp* process fails?
+
+<br>
+
+It can stop for many reasons, the most likely are:
+
+  - Samplesheet with a different separator
+  - Missing columns in Samplesheet
+  - No write permissions
+  - Not setting your RSA key (see *Q & A*: What to do when you don't have permissions to decrypt the sequencing files)
+
+<br>
+
+For any or other reasons, to re-launch *LocalApp* (see section 'Launch *LocalApp* analysis (01)'), we need to do the follwing steps **before**.
+
+<br>
+
+  1. **Kill process in *slurm* **
+  2. **Kill the bash process**
+  3. **Delete results in *TSO500_analyses* folder**
+
+<br>
+
+#### Stop process in *slurm*
+
+<br>
+
+The *slurm* jobid can be found in the  `${DURABLE}/TSO500_scripts_and_logs}/${RUN_ID}/01_raw_sequencing_data_management_and_TSO500_analysis.stdout`.
+
+Use the command `scancel slurmID` to cancell this process (Figure 29).
+
+```{bash, echo=TRUE, eval = FALSE}
+# The slurm ID is printed in this logfile
+more ${DURABLE}/TSO500_scripts_and_logs}/${RUN_ID}/01_raw_sequencing_data_management_and_TSO500_analysis.stdout
+
+# Example of slurm ID
+scancel 22262551
+```
+
+```{r scancel, echo=FALSE, results='asis'}
+insert.fig.toggle(
+  fig.id = "scancel",
+  button.label = "Figure 29",
+  img.src = "fig/29_scancel.png",
+  fig.width = "100%",
+  fig.cap = "Example to get the slurm ID and cancel it from the terminal"
+)
+```
+
+<br>
+
+#### Stop the bash process
+
+<br>
+
+You can use `htop -u` to list your running jobs, identify the jobid associated to the `01_raw_sequencing_data_management_and_TSO500_analysis.sh` and stop it (Figure 30).
+
+```{bash, echo=TRUE, eval = FALSE}
+# Find the jobid
+htop -u
+
+# Example of slurm ID
+kill -9 123456
+```
+
+<br>
+
+#### Delete results in *TSO500_analyses* folder
+
+<br>
+
+Delete the *LocalApp* output folder for this `${RUN_ID}` : `${DURABLE}/TSO500_analyses/${RUN_ID}_TSO500_LocalApp_analysis_fromRAW`
+
+```{bash, echo=TRUE, eval = FALSE}
+# Verify first this folder exists ...
+ls ${DURABLE}/TSO500_analyses/${RUN_ID}_TSO500_LocalApp_analysis_fromRAW
+
+# Then remove it
+rm -rfi ${DURABLE}/TSO500_analyses/${RUN_ID}_TSO500_LocalApp_analysis_fromRAW
+```
+
+<br>
+
+### : Add *normal* samples in the TSOPPI table.
+
+<br>
+
+In many cases, one sample can have both *tumor* and *normal* samples that were sequenced in different `$RUN_ID`. In such cases, we have to manually
+adapt the *TSOPPI* config table, add the `$RUN_ID`s of tumor *tumor* and *normal* and launch *TSOPPI* two times: (1) to generate the config table and adapt it manually and (2) to launch the TSOPPI analysis.
+
+
+1. Update `config.sh` file in the following variables. By default both variables are set to `"T"`.
+This will tell *TSOPPI* to generate the config table only, without launching the analysis.
+
+```{bash, echo=TRUE, eval = FALSE}
+MAKE_TSOPPI_CONFIG="T"
+EXECUTE_TSOPPI_SCRIPTS="F"
+```
+
+<br>
+
+2. Source the config file before launching *TSOPPI*. Once we changed and sourced this configuration, *TSOPPI* will stop after creating the config table.
+
+```{bash, echo=TRUE, eval = FALSE}
+source config.sh ${RUN_ID}
+```
+
+<br>
+
+3. Launch *TSOPPI* as usual.
+
+```{bash, echo=TRUE, eval = FALSE}
+bash 02_execute_tsoppi_and_archive_results.sh ${RUN_ID} \
+  > ${SCRIPTS_AND_LOGS_FOLDER}/02_execute_tsoppi_and_archive_results.stdout \
+  2> ${SCRIPTS_AND_LOGS_FOLDER}/02_execute_tsoppi_and_archive_results.stderr &
+```
+
+<br>
+
+4. Open the `${SCRIPTS_AND_LOGS_FOLDER}/02_used_scripts/config_${RUN_ID}.sh` file with a text editor.
+This file contains a variable declared as in the following chunk. The following (0-based) columns must be updated
+with the *normal* sample information.
+
+  - 3 : NORMAL_AVAILABLE
+  - 4 : NORMAL_ID_DNA
+  - 5 : RUN_ID_NORMAL_DNA
+
+```{bash, echo=TRUE, eval = FALSE}
+# SAMPLE_ID,TUMOR_ID_DNA,RUN_ID_TUMOR_DNA,NORMAL_AVAILABLE,NORMAL_ID_DNA,RUN_ID_NORMAL_DNA,TUMOR_ID_RNA,RUN_ID_TUMOR_RNA,TUMOR_PURITY,TUMOR_SITE
+SAMPLE_INFO=(\
+  "IPA0123,IPA0123-D00-P00-A00,250821_AAAAAAAA_BBB_CCCCCCCCCC,False,NA,NA,IPA0523-R00-P00-A00,250821_AAAAAAAA_BBB_CCCCCCCCCC,0.9,0" \
+)
+```
+
+<br>
+
+5. Modify the aforementioned variables. The updated version of the config file must look like in the 
+following chunk. The `NORMAL_ID_DNA` and `RUN_ID_NORMAL_DNA` can be obtained from the *PRONTO* metadata table.
+
+  - 3 : Replace the default `False` by `True` (this will tell *TSOPPI* that this sample has a *normal* counterpart).
+  - 4 : Replace the default `NA` by the complete `${SAMPLE_ID}` of the *normal* sample (IPA0124-D00-N00-A00 in the example).
+  - 5 : Replace the default `NA` by the `${RUN_ID}` of the *normal* sample (250822_AAAAAAAA_BBB_CCCCCCCCCC in the example).
+  
+*NOTE* : the normal samples have the prefix followed by a number. Example: IPA0124-D00**-N00-**A00.
+
+```{bash, echo=TRUE, eval = FALSE}
+# SAMPLE_ID,TUMOR_ID_DNA,RUN_ID_TUMOR_DNA,NORMAL_AVAILABLE,NORMAL_ID_DNA,RUN_ID_NORMAL_DNA,TUMOR_ID_RNA,RUN_ID_TUMOR_RNA,TUMOR_PURITY,TUMOR_SITE
+SAMPLE_INFO=(\
+  "IPA0123,IPA0123-D00-P00-A00,250821_AAAAAAAA_BBB_CCCCCCCCCC,True,IPA0124-D00-P00-A00,250822_AAAAAAAA_BBB_CCCCCCCCCC,IPA0523-R00-P00-A00,250821_AAAAAAAA_BBB_CCCCCCCCCC,0.9,0" \
+)
+```
+
+<br>
+
+6. Update again the `config.sh` file in the following variables.
+This will tell *TSOPPI* to skip the generation of the config table and will launching the analysis immediately.
+
+```{bash, echo=TRUE, eval = FALSE}
+MAKE_TSOPPI_CONFIG="F"
+EXECUTE_TSOPPI_SCRIPTS="T"
+``` 
+
+<br>
+
+> **⚠️ Important: update *TSOPPI* config**. If the `MAKE_TSOPPI_CONFIG` is not set to "F", *TSOPPI* will overwrite the changes in the config file and we will have to repeat this process.  
+
+7. Launch again *TSOPPI*. This time will launch the analysis without generating a new config file
+
+```{bash, echo=TRUE, eval = FALSE}
+bash 02_execute_tsoppi_and_archive_results.sh ${RUN_ID} \
+  > ${SCRIPTS_AND_LOGS_FOLDER}/02_execute_tsoppi_and_archive_results.stdout \
+  2> ${SCRIPTS_AND_LOGS_FOLDER}/02_execute_tsoppi_and_archive_results.stderr &
+```
+
+<br>
+
+8. Revert the *TSOPPI* config variables to their default values in the `config.sh` file.
+
+```{bash, echo=TRUE, eval = FALSE}
+MAKE_TSOPPI_CONFIG="T"
+EXECUTE_TSOPPI_SCRIPTS="T"
+```
+
+<br>
+
+### TSD *p1150* responsible
+
+<br>
+
+Contact Torben Lüders (torben.luders@medisin.uio.no) for any issue related to this project,
+such as disk space left, errors in the pipeline or question regarding the samplesheets.
+
+Also, you can contact him to any iossue related the metadata (missing fields, wrong IDs or other stuff).
+
+<br>
+
+### I cannot see results after running PRONTO (03)
+
+<br>
+
+It may happen that you launched *PRONTO* and ir ran succesfully, however you didn't
+find any results in the `${DURABLE}/TSO500_export_for_interpretation/RECENT_RUN/` folder.
+
+You can verify in 2 places.
+
+1. In *PRONTO* *Out* folder (`${DURABLE}/software/PRONTO/PRONTO-1.2.0/Out/${RUN_ID}/`) : here you should see a folder for each sample ID.
+
+2. In case the `${DURABLE}/software/PRONTO/PRONTO-1.2.0/Out/${RUN_ID}/` folder does not exist or is empty, the issue may come directly from the master metadata table (`${DURABLE}/software/PRONTO/PRONTO-1.2.0/In/InPreD_PRONTO_metadata.txt`). The problem may be a separator-related issue. You have to manually check that the separator bewteen columns is a tab and not single spaces.
+
+<br>
+
+### How to run the pipeline when there are samples with RNA data only
+
+<br>
+It may happen that in a sequencing run we sequence only RNA for a given sample
+(and the DNA was sequenced in a previous run).
+
+1. *LocalApp* and *icnva* run as usual, so no need to update them
+2. *TSOPPI* and *PRONTO* runs have to be manually adapted to properly run the analysis for all samples.
+
+Here we explain what to do in *TSOPPI* and *PRONTO*, respectively.
+
+<br>
+
+#### Generate *TSOPPI* config file when a sample has only its RNA component
+
+<br>
+
+In such cases we have to manually adapt the *TSOPPI* config file, however the script 
+that creates this config file assumes the *DNA* sample ID is known, which is not
+true in these cases, and it will generate an error when launching *TSOPPI*.
+
+<br>
+
+1. Update `config.sh` file in the following variables. By default both variables are set to `"T"`.
+This will tell *TSOPPI* to generate the config table only, without launching the analysis.
+
+```{bash, echo=TRUE, eval = FALSE}
+MAKE_TSOPPI_CONFIG="T"
+EXECUTE_TSOPPI_SCRIPTS="F"
+```
+
+<br>
+
+2. As a temporary solution, you have to uncomment the following lines in the 
+`${SCRIPTS_FOLDER}/generate_config_file.py` script (the chunk show them uncommented 
+but they are commented in the script).
+
+This will create the *TSOPPI* config file however you have to replace the run ID and 
+sample ID for the DNA sample.
+
+```{bash, echo=TRUE, eval = FALSE}
+info[patient_id]['DNA_tumor'] = sample_id
+info[patient_id]['run_id_dna_tumor'] = seq_run_id
+```
+
+<br>
+
+3. Launch *TSOPPI* as usual.
+
+```{bash, echo=TRUE, eval = FALSE}
+bash 02_execute_tsoppi_and_archive_results.sh ${RUN_ID} \
+  > ${SCRIPTS_AND_LOGS_FOLDER}/02_execute_tsoppi_and_archive_results.stdout \
+  2> ${SCRIPTS_AND_LOGS_FOLDER}/02_execute_tsoppi_and_archive_results.stderr &
+```
+
+<br>
+
+4. Open the `${SCRIPTS_AND_LOGS_FOLDER}/02_used_scripts/config_${RUN_ID}.sh` file with a text editor.
+This file contains a variable declared as in the following chunk. The following (0-based) columns must be updated
+with the *DNA* sample information, with the step 2 these values correspond to the RNA data and they have to be corrected.
+
+  - 1 : TUMOR_ID_DNA
+  - 2 : RUN_ID_TUMOR_DNA
+
+Note that the column 1 and 2 are identical to columns 6 and 7. This is incorrect
+and has to be updated.
+
+```{bash, echo=TRUE, eval = FALSE}
+# SAMPLE_ID,TUMOR_ID_DNA,RUN_ID_TUMOR_DNA,NORMAL_AVAILABLE,NORMAL_ID_DNA,RUN_ID_NORMAL_DNA,TUMOR_ID_RNA,RUN_ID_TUMOR_RNA,TUMOR_PURITY,TUMOR_SITE
+SAMPLE_INFO=(\
+  "IPA0123,IPA0523-R00-P00-A00,250821_AAAAAAAA_BBB_CCCCCCCCCC,False,NA,NA,IPA0523-R00-P00-A00,250821_AAAAAAAA_BBB_CCCCCCCCCC,0.9,0" \
+)
+```
+
+<br>
+
+5. Modify the aforementioned variables. The updated version of the config file must look like in the 
+following chunk. The `TUMOR_ID_DNA` and `RUN_ID_TUMOR_DNA` can be obtained from the *PRONTO* metadata table.
+
+  - 1 : Replace the value by the corresponding DNA sample ID (IPA0123-D00-P00-A00 in the example below).
+  - 2 : Replace the value by the corresponding run ID associated to the DNA sample (250828_AAAAAAAA_BBB_CCCCCCCCCC in the example below).
+  
+*NOTE* : the DNA samples contain the string `-D01-`. Example: IPA0124**-D01-**P00-A00.
+
+```{bash, echo=TRUE, eval = FALSE}
+# SAMPLE_ID,TUMOR_ID_DNA,RUN_ID_TUMOR_DNA,NORMAL_AVAILABLE,NORMAL_ID_DNA,RUN_ID_NORMAL_DNA,TUMOR_ID_RNA,RUN_ID_TUMOR_RNA,TUMOR_PURITY,TUMOR_SITE
+SAMPLE_INFO=(\
+  "IPA0123,IPA0123-D00-P00-A00,250828_AAAAAAAA_BBB_CCCCCCCCCC,False,NA,NA,IPA0523-R00-P00-A00,250821_AAAAAAAA_BBB_CCCCCCCCCC,0.9,0" \
+)
+```
+
+<br>
+
+6. Update again the `config.sh` file in the following variables.
+This will tell *TSOPPI* to skip the generation of the config table and will launching the analysis immediately.
+
+```{bash, echo=TRUE, eval = FALSE}
+MAKE_TSOPPI_CONFIG="F"
+EXECUTE_TSOPPI_SCRIPTS="T"
+``` 
+
+<br>
+
+> **⚠️ Important: update *TSOPPI* config**. If the `MAKE_TSOPPI_CONFIG` is not set to "F", *TSOPPI* will overwrite the changes in the config file and we will have to repeat this process.  
+
+7. Launch again *TSOPPI*. This time will launch the analysis without generating a new config file
+
+```{bash, echo=TRUE, eval = FALSE}
+bash 02_execute_tsoppi_and_archive_results.sh ${RUN_ID} \
+  > ${SCRIPTS_AND_LOGS_FOLDER}/02_execute_tsoppi_and_archive_results.stdout \
+  2> ${SCRIPTS_AND_LOGS_FOLDER}/02_execute_tsoppi_and_archive_results.stderr &
+```
+
+<br>
+
+8. Revert the *TSOPPI* config variables to their default values in the `config.sh` file.
+
+```{bash, echo=TRUE, eval = FALSE}
+MAKE_TSOPPI_CONFIG="T"
+EXECUTE_TSOPPI_SCRIPTS="T"
+```
+
+<br>
+
+9. Comment these lines again (in `${SCRIPTS_FOLDER}/generate_config_file.py`)
+after the *TSOPPI* config file was successfully created. 
+
+```{bash, echo=TRUE, eval = FALSE}
+#info[patient_id]['DNA_tumor'] = sample_id
+#info[patient_id]['run_id_dna_tumor'] = seq_run_id
+```
+
+<br>
+
+#### Generate reports for samples containing only RNA data
+
+<br>
+
+*PRONTO* takes many parameters including the `${RUN_ID}`, the `config.sh` and the 
+`${SCRIPTS_AND_LOGS_FOLDER}/02_used_scripts/config_${RUN_ID}.sh` (the *TSOPPI* config file).
+
+The main issue is that *PRONTO* uses the DNA sample ID as a reference, however,
+in these situations the DNA sample ID corresponds to a previous run, not the `${RUN_ID}`
+we usually use for other runs.
+
+In a nutshell, we have to launch *PRONTO* with the current run *TSOPPI* results
+(containing both DNA and RNA analysis) but using the information of the previous (DNA) run.
+
+For this example we will use the notation **RNA_RUN** for the current run and **DNA_RUN**
+a previous run where the DNA data was sequenced and analyzed.
+
+1. Updated the `SAMPLE_IDs` variable ONLY for those samples containing both DNA and RNA
+in the same run and launch *PRONTO* as usual.
+
+2. Updated the `SAMPLE_IDs` variable ONLY for those samples containing RNA in the 
+current `${RUN_ID}` and DNA in a previous sequencing run.
+
+```{bash, echo=TRUE, eval = FALSE}
+SAMPLE_IDs=( "SAMPLE1" "SAMPLE_2" ... "SAMPLE_3" )
+```
+
+3. Rename the *PRONTO out* folder for the **DNA_RUN**, in this way we keep a backup.
+
+```{bash, echo=TRUE, eval = FALSE}
+mv ${DURABLE}/software/PRONTO/PRONTO-1.2.0/Out/DNA_RUN   \
+   ${DURABLE}/software/PRONTO/PRONTO-1.2.0/Out/DNA_RUN_1
+```
+
+<br>
+
+4. Copy the `config_${RUN_ID}.sh` of the RNA_RUN in the DNA_RUN `${SCRIPTS_AND_LOGS_FOLDER}/02_used_scripts` and viceversa. 
+
+```{r DNA_in_RNA_config, echo=FALSE, results='asis'}
+insert.fig.toggle(
+  fig.id = "DNA_in_RNA_config",
+  button.label = "Figure 30",
+  img.src = "fig/30_DNA_in_RNA_config.png",
+  fig.width = "100%",
+  fig.cap = "DNA config file copied to RNA 02_used_scripts folders"
+)
+```
+
+
+```{r RNA_in_DNA_config, echo=FALSE, results='asis'}
+insert.fig.toggle(
+  fig.id = "RNA_in_DNA_config",
+  button.label = "Figure 31",
+  img.src = "fig/31_RNA_in_DNA_config.png",
+  fig.width = "100%",
+  fig.cap = "RNA config file copied to DNA 02_used_scripts folders"
+)
+```
+
+<br>
+
+5. Rename the *TOSPPI* results folders of the samples to be updated from the DNA_RUN
+by adding the prefix *ORIGINAL_*. We keep this renamed folders as a backup.
+
+<br>
+
+6. We need to rename the *LocalApp* results folders by adding the prefix *ORIGINAL_*.
+This is important to avoid results from previous *LocalApp* runs with the same ID
+to appear in the results of the new version.
+
+As alternative, in case you don'y need to create a backup, delete the old *LocalApp* folder.
+
+
+<br>
+
+7. Copy the *TSOPPI* results of the samples to be updated (the ones containing both
+*DNA* and *RNA* analysis, i.e. RNA_RUN) in the folders from the DNA_RUN (the run 
+where DNA (but not RNA) was sequenced).
+
+```{r Rename_old_run_TSOPPI_files, echo=FALSE, results='asis'}
+insert.fig.toggle(
+  fig.id = "Rename_old_run_TSOPPI_files",
+  button.label = "Figure 32",
+  img.src = "fig/32_Rename_old_run_TSOPPI_files.png",
+  fig.width = "100%",
+  fig.cap = ""
+)
+```
+
+<br>
+
+8. Update the `${RUN_ID}` variable with the previous run (DNA_RUN), source it and launch *PRONTO*.
+
+```{bash, echo=TRUE, eval = FALSE}
+
+# Update RUN_ID with the run ID associated to the DNA samples
+RUN_ID=251002_NB552811_0108_AHHVC2BGYX
+
+# Source the config file
+source config.sh ${RUN_ID}
+
+# Launch PRONTO as usual with the updated config
+for SAMPLE_ID in ${SAMPLE_IDs[@]}
+do
+      echo "SAMPLE_ID=${SAMPLE_ID}"
+
+      bash 03_generate_and_archive_pronto_report_collect_data_for_export.sh ${RUN_ID} ${SAMPLE_ID} ${SCRIPTS_AND_LOGS_FOLDER}/02_used_scripts/config_${RUN_ID}.sh \
+          > ${SCRIPTS_AND_LOGS_FOLDER}/03_generate_and_archive_pronto_v${PRONTO_VERSION}_report_collect_data_for_export_${SAMPLE_ID}_${RUN_ID}.stdout \
+          2> ${SCRIPTS_AND_LOGS_FOLDER}/03_generate_and_archive_pronto_v${PRONTO_VERSION}_report_collect_data_for_export_${SAMPLE_ID}_${RUN_ID}.stderr 
+
+done
+```
+
+<br>
+
+### Additional information on undescribed variables in the README: 
+
+<br>
+
+Not all variables are described in this README file as they do not need to be change. Below are the location of folder and files declared by those variables:
+
+```{r undescribed_var, echo=FALSE, eval = TRUE, comment=""}
+cat(glue('SCRIPTS_AND_LOGS_FOLDER="${{DURABLE}}/TSO500_scripts_and_logs/${{RUN_ID}}"
+SAMPLESHEETS_FOLDER="${{DURABLE}}/TSO500_SampleSheets"
+INFO_FILE_NAME="SampleSheet_${{RUN_DATE}}_info.csv"
+INFO_FILE_NAME_TSOPPI="SampleSheet_${{RUN_DATE}}_info_TSOPPI.csv"
+PIPELINE_FOLDER = "${{DURABLE}}/software/pipeline/v003_upgrading_pronto_to_1.2.0"'), "\n")
+```
+
+
+  
+<!-- 
+
+sudo apptainer build create_fusviz_input.sif Singularity
+
+singularity run create_fusviz_input.sif -s ../../examples/prepare_fusviz_tables/variant_summary.tsv -m ../../examples/prepare_fusviz_tables/sample1_fusion_and_splice_variant_candidates.tsv -o TEST.txt 
+
+-->
