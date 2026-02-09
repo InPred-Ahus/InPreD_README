@@ -356,10 +356,14 @@ Follow the instructions below to automatically generate these tables.
 <br>
 
   - In your browser, open the [View UiO Portal - Hypathia](https://view.uio.no/portal/webclient/#/launchitems) website. Log in with your *username* and  your *UiO user password* and click on the **UiO Linux Desktop** icon (see Figure 3).
+  
+<br>
 
   - Go to the folder `\\platon.uio.no\med-klinmed-u2\jamondra\JACM/Ahus_InPreD_toolkit`, this is a copy of the
   [github repository Ahus_InPreD_toolkit](https://github.com/jaimicore/Ahus_InPreD_toolkit).
   
+<br>
+
   - Open the file `commands.txt` and manually update the following variables:
     
     - `WEEK` : set it to the current week in the format 'wW', where 'W' is the week number. Example for week 6 = w6.
@@ -368,14 +372,37 @@ Follow the instructions below to automatically generate these tables.
 
 <br>
 
-  - **SampleSheet**:
+  - Launch the scripts (Running time ~2-3 minutes)
   
-    - In *Sheet1*, select columns **InPred ID (IPA)** (E), **Tumor content** (R), and  **Barcode** (S).
-    - Create a new file with these columns and  **remove the header**. The file must be named `SampleSheet_YYMMDD_info.csv`.
-    - Verify that all entries in the **Barcode** column start with the **UP** prefix. (E.g., UP01, UP16).
-    - Verify that all entries in the **Tumor content** column have an integer value (0-100). In case there is no value, leave it empty (avoid '-' or other characters)
-    
-    - Save the new file in the metadata folder `\\platon.uio.no\med-klinmed-u2\jamondra\pc\Dokumenter\Metadata`.
+```{bash, echo=TRUE, eval = FALSE}
+bash commands.txt
+```
+
+<br>
+
+  - Go to the results folder : `\\platon.uio.no\med-klinmed-u2\jamondra\JACM/Ahus_InPreD_toolkit/results/`, and go to the week you set on `commands.txt`, you will se the following files (Figure 6): 
+  
+    - `coordinator_table_wW.csv` : contains clinical metadata and doctor contact and other information (sensitive)
+    - `PRONTO_metadata_YYMMDD.txt` : patient metadata (age, year of diagnosis, cancer type, hospital) (sensitive)
+    - `SampleSheet_ YYMMDD_info.csv` : sample ID and tumor content (not sensitive)
+
+```{r ToolKit_results_meta, echo=FALSE, results='asis'}
+
+insert.fig.toggle(
+  fig.id = "ViewUiO_SampleSheet ",
+  button.label = "Figure 6",
+  img.src = "fig_v2/06_Metadata_files_from_script.png",
+  fig.width = "75%",
+  fig.cap = "File produced after running `bash commands.txt` in the Toolkit InPreD folder."
+)
+```
+
+<br>  
+
+  - Switch to the Windows machine (*Kontor Fullsjerm*, see Figure 3). We will continue with the file transfer in this machine.
+  
+  
+  - Copy the `coordinator_table_wW.csv` to the following folder: `hypathia.uio.no/Ih-med-klinmed-ahus-inpred/IMPRESS/Coordinator_tables_from_script/2026`
 
 <br>
 
@@ -385,18 +412,14 @@ Follow the instructions below to automatically generate these tables.
 
   - **PRONTO metadata**:
   
-    - In *PRONTO* sheet. Save the content as it is in a new **tab separated file (.txt)**. The file must be named `PRONTO_metadata_YYMMDD.txt`.
-    
-    - Save the new file in the metadata folder `\\platon.uio.no\med-klinmed-u2\jamondra\pc\Dokumenter\Metadata`.
-    
-    - **Encrypt this file in *7z* format.** *Right click* on the file and select the *7-zip* option, select the *Leff til arkiv* option (Figure 5). This will open a window, write and repeat your encryption password in the *Angi passord* and *Bekreft passord* text boxes (Figure 6). Do not modify the other parameters.
+    - **Encrypt this file in *7z* format.** *Right click* on the file and select the *7-zip* option, select the *Leff til arkiv* option (Figure 7). This will open a window, write and repeat your encryption password in the *Angi passord* and *Bekreft passord* text boxes (Figure 8). Do not modify the other parameters.
 
 ```{r Encrypt_PRONTO_pt1, echo=FALSE, results='asis'}
 
 insert.fig.toggle(
   fig.id = "Encrypt_PRONTO_pt1",
-  button.label = "Figure 5",
-  img.src = "fig/05_Encrypt_pt1.png",
+  button.label = "Figure 7",
+  img.src = "fig_v2/07_Encrypt_pt1.png",
   fig.width = "85%",
   fig.cap = "Right click on the PRONTO metadata file to display encryption options"
 )
@@ -407,8 +430,8 @@ insert.fig.toggle(
 
 insert.fig.toggle(
   fig.id = "Encrypt_PRONTO_pt2",
-  button.label = "Figure 6",
-  img.src = "fig/06_Encrypt_pt2.png",
+  button.label = "Figure 8",
+  img.src = "fig_v2/08_Encrypt_pt2.png",
   fig.width = "65%",
   fig.cap = "Write and repeat your encryption password"
 )
