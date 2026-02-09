@@ -188,7 +188,7 @@ insert.fig.toggle(
 insert.fig.toggle(
   fig.id = "figVMs",
   button.label = "Figure 2",
-  img.src = "fig_v2//02_VMs.png",
+  img.src = "fig_v2/02_VMs.png",
   fig.width = "45%",
   fig.cap = "Available VMs. Left: Linux, Right: Windows"
 )
@@ -310,42 +310,8 @@ insert.fig.toggle(
 Before launching the pipeline, we must generate the *SampleSheet* and *PRONTO* metadata from the [View UiO Portal - Hypathia](https://view.uio.no/portal/webclient/#/home), these files must be transfered
 to *TSD*.
 
-Once in *TSD*, these files muts be located at specific folder for the *TSO500* results and
+Once in *TSD*, these files must be located at specific folder for the *TSO500* results and
 the *SampleSheet* must be transfered to *OUS* via an *OUS-Ahus* shared folder in *TSD* (see later).
-
-  - Log in into the [View UiO portal](https://view.uio.no/portal/webclient/#/home). You must write your *2FA* one time code and your password.
-  
-  - Click on *Windows icon* -> *This PC* -> *Hypathia.uio.no* (Figure 3).
-  
-  - **SampleSheet** file: 
-    
-    - `hypathia.uio.no/Ih-med-klinmed-ahus-inpred/TS0500/Samples_YYYY_wWW.xlsx` (where *YYYY* = Year and *wWW* = week. Example: *w22* for week 22; see Figure 4).
-
-```{r ViewUiO, echo=FALSE, results='asis'}
-
-insert.fig.toggle(
-  fig.id = "Hypathia",
-  button.label = "Figure 3",
-  img.src = "fig/03_Hypatia.png",
-  fig.width = "75%",
-  fig.cap = "Access the Hypathia server thorugh UiO View Portal"
-)
-
-```
-
-<br>
-
-```{r ViewUiO_SampleSheet, echo=FALSE, results='asis'}
-
-insert.fig.toggle(
-  fig.id = "ViewUiO_SampleSheet ",
-  button.label = "Figure 4",
-  img.src = "fig/04_SampleSheet.png",
-  fig.width = "75%",
-  fig.cap = "Original SampleSheet in View UiO portal"
-)
-
-```
 
 <br>
 
@@ -353,7 +319,52 @@ insert.fig.toggle(
 
 <br>
 
-  - Open the *SampleSheet file* with *Microsoft Excel*. You will see two sheets, namely **Sheet1** and **PRONTO**.
+In previous versions, these steps were manual, but now we have an automated way
+to create these tables.
+
+Both *SampleSheet* and *PRONTO* metadata content is found in the following file:
+`hypathia.uio.no/Ih-med-klinmed-ahus-inpred/TS0500/Samples_YYYY_wW.xlsx` (where 
+*YYYY* = Year and *wWW* = week. Example: *w22* for week 22; see Figure 4 and 5).
+
+```{r ViewUiO, echo=FALSE, results='asis'}
+
+insert.fig.toggle(
+  fig.id = "Hypathia",
+  button.label = "Figure 4",
+  img.src = "fig_v2/04_Hypatia.png",
+  fig.width = "75%",
+  fig.cap = "Access the Hypathia server thorugh UiO View Portal"
+)
+
+```
+
+```{r ViewUiO_SampleSheet, echo=FALSE, results='asis'}
+
+insert.fig.toggle(
+  fig.id = "ViewUiO_SampleSheet ",
+  button.label = "Figure 5",
+  img.src = "fig_v2/05_SampleSheet.png",
+  fig.width = "75%",
+  fig.cap = "Original SampleSheet in View UiO portal"
+)
+
+```
+
+
+Follow the instructions below to automatically generate these tables.
+
+<br>
+
+  - In your browser, open the [View UiO Portal - Hypathia](https://view.uio.no/portal/webclient/#/launchitems) website. Log in with your *username* and  your *UiO user password* and click on the **UiO Linux Desktop** icon (see Figure 3).
+
+  - Go to the folder `\\platon.uio.no\med-klinmed-u2\jamondra\JACM/Ahus_InPreD_toolkit`, this is a copy of the
+  [github repository Ahus_InPreD_toolkit](https://github.com/jaimicore/Ahus_InPreD_toolkit).
+  
+  - Open the file `commands.txt` and manually update the following variables:
+    
+    - `WEEK` : set it to the current week in the format 'wW', where 'W' is the week number. Example for week 6 = w6.
+    
+    - `YYMMDD` : the date when sequencing started. Example: 260209.
 
 <br>
 
