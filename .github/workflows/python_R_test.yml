@@ -91,6 +91,12 @@ jobs:
         Rscript -e "install.packages(c('renv'))"
         Rscript -e "renv::restore()"
 
-    - name: Render Rmd file
+    - name: Render Rmd file (v1)
       run: |
         Rscript -e "rmarkdown::render('InPreD_README.Rmd')"
+
+    - name: Render Rmd file (v2)
+      run: |
+        Rscript -e "rmarkdown::render('InPreD_pipeline_OUS-Ahus_README.Rmd')"
+
+
