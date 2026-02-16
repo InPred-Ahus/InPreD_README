@@ -33,7 +33,7 @@ run.id.date     <- ""
 
 # Force user to define a Run ID
 # Replace the old ID for the new one
-run.id <- "260129_NB552811_0122_AHL7KYBGYX" 
+run.id <- "260213_A02134_0129_BHJNFNDRX7" 
 #         "250606_AAAAAAAA_BBBB_CCCCCCCCCC"   # ID template
 
 # 260123_NB552811_0121_AHL7KWBGYX
@@ -441,27 +441,6 @@ insert.fig.toggle(
 <br>
 
   - **NOTE:** both *SampleSheet* and *PRONTO* metadata file **must** have the exact same date *YYMMDD*.
-  
-
-```{r, echo=FALSE, eval = TRUE}
-cl.sections   <- add.cl.section("Create SampleSheet (View UiO)", cl.sections)
-cl.categories <- add.cl.categories("file_manip", cl.categories)
-
-cl.sections   <- add.cl.section("Verify Barcode column (UP)", cl.sections)
-cl.categories <- add.cl.categories("file_manip", cl.categories)
-
-cl.sections   <- add.cl.section("Verify Tumor content (numeric or empty)", cl.sections)
-cl.categories <- add.cl.categories("file_manip", cl.categories)
-
-cl.sections   <- add.cl.section("Create PRONTO metadata (View UiO)", cl.sections)
-cl.categories <- add.cl.categories("file_manip", cl.categories)
-
-cl.sections   <- add.cl.section("Verify Batch column ('-')", cl.sections)
-cl.categories <- add.cl.categories("file_manip", cl.categories)
-
-cl.sections   <- add.cl.section("Encrypt PRONTO metadata", cl.sections)
-cl.categories <- add.cl.categories("important", cl.categories)
-```
 
 <br>
 
@@ -479,7 +458,7 @@ cl.categories <- add.cl.categories("important", cl.categories)
   
   - Upload the `SampleSheet_YYMMDD.csv` and `PRONTO_metadata_YYMMDD.7z` files. Verify both files are listed and checked, and click on the *import button* (Figure 8).
   
-  - **NOTE**: only import the encrypted *PRONTO metadata* file, never the *.txt (non-encrypted)* version.
+  - **NOTE**: only import the encrypted *PRONTO metadata (.7z)* file, never the *.txt (non-encrypted)* file.
 
 <br>
 
@@ -557,14 +536,6 @@ insert.fig.toggle(
 )
 ```
 
-```{r, echo=FALSE, eval = TRUE}
-cl.sections   <- add.cl.section("Import files in TSD Data Portal", cl.sections)
-cl.categories <- add.cl.categories("file_manip", cl.categories)
-
-cl.sections   <- add.cl.section("Decrypt PRONTO metadata", cl.sections)
-cl.categories <- add.cl.categories("file_manip", cl.categories)
-```
-
 ## Prepare pipeline
 
 <br>
@@ -582,27 +553,6 @@ Before launching the pipeline we must verify if there is enough space in the dis
 df -h /ess/p1150
 ```
 
-```{r, echo=FALSE, eval = TRUE}
-cl.sections   <- add.cl.section("Verify disk space availability", cl.sections)
-cl.categories <- add.cl.categories("prepare_pipeline", cl.categories)
-```
-
-<br>
-
-### Verify size of sequencing run
-
-  - **Size of files from current run ID**: usually a sequencing run produces a folder with size varying from **~30-60 GB**. If this number is outside this range, please contact the people involved in sequencing.
-
-```{bash, echo=TRUE, eval = FALSE}
-# Check size of sequencing results
-du -csh /ess/p1150/data/durable/file-import/p1150-member-group/tsd
-```
-
-```{r, echo=FALSE, eval = TRUE}
-cl.sections   <- add.cl.section("Verify size of sequencing run", cl.sections)
-cl.categories <- add.cl.categories("prepare_pipeline", cl.categories)
-```
-
 <br>
 
 ### Connect to hpc (*Colossus*) server.
@@ -614,11 +564,6 @@ cl.categories <- add.cl.categories("prepare_pipeline", cl.categories)
 ssh p1150-hpc-01
 ```
 
-```{r, echo=FALSE, eval = TRUE}
-cl.sections   <- add.cl.section("Connect to hpc (Colossus) server", cl.sections)
-cl.categories <- add.cl.categories("prepare_pipeline", cl.categories)
-```
-
 <br>
 
 ### Pipeline run directory.
@@ -626,12 +571,7 @@ cl.categories <- add.cl.categories("prepare_pipeline", cl.categories)
   - **NOTE**: the pipeline must be launched from this folder.
 
 ```{bash, echo=TRUE, eval = FALSE}
-cd  /ess/p1150/data/durable/software/pipeline/v003_upgrading_pronto_to_1.2.0
-```
-
-```{r, echo=FALSE, eval = TRUE}
-cl.sections   <- add.cl.section("Pipeline run directory", cl.sections)
-cl.categories <- add.cl.categories("prepare_pipeline", cl.categories)
+cd  /ess/p1150/data/durable/software/pipeline/v004_sequencing_at_OUS_WIP
 ```
 
 <br>
@@ -664,23 +604,40 @@ echo $DURABLE
 echo " "
 ```
 
-```{r, echo=FALSE, eval = TRUE}
-cl.sections   <- add.cl.section("Set up  ${RUN_ID}", cl.sections)
-cl.categories <- add.cl.categories("setup", cl.categories)
+<br>
 
-cl.sections   <- add.cl.section("Set up  ${RUN_DATA}", cl.sections)
-cl.categories <- add.cl.categories("setup", cl.categories)
+### Move *OUS*-shared *LocalApp* results 
 
-cl.sections   <- add.cl.section("Set up  ${INPUT_DATA_TYPE}", cl.sections)
-cl.categories <- add.cl.categories("setup", cl.categories)
+<br>
 
-cl.sections   <- add.cl.section("Set up  ${DURABLE}", cl.sections)
-cl.categories <- add.cl.categories("setup", cl.categories)
+*OUS* (Oslo UniversitetsSykehus) will send the *LocalApp* results every Monday morning 
+in the Ahus - OUS shared folder at `/ess/p1532sharedp1150/data/durable`
+
+We will do the following steps:
+
+- Move and rename the folder
+- Rename the SampleSheet
+- Create link
+
+
+```{bash, echo=TRUE, eval = FALSE}
+# Move and rename LocalApp folder 
+mv -i /ess/p1532sharedp1150/data/durable/${RUN_ID}_TSO_500* ${DURABLE}/TSO500_analyses/${RUN_ID}_TSO500_LocalApp_analysis_fromRAW
+```
+
+```{bash, echo=TRUE, eval = FALSE}
+# Rename LocalApp SampleSheet file
+mv ${DURABLE}/TSO500_analyses/${RUN_ID}_TSO500_LocalApp_analysis/SampleSheet_${RUN_ID}_Ahus.csv ${DURABLE}/TSO500_analyses/${RUN_ID}_TSO500_LocalApp_analysis/SampleSheet_${RUN_ID}.csv 
+```
+
+```{bash, echo=TRUE, eval = FALSE}
+# Create link (that will be used when running PRONTO)
+ln -s ${DURABLE}/TSO500_analyses/${RUN_ID}_TSO500_LocalApp_analysis_fromRAW ${DURABLE}/TSO500_analyses/${RUN_ID}_TSO500_LocalApp_analysis
 ```
 
 <br>
 
-### Prepare sequences and metadata
+### Prepare metadata
 
 <br>
 
@@ -689,10 +646,6 @@ They must be moved to the `TSO500_sequences`, `TSO500_pronto_metadata`, and `TSO
 
 **NOTE**: An invisible character is inserted in the header of the `SampleSheet_$DATE.csv` metadata file. This character must be removed because the table cannot be properly read by other software and crash the analysis. Once this issue is solved, proceed to move the folders.
 
-```{bash, echo=TRUE, eval = FALSE}
-# Move sequences file
-mv -i ${DURABLE}/file-import/p1150-member-group/tsd/${RUN_DATE}* ${DURABLE}/TSO500_sequences/
-```
 
 ```{bash, echo=TRUE, eval = FALSE}
 # Move SampleSheet metadata file
@@ -705,20 +658,6 @@ mv -i ${DURABLE}/file-import/p1150-member-group/SampleSheet_${RUN_DATE}_info.csv
 mv -i ${DURABLE}/file-import/p1150-member-group/PRONTO_metadata_${RUN_DATE}.txt ${DURABLE}/TSO500_pronto_metadata/PRONTO_metadata_${RUN_DATE}.txt
 
 mv -i ${DURABLE}/file-import/p1150-member-group/PRONTO_metadata_${RUN_DATE}.7z ${DURABLE}/TSO500_pronto_metadata/PRONTO_metadata_${RUN_DATE}.7z
-```
-
-```{r, echo=FALSE, eval = TRUE}
-cl.sections   <- add.cl.section("Remove invisible character in ShampleSheet file", cl.sections)
-cl.categories <- add.cl.categories("important", cl.categories)
-
-cl.sections   <- add.cl.section("Move sequences files", cl.sections)
-cl.categories <- add.cl.categories("file_manip", cl.categories)
-
-cl.sections   <- add.cl.section("Move ShampleSheet", cl.sections)
-cl.categories <- add.cl.categories("file_manip", cl.categories)
-
-cl.sections   <- add.cl.section("Move PRONTO metadata", cl.sections)
-cl.categories <- add.cl.categories("file_manip", cl.categories)
 ```
 
 <br>
@@ -767,27 +706,6 @@ echo ' ';
 source config.sh ${RUN_ID}
 ```
 
-```{r, echo=FALSE, eval = TRUE}
-cl.sections   <- add.cl.section("config.sh : SEPARATOR", cl.sections)
-cl.categories <- add.cl.categories("setup", cl.categories)
-
-cl.sections   <- add.cl.section("config.sh : DECRYPT_UNPACK_CHECKSUM", cl.sections)
-cl.categories <- add.cl.categories("setup", cl.categories)
-
-cl.sections   <- add.cl.section("config.sh : REMOVE_DECRYPTED_COMPRESSED_DATA", cl.sections)
-cl.categories <- add.cl.categories("setup", cl.categories)
-
-cl.sections   <- add.cl.section("config.sh : MAKE_TSOPPI_CONFIG", cl.sections)
-cl.categories <- add.cl.categories("setup", cl.categories)
-
-cl.sections   <- add.cl.section("config.sh : EXECUTE_TSOPPI_SCRIPTS", cl.sections)
-cl.categories <- add.cl.categories("setup", cl.categories)
-
-cl.sections   <- add.cl.section("Source config.sh", cl.sections)
-cl.categories <- add.cl.categories("setup", cl.categories)
-
-```
-
 <br>
 
 ### Prepare folder structure
@@ -799,11 +717,6 @@ results and logs.
 
 ```{bash, echo=TRUE, eval = FALSE}
 bash 00_setup_folder_structure_for_new_run.sh ${RUN_ID}
-```
-
-```{r, echo=FALSE, eval = TRUE}
-cl.sections   <- add.cl.section("Prepare folder structure", cl.sections)
-cl.categories <- add.cl.categories("setup", cl.categories)
 ```
 
 <br>
@@ -841,14 +754,6 @@ cp -a 00_generate_TSO500_sample_sheet.sh ${SCRIPTS_AND_LOGS_FOLDER}
 cp -a config.sh ${SCRIPTS_AND_LOGS_FOLDER}/00_config.sh
 ```
 
-```{r, echo=FALSE, eval = TRUE}
-cl.sections   <- add.cl.section("Generate sample sheet", cl.sections)
-cl.categories <- add.cl.categories("analysis", cl.categories)
-
-cl.sections   <- add.cl.section("Copy Samplesheet (00) scripts and logs", cl.sections)
-cl.categories <- add.cl.categories("file_manip", cl.categories)
-```
-
 <br>
 
 ## Launch TSO500 pipeline
@@ -864,45 +769,8 @@ in many steps, and many of them require manual intervention.
 
 <br>
 
-  - This analysis performs the data QC for the sequencing results.
+> **⚠️ Important**: this step is now outsourced to OUS, they will run this step and share with us the results. We just need to located the *LocalApp* results to the expected folder *TSO500_analyses* and continue the pipeline with *TSOPPI*.
 
-`r emo::ji("hourglass_flowing_sand")` Running time: ~13 hours
-
-```{bash, echo=TRUE, eval = FALSE}
-bash 01_raw_sequencing_data_management_and_TSO500_analysis.sh ${RUN_ID} ${INPUT_DATA_TYPE} \
-  > ${SCRIPTS_AND_LOGS_FOLDER}/01_raw_sequencing_data_management_and_TSO500_analysis.stdout \
-  2> ${SCRIPTS_AND_LOGS_FOLDER}/01_raw_sequencing_data_management_and_TSO500_analysis.stderr &
-```
-
-```{bash, echo=TRUE, eval = FALSE}
-more ${SCRIPTS_AND_LOGS_FOLDER}/01_raw_sequencing_data_management_and_TSO500_analysis.stdout
-more ${SCRIPTS_AND_LOGS_FOLDER}/01_raw_sequencing_data_management_and_TSO500_analysis.stderr
-```
-
-<br>
-
-> **⚠️ Important: Send an email to the local InPreD team** to tell them that the *LocalApp* analyses have been launched. You can find a draft in the *Email Drafts* section below in this document.
-
-<br>
-
-  - Once this analysis is done, copy the logs and scripts for this sequencing run in
-the `${SCRIPTS_AND_LOGS_FOLDER}` folder.
-
-```{bash, echo=TRUE, eval = FALSE}
-cp -a 01_raw_sequencing_data_management_and_TSO500_analysis.sh ${SCRIPTS_AND_LOGS_FOLDER}
-cp -a config.sh ${SCRIPTS_AND_LOGS_FOLDER}/01_config.sh
-```
-
-```{r, echo=FALSE, eval = TRUE}
-cl.sections   <- add.cl.section("Launch LocalApp", cl.sections)
-cl.categories <- add.cl.categories("analysis", cl.categories)
-
-cl.sections   <- add.cl.section("Send LocalApp email", cl.sections)
-cl.categories <- add.cl.categories("email", cl.categories)
-
-cl.sections   <- add.cl.section("Copy LocalApp (01) scripts and logs", cl.sections)
-cl.categories <- add.cl.categories("file_manip", cl.categories)
-```
 
 <br>
 
@@ -926,11 +794,6 @@ This analysis performs different analysis included in the  [TSOPPI](https://tsop
 
 ```{bash, echo=TRUE, eval = FALSE}
 cp ${SAMPLESHEETS_FOLDER}/${INFO_FILE_NAME} ${SAMPLESHEETS_FOLDER}/${INFO_FILE_NAME_TSOPPI}
-```
-
-```{r, echo=FALSE, eval = TRUE}
-cl.sections   <- add.cl.section("Copy SampleSheet info TSOPPI", cl.sections)
-cl.categories <- add.cl.categories("file_manip", cl.categories)
 ```
 
 <br>
@@ -992,11 +855,6 @@ fi
 chmod 755 $ALL_RUN_IDS
 ```
 
-```{r, echo=FALSE, eval = TRUE}
-cl.sections   <- add.cl.section("Update ${ALL_RUN_IDs} variable", cl.sections)
-cl.categories <- add.cl.categories("setup", cl.categories)
-```
-
 <br>
 
 #### Launch *TSOPPI* (02)
@@ -1019,14 +877,6 @@ the `${SCRIPTS_AND_LOGS_FOLDER}` folder.
 ```{bash, echo=TRUE, eval = FALSE}
 cp -a 02_execute_tsoppi_and_archive_results.sh ${SCRIPTS_AND_LOGS_FOLDER}
 cp -a config.sh ${SCRIPTS_AND_LOGS_FOLDER}/02_config.sh
-```
-
-```{r, echo=FALSE, eval = TRUE}
-cl.sections   <- add.cl.section("Launch TSOPPI", cl.sections)
-cl.categories <- add.cl.categories("analysis", cl.categories)
-
-cl.sections   <- add.cl.section("Copy TSOPPI (02) scripts and logs", cl.sections)
-cl.categories <- add.cl.categories("file_manip", cl.categories)
 ```
 
 <br>
@@ -1089,14 +939,6 @@ echo ${#SAMPLE_IDs[@]}
 printf "%s\n" "${SAMPLE_IDs[@]}"
 ```
 
-```{r, echo=FALSE, eval = TRUE}
-cl.sections   <- add.cl.section("Update ${SAMPLE_IDs} variable", cl.sections)
-cl.categories <- add.cl.categories("setup", cl.categories)
-
-cl.sections   <- add.cl.section("Verify ${SAMPLE_IDs} size and content", cl.sections)
-cl.categories <- add.cl.categories("setup", cl.categories)
-```
-
 <br>
 
 #### Launch *ICNVA* (025)
@@ -1131,19 +973,6 @@ cp -a config.sh ${SCRIPTS_AND_LOGS_FOLDER}/025_config.sh
 <br>
 
 > **⚠️ Important: Send an email to the local InPreD team** to tell them that *TSOPPI* and *ICNVA* analyses are ready and they can proceed with QC. You can find a draft in the *Email Drafts* section below in this document.
-
-
-```{r, echo=FALSE, eval = TRUE}
-cl.sections   <- add.cl.section("Launch ICNVA", cl.sections)
-cl.categories <- add.cl.categories("analysis", cl.categories)
-
-cl.sections   <- add.cl.section("Copy ICNVA (025) scripts and logs", cl.sections)
-cl.categories <- add.cl.categories("file_manip", cl.categories)
-
-cl.sections   <- add.cl.section("Send TSOPPI + ICNVA email", cl.sections)
-cl.categories <- add.cl.categories("email", cl.categories)
-
-```
 
 <br>
 
