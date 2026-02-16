@@ -1,0 +1,60 @@
+Item	Group
+Create SampleSheet (View UiO)	File_Manipulation
+Verify Barcode column (UP)	File_Manipulation
+Verify Tumor content (numeric or empty)	File_Manipulation
+Create PRONTO metadata (View UiO)	File_Manipulation
+Verify Batch column ('-')	File_Manipulation
+Encrypt PRONTO metadata	File_Manipulation
+Import files in TSD Data Portal	File_Manipulation
+Decrypt PRONTO metadata	File_Manipulation
+Verify disk space availability	Prepare_Pipeline
+Verify size of sequencing run	Prepare_Pipeline
+Connect to hpc (Colossus) server	Prepare_Pipeline
+Pipeline run directory	Prepare_Pipeline
+Set up ${RUN_ID}	Prepare_Pipeline
+Set up ${RUN_DATA}	Prepare_Pipeline
+Set up ${INPUT_DATA_TYPE}	Prepare_Pipeline
+Set up ${DURABLE}	Prepare_Pipeline
+Remove invisible character in ShampleSheet file	Important
+Move ShampleSheet	File_Manipulation
+Move PRONTO metadata	File_Manipulation
+config.sh : SEPARATOR	Setup
+config.sh : DECRYPT_UNPACK_CHECKSUM	Setup
+config.sh : REMOVE_DECRYPTED_COMPRESSED_DATA	Setup
+config.sh : MAKE_TSOPPI_CONFIG	Setup
+config.sh : EXECUTE_TSOPPI_SCRIPTS	Setup
+Source config.sh	Setup
+Prepare folder structure	Setup
+Generate sample sheet	Launch_Analysis
+Copy Samplesheet (00) scripts and logs	File_Manipulation
+Copy SampleSheet info TSOPPI	File_Manipulation
+Update ${ALL_RUN_IDs} variable	Setup
+Launch TSOPPI	Launch_Analysis
+Copy TSOPPI (02) scripts and logs	File_Manipulation
+Update ${SAMPLE_IDs} variable	Setup
+Verify ${SAMPLE_IDs} size and content	Setup
+Launch ICNVA	Launch_Analysis
+Copy ICNVA (025) scripts and logs	File_Manipulation
+Send TSOPPI + ICNVA email	Send_Email
+Remove the content of RECENT_RUN folder	File_Manipulation
+Create predisposition_tables folder	File_Manipulation
+Copy predisposition tables	File_Manipulation
+Convert tables: xlsx -> tsv 	Launch_Analysis
+Copy xlsx -> tsv (023) scripts and logs	File_Manipulation
+Comment previous run in PRONTO master table	File_Manipulation
+Set 'N' in 3rd column in PRONTO master table	File_Manipulation
+Add current ID PRONTO metadata to PRONTO master table	File_Manipulation
+Replace Æ/æ in new PRONTO table	File_Manipulation
+Replace Ø/ø in new PRONTO table	File_Manipulation
+Replace Å/å in new PRONTO table	File_Manipulation
+Rename PRONTO master table	File_Manipulation
+Generate reports with PRONTO (03)	Launch_Analysis
+Copy PRONTO (03) scripts and logs	File_Manipulation
+Switch to Windows VM	Setup
+Encrypt RECENT_RUN folder	File_Manipulation
+Move RECENT_RUN.7z to file-export/ folder	File_Manipulation
+Open the View UiO Portal	Setup
+Download RECENT_RUN.7z from TSD Data Portal	File_Manipulation
+Move RECENT_RUN.7z to InPreD folder	File_Manipulation
+Decrypt RECENT_RUN.7z file	File_Manipulation
+Send_Email to InPreD team	Send_Email
