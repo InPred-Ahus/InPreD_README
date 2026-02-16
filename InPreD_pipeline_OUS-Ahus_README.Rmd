@@ -91,54 +91,6 @@ insert.fig.toggle <- function(
 ', safe_fig_id, safe_button_label, safe_fig_id, safe_img_src, fig.width, safe_button_label, safe_fig_cap))
 }
 
-# ------------------------------ #
-# Checklist names and categories #
-# ------------------------------ #
-make_prepender <- function(prefix_name) {
-  function(label, v) {
-    c(label, v)
-  }
-}
-
-add.cl.section    <- make_prepender("section")
-add.cl.categories <- make_prepender("category")
-```
-
-
-
-```{r checklist, include=FALSE}
-
-checklist.template.file <- "templates/InPreD_pipeline_Checklist.html"
-checklist.ready.file    <- paste0(run.date, "_InPreD_pipeline_Checklist.html")
-
-# ------------------------------- #
-# Prepare CheckList section names #
-# ------------------------------- #
-
-# CheckList section names
-cl.sections   <- vector()
-cl.categories <- vector()
-
-# Check List item
-generate_checklist_html <- function(checklist, categories) {
-  if (length(checklist) != length(categories)) {
-    stop("Checklist and categories must have the same length.")
-  }
-  
-  html_items <- mapply(function(item, i, category) {
-    sprintf(
-      '<div class="checklist-item %s">\n  <input type="checkbox" id="item%d">\n  <label for="item%d">%d. %s</label>\n</div>',
-      category, i, i, i, item
-    )
-  }, checklist, seq_along(checklist), categories, USE.NAMES = FALSE)
-  
-  paste(html_items, collapse = "\n")
-}
-
-
-## Copy template and read copy
-file.copy(from = checklist.template.file,
-          to   = checklist.ready.file)
 
 ```
 
@@ -664,14 +616,20 @@ mv -i ${DURABLE}/file-import/p1150-member-group/PRONTO_metadata_${RUN_DATE}.7z $
 
 ### Verify flags and source `config.sh`
 
+
+<br>
+
+The decryption/encryption related flags are used in *LocalApp*, due that this part is
+ran by *OUS* we set this variables as *F*.
+
  - Verify the three following flags in the config file.
   
 ```{bash, echo=TRUE, eval = FALSE}
 # Default ';' but other separator (',', '-', '/') can be used
 SEPARATOR=";"
 
-DECRYPT_UNPACK_CHECKSUM="T"
-REMOVE_ENCRYPTED_COMPRESSED_DATA="T"
+DECRYPT_UNPACK_CHECKSUM="F"
+REMOVE_ENCRYPTED_COMPRESSED_DATA="F"
 
 MAKE_TSOPPI_CONFIG="T"
 EXECUTE_TSOPPI_SCRIPTS="T"
@@ -1002,17 +960,6 @@ done
 ls ${PRED_TABLES}
 ```
 
-```{r, echo=FALSE, eval = TRUE}
-cl.sections   <- add.cl.section("Remove the content of RECENT_RUN folder", cl.sections)
-cl.categories <- add.cl.categories("file_manip", cl.categories)
-
-cl.sections   <- add.cl.section("Create predisposition_tables folder", cl.sections)
-cl.categories <- add.cl.categories("file_manip", cl.categories)
-
-cl.sections   <- add.cl.section("Copy predisposition tables", cl.sections)
-cl.categories <- add.cl.categories("file_manip", cl.categories)
-```
-
 <br>
 
 ### Process QC variant tables (023)
@@ -1050,14 +997,6 @@ the `${SCRIPTS_AND_LOGS_FOLDER}` folder.
 ```{bash, echo=TRUE, eval = FALSE}
 cp -a 023c_convert_variant_table_forQC_xlsx_to_tsv.sh ${SCRIPTS_AND_LOGS_FOLDER}
 cp -a config.sh ${SCRIPTS_AND_LOGS_FOLDER}/023_config.sh
-```
-
-```{r, echo=FALSE, eval = TRUE}
-cl.sections   <- add.cl.section("Convert tables: xlsx -> tsv", cl.sections)
-cl.categories <- add.cl.categories("analysis", cl.categories)
-
-cl.sections   <- add.cl.section("Copy xlsx -> tsv (023) scripts and logs", cl.sections)
-cl.categories <- add.cl.categories("file_manip", cl.categories)
 ```
 
 <br>
@@ -1115,29 +1054,6 @@ python3 ${SCRIPTS_FOLDER}/update_metadata.py                                    
 mv -i ${DURABLE}/software/PRONTO/PRONTO-1.2.0/In/InPreD_PRONTO_metadata.txt.new ${DURABLE}/software/PRONTO/PRONTO-1.2.0/In/InPreD_PRONTO_metadata.txt
 ```
 
-```{r, echo=FALSE, eval = TRUE}
-cl.sections   <- add.cl.section("Comment previous run in PRONTO master table", cl.sections)
-cl.categories <- add.cl.categories("file_manip", cl.categories)
-
-cl.sections   <- add.cl.section("Set 'N' in 3rd column in PRONTO master table", cl.sections)
-cl.categories <- add.cl.categories("file_manip", cl.categories)
-
-cl.sections   <- add.cl.section("Add current ID PRONTO metadata to PRONTO master table", cl.sections)
-cl.categories <- add.cl.categories("file_manip", cl.categories)
-
-cl.sections   <- add.cl.section("Replace Æ/æ in new PRONTO table", cl.sections)
-cl.categories <- add.cl.categories("file_manip", cl.categories)
-
-cl.sections   <- add.cl.section("Replace Ø/ø in new PRONTO table", cl.sections)
-cl.categories <- add.cl.categories("file_manip", cl.categories)
-
-cl.sections   <- add.cl.section("Replace Å/å in new PRONTO table", cl.sections)
-cl.categories <- add.cl.categories("file_manip", cl.categories)
-
-cl.sections   <- add.cl.section("Rename PRONTO master table", cl.sections)
-cl.categories <- add.cl.categories("file_manip", cl.categories)
-```
-
 <br>
 
 #### Generate reports with PRONTO (03)
@@ -1172,14 +1088,6 @@ the `${SCRIPTS_AND_LOGS_FOLDER}` folder.
 ```{bash, echo=TRUE, eval = FALSE}
 cp -a 03_generate_and_archive_pronto_report_collect_data_for_export.sh ${SCRIPTS_AND_LOGS_FOLDER}
 cp -a config.sh ${SCRIPTS_AND_LOGS_FOLDER}/03_config.sh
-```
-
-```{r, echo=FALSE, eval = TRUE}
-cl.sections   <- add.cl.section("Generate reports with PRONTO (03)", cl.sections)
-cl.categories <- add.cl.categories("analysis", cl.categories)
-
-cl.sections   <- add.cl.section("Copy PRONTO (03) scripts and logs", cl.sections)
-cl.categories <- add.cl.categories("file_manip", cl.categories)
 ```
 
 <br>
@@ -1260,17 +1168,6 @@ insert.fig.toggle(
 )
 ```
 
-```{r, echo=FALSE, eval = TRUE}
-cl.sections   <- add.cl.section("Switch to Windows VM", cl.sections)
-cl.categories <- add.cl.categories("setup", cl.categories)
-
-cl.sections   <- add.cl.section("Encrypt RECENT_RUN folder", cl.sections)
-cl.categories <- add.cl.categories("file_manip", cl.categories)
-
-cl.sections   <- add.cl.section("Move RECENT_RUN.7z to file-export/ folder", cl.sections)
-cl.categories <- add.cl.categories("file_manip", cl.categories)
-```
-
 <br>
 
 ### Export Reports
@@ -1344,24 +1241,6 @@ insert.fig.toggle(
 )
 ```
 
-```{r, echo=FALSE, eval = TRUE}
-cl.sections   <- add.cl.section("Open the View UiO Portal", cl.sections)
-cl.categories <- add.cl.categories("setup", cl.categories)
-
-cl.sections   <- add.cl.section("Download RECENT_RUN.7z from TSD Data Portal", cl.sections)
-cl.categories <- add.cl.categories("file_manip", cl.categories)
-
-cl.sections   <- add.cl.section("Move RECENT_RUN.7z to InPreD folder", cl.sections)
-cl.categories <- add.cl.categories("file_manip", cl.categories)
-
-cl.sections   <- add.cl.section("Decrypt RECENT_RUN.7z file", cl.sections)
-cl.categories <- add.cl.categories("file_manip", cl.categories)
-
-cl.sections   <- add.cl.section("Send email to InPreD team", cl.sections)
-cl.categories <- add.cl.categories("email", cl.categories)
-```
-
-<br>
 <br>
 
 <!-- # ---------- # -->
@@ -1401,56 +1280,7 @@ function toggleFigure(id) {
 ')
 ```
 
-
-
-```{r fill_template, echo = FALSE, eval = TRUE}
-
-# Generate CheckList entries
-html.output <- generate_checklist_html(checklist  = rev(cl.sections),
-                                       categories = rev(cl.categories))
-
-# Placeholder list
-checklist.terms[['--runID--']] <- run.id
-checklist.terms[['--checklist_buttons--']] <- html.output
-
-
-# Fill CheckList template
-template.to.fill   <- readLines(checklist.ready.file)
-
-for (t in names(checklist.terms)) {
-  
-  template.to.fill <- gsub(x           = template.to.fill,
-                           pattern     = t,
-                           replacement = checklist.terms[[t]],
-                           ignore.case = T, perl = T)
-} 
-
-# Export ready-to-use CheckList
-writeLines(text = template.to.fill, con = checklist.ready.file)
-```
-
 ## Email Drafts
-
-<br>
-
-### After launching *LocalApp*
-
-<br>
-
-```
-Title: Bioinformatic analysis week WW
-
-Dear all,
-
-Sequencing data and its corresponding metadata are now in TSD.
-LocalApp analysis will start in an hour.
-
-We will continue with TSOPPI and ICNVA on Monday morning, so data for QC should be available shortly before Monday meeting.
-
-Have a nice weekend
-
-Jaime & Jean-Marc
-```
 
 <br>
 
