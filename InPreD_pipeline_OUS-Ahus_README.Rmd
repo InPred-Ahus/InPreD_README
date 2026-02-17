@@ -49,16 +49,13 @@ if (is.null(run.id)){
 run.date <- unlist(strsplit(run.id, split = "_"))[1]
 
 
-# JACM: to check
-# if (file.exists("InPreD_README.html")) {
-#   file.remove("InPreD_README.html")
-# }
-# 
-# 
-# checklist.file <- paste0(run.date, "_InPreD_pipeline_Checklist.html")
-# if (file.exists(checklist.file)) {
-#   file.remove(checklist.file)
-# }
+
+## Copy Checklist temlplate
+checklist.template.file <- "checklist/v2_OUS-Ahus/InPreD_pipeline_checklist.html"
+checklist.ready.file    <- paste0("InPreD_pipeline_checklist", run.date, ".html")
+file.copy(from = checklist.template.file,
+          to   = checklist.ready.file)
+
 ```
 
 ```{r klippy, echo=FALSE, include=TRUE}
