@@ -78,6 +78,29 @@ The interactive README file can be created in two ways:
   - Command line
     1.  Requires `pandoc` to be installed in your machine. Installation in Ubuntu: `sudo apt-get install pandoc`
     2. `Rscript -e "rmarkdown::render('InPreD_README.Rmd')"`
+   
+#### Ahus-OUS pipeline
+
+Due to changes in the logistics, we adapted the InPreD pipeline so the *LocalApp* is ran by *OUS* and the rest by *Ahus* (us).
+The pipeline and checklist slightly differs as we need to run different steps, use the following command to generate the README.
+
+You just need to pass the run ID and the command will create:
+
+  - *README* in html
+  - Interactive html checklist
+
+
+```bash
+# Define RUN_ID
+RUN_ID='250606_AAAAAAAA_BBBB_CCCCCCCCCC'
+
+# Date is taken from RUN_ID
+RUN_ID_DATE="${RUN_ID%%_*}"
+
+# RUN_ID is passed as an argument to the RMD file
+Rscript -e "rmarkdown::render(input = 'InPreD_pipeline_OUS-Ahus_README.Rmd', output_file = paste0('InPreD_pipeline_OUS-Ahus_README_','${RUN_ID_DATE}','.html'), params=list(args='${RUN_ID}'))"
+```
+
 
 &nbsp;
 
