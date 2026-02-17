@@ -97,6 +97,9 @@ jobs:
 
     - name: Render Rmd file (v2)
       run: |
-        Rscript -e "rmarkdown::render('InPreD_pipeline_OUS-Ahus_README.Rmd')"
+        RUN_ID='250606_AAAAAAAA_BBBB_CCCCCCCCCC'
+        RUN_ID_DATE="${RUN_ID%%_*}"
+        Rscript -e "rmarkdown::render(input = 'InPreD_pipeline_OUS-Ahus_README.Rmd', output_file = paste0('InPreD_pipeline_OUS-Ahus_README_','${RUN_ID_DATE}','.html'), params=list(args='${RUN_ID}'))"
+
 
 

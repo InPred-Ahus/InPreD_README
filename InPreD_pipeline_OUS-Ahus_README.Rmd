@@ -2,6 +2,8 @@
 title: "InPreD_README"
 author: "Jaime Abraham Castro-Mondragon & Jean-Marc Costanzi"
 date: 'Last update: `r Sys.Date()`'
+params:
+    args: ''
 output:
   html_document:
     number_sections: true
@@ -33,7 +35,9 @@ run.id.date     <- ""
 
 # Force user to define a Run ID
 # Replace the old ID for the new one
-run.id <- "260213_A02134_0129_BHJNFNDRX7" 
+args   <-  params$args
+run.id <- args[1]
+# run.id <- "260213_A02134_0129_BHJNFNDRX7" 
 #         "250606_AAAAAAAA_BBBB_CCCCCCCCCC"   # ID template
 
 # 260123_NB552811_0121_AHL7KWBGYX
