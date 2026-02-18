@@ -95,6 +95,8 @@ jobs:
       run: |
         Rscript -e "rmarkdown::render('InPreD_README.Rmd')"
 
+    # Here we are creating the RUN_ID variable and passing to the Rmd file as a parameter
+    # If not provided the README is generated without a run ID
     - name: Render Rmd file (v2)
       run: |
         RUN_ID='250606_AAAAAAAA_BBBB_CCCCCCCCCC'
