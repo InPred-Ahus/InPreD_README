@@ -16,6 +16,9 @@ Set up ${RUN_DATA}	Prepare_Pipeline
 Set up ${INPUT_DATA_TYPE}	Prepare_Pipeline
 Set up ${DURABLE}	Prepare_Pipeline
 Remove invisible character in ShampleSheet file	Important
+Move LocalApp results File_Manipulation
+Rename LocalApp Samplesheet File_Manipulation
+Create LocalApp RUN_ID link File_Manipulation
 Move ShampleSheet	File_Manipulation
 Move PRONTO metadata	File_Manipulation
 config.sh : SEPARATOR	Setup
@@ -51,6 +54,8 @@ Rename PRONTO master table	File_Manipulation
 Generate reports with PRONTO (03)	Launch_Analysis
 Copy PRONTO (03) scripts and logs	File_Manipulation
 Switch to Windows VM	Setup
+Add_intersection_results	File_Manipulation
+Add_Fusion_plots	File_Manipulation
 Encrypt RECENT_RUN folder	File_Manipulation
 Move RECENT_RUN.7z to file-export/ folder	File_Manipulation
 Open the View UiO Portal	Setup
