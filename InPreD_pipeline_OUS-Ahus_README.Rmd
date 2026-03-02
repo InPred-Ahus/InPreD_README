@@ -580,7 +580,7 @@ mv -i /ess/p1532sharedp1150/data/durable/${RUN_ID}_TSO_500* ${DURABLE}/TSO500_an
 
 ```{bash, echo=TRUE, eval = FALSE}
 # Rename LocalApp SampleSheet file
-mv ${DURABLE}/TSO500_analyses/${RUN_ID}_TSO500_LocalApp_analysis/SampleSheet_${RUN_ID}_Ahus.csv ${DURABLE}/TSO500_analyses/${RUN_ID}_TSO500_LocalApp_analysis/SampleSheet_${RUN_ID}.csv 
+mv ${DURABLE}/TSO500_analyses/${RUN_ID}_TSO500_LocalApp_analysis_fromRAW/SampleSheet_${RUN_ID}_Ahus.csv ${DURABLE}/TSO500_analyses/${RUN_ID}_TSO500_LocalApp_analysis_fromRAW/SampleSheet_${RUN_ID}.csv 
 ```
 
 ```{bash, echo=TRUE, eval = FALSE}
@@ -596,9 +596,6 @@ ln -s ${DURABLE}/TSO500_analyses/${RUN_ID}_TSO500_LocalApp_analysis_fromRAW ${DU
 
 The sequences, the *PRONTO* metadata, and the *SampleSheet* for the current run ID are located in the `file-import` folder.
 They must be moved to the `TSO500_sequences`, `TSO500_pronto_metadata`, and `TSO500_SampleSheets` folders, respectively, before launching the analysis.
-
-**NOTE**: An invisible character is inserted in the header of the `SampleSheet_$DATE.csv` metadata file. This character must be removed because the table cannot be properly read by other software and crash the analysis. Once this issue is solved, proceed to move the folders.
-
 
 ```{bash, echo=TRUE, eval = FALSE}
 # Move SampleSheet metadata file
