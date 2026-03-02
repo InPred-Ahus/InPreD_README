@@ -15,10 +15,9 @@ Set up ${RUN_ID}	Prepare_Pipeline
 Set up ${RUN_DATA}	Prepare_Pipeline
 Set up ${INPUT_DATA_TYPE}	Prepare_Pipeline
 Set up ${DURABLE}	Prepare_Pipeline
-Remove invisible character in ShampleSheet file	Important
-Move LocalApp results File_Manipulation
-Rename LocalApp Samplesheet File_Manipulation
-Create LocalApp RUN_ID link File_Manipulation
+Move LocalApp results	File_Manipulation
+Rename LocalApp Samplesheet	File_Manipulation
+Create LocalApp RUN_ID link	File_Manipulation
 Move ShampleSheet	File_Manipulation
 Move PRONTO metadata	File_Manipulation
 config.sh : SEPARATOR	Setup
