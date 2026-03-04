@@ -68,20 +68,10 @@ for (lib in required.packages) {
 ### 3. Create interactive html README and Checklist
 
 &nbsp;
-
-The interactive README file can be created in two ways:
-
-  - Via *RStudio IDE*
-    1. Open the `InPreD_README.Rmd` file with *RStudio*
-    2. Click on the *knit* button (located on the top panel).
-    
-  - Command line
-    1.  Requires `pandoc` to be installed in your machine. Installation in Ubuntu: `sudo apt-get install pandoc`
-    2. `Rscript -e "rmarkdown::render('InPreD_README.Rmd')"`
    
 #### Ahus-OUS pipeline
 
-Due to changes in the logistics, we adapted the InPreD pipeline so the *LocalApp* is ran by *OUS* and the rest by *Ahus* (us).
+Due to changes in the logistics, we adapted the InPreD pipeline so *LocalApp* is ran by *OUS* and the follwoing steps by *Ahus* (us).
 The pipeline and checklist slightly differs as we need to run different steps, use the following command to generate the README.
 
 You just need to pass the run ID and the command will create:
@@ -89,6 +79,9 @@ You just need to pass the run ID and the command will create:
   - *README* in html
   - Interactive html checklist
 
+NOTE: the checklist is not anymore generated within the `.Rmd` file. The checklist html document was externally generated using [this tool](https://jaimicore.shinyapps.io/html-checklist-generator/) and we simply copy-paste the template (when the `.Rmd` file is executed). If the checklist items are updated, we have to create a new html template.
+
+&nbsp;
 
 ```bash
 # Define RUN_ID
@@ -101,6 +94,19 @@ RUN_ID_DATE="${RUN_ID%%_*}"
 Rscript -e "rmarkdown::render(input = 'InPreD_pipeline_OUS-Ahus_README.Rmd', output_file = paste0('InPreD_pipeline_OUS-Ahus_README_','${RUN_ID_DATE}','.html'), params=list(args='${RUN_ID}'))"
 ```
 
+&nbsp;
+
+#### Ahus pipeline (used until 16-02-2026)
+
+The interactive README file can be created in two ways:
+
+  - Via *RStudio IDE*
+    1. Open the `InPreD_README.Rmd` file with *RStudio*
+    2. Click on the *knit* button (located on the top panel).
+    
+  - Command line
+    1.  Requires `pandoc` to be installed in your machine. Installation in Ubuntu: `sudo apt-get install pandoc`
+    2. `Rscript -e "rmarkdown::render('InPreD_README.Rmd')"`
 
 &nbsp;
 
