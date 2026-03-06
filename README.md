@@ -71,8 +71,8 @@ for (lib in required.packages) {
    
 #### Ahus-OUS pipeline
 
-Due to changes in the logistics, we adapted the InPreD pipeline so *LocalApp* is ran by *OUS* and the follwoing steps by *Ahus* (us).
-The pipeline and checklist slightly differs as we need to run different steps, use the following command to generate the README.
+Due to changes in the logistics, we adapted the InPreD pipeline so *LocalApp* is ran by *OUS* and the following steps by *Ahus* (us).
+The pipeline and checklist slightly differs as we need to run different steps, use the following commands to generate the README.
 
 You just need to pass the run ID and the command will create:
 
