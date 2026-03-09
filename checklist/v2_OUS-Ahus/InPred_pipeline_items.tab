@@ -8,7 +8,6 @@ Encrypt PRONTO metadata	File_Manipulation
 Import files in TSD Data Portal	File_Manipulation
 Decrypt PRONTO metadata	File_Manipulation
 Verify disk space availability	Prepare_Pipeline
-Verify size of sequencing run	Prepare_Pipeline
 Connect to hpc (Colossus) server	Prepare_Pipeline
 Pipeline run directory	Prepare_Pipeline
 Set up ${RUN_ID}	Prepare_Pipeline
