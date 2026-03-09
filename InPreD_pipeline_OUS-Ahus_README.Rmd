@@ -572,11 +572,20 @@ We will do the following steps:
 - Rename the SampleSheet
 - Create link
 
+<br>
 
 ```{bash, echo=TRUE, eval = FALSE}
 # Move and rename LocalApp folder 
-mv -i /ess/p1532sharedp1150/data/durable/${RUN_ID}_TSO_500* ${DURABLE}/TSO500_analyses/${RUN_ID}_TSO500_LocalApp_analysis_fromRAW
+cp -R /ess/p1532sharedp1150/data/durable/${RUN_ID}_TSO_500* ${DURABLE}/TSO500_analyses/${RUN_ID}_TSO500_LocalApp_analysis_fromRAW
 ```
+
+> **⚠️ Important**:as the *LocalApp* results take many GB in space, this step takes between 10-15 minutes to be completed.
+
+```{bash, echo=TRUE, eval = FALSE}
+# Verify the folder was moved correctly
+ls ${DURABLE}/TSO500_analyses/${RUN_ID}_TSO500_LocalApp_analysis_fromRAW
+```
+
 
 ```{bash, echo=TRUE, eval = FALSE}
 # Rename LocalApp SampleSheet file
