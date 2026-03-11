@@ -194,6 +194,12 @@ def process_mutation_summary(summary_file : pl.dataframe = None) -> pl.DataFrame
     print(f"; Reading summary mutation table : {summary_file}")
     summary = pl.read_csv(summary_file, separator="\t", comment_prefix='#')
 
+    # Check if there are any samples with fusions
+    nb_samples_with_fusions = summary.drop_nulls(subset=["fusions"]).shape[0]
+    if nb_samples_with_fusions == 0:
+        print("; No samples with fusions found.")
+        return pl.DataFrame()
+
     # Check if the required columns are present and not empty
     required_columns = ["sample_id", "fusions"]
     columns_exist(summary, required_columns, label="Summary mutations")
@@ -295,49 +301,54 @@ def main(summary_file, sample_mut_file, gene_coord, output_file):
 
     # Process the summary mutation file
     summary_df = process_mutation_summary(summary_file)
-    #print(summary_df)
 
-    # Process the sample mutation file
-    samples_df = process_mutation_samples(sample_mut_file)
-    print("After process_mutation_samples()")
-    print(samples_df)
+    # If not fusion found in thir RUN_ID print a message and exit
+    if summary_df.is_empty():
+        print("; No fusion events found in the summary mutation file. Exiting.")
 
-    # Join the summary with the sample mutations
-    fusions2export = (summary_df.join( samples_df,
-                                       on  = "coord",
-                                       how = "inner")
-                                .select([
-                                    pl.col("chrom1"),
-                                    pl.col("pos1"),
-                                    pl.col("gene1"),
-                                    pl.col("chrom2"),
-                                    pl.col("pos2"),
-                                    pl.col("gene2"),
-                                    pl.col("name"),
-                                    pl.col("split"),
-                                    pl.col("span"),
-                                    pl.lit(".").alias("strand1"),  # Default strand direction
-                                    pl.lit(".").alias("strand2"),  # Default strand direction
-                                    pl.lit(None).alias("untemplated_insert"),  # Default untemplated insert
-                                    pl.lit(None).alias("comment")  # Default comment
-                                ]))
+    else:
 
-    # Read hg19 protein coding gene table
-    hg19_genes = (pl.read_csv(gene_coord, separator="\t")
-                    .select([ pl.col("hgnc_symbol").alias("gene_name"),
-                              pl.col("strand")])
-                    .unique()
-                 )
-    hg19_genes = dict(hg19_genes.select("gene_name", "strand").iter_rows())
+        # Process the sample mutation file
+        samples_df = process_mutation_samples(sample_mut_file)
+        print("After process_mutation_samples()")
+        print(samples_df)
+
+        # Join the summary with the sample mutations
+        fusions2export = (summary_df.join( samples_df,
+                                        on  = "coord",
+                                        how = "inner")
+                                    .select([
+                                        pl.col("chrom1"),
+                                        pl.col("pos1"),
+                                        pl.col("gene1"),
+                                        pl.col("chrom2"),
+                                        pl.col("pos2"),
+                                        pl.col("gene2"),
+                                        pl.col("name"),
+                                        pl.col("split"),
+                                        pl.col("span"),
+                                        pl.lit(".").alias("strand1"),  # Default strand direction
+                                        pl.lit(".").alias("strand2"),  # Default strand direction
+                                        pl.lit(None).alias("untemplated_insert"),  # Default untemplated insert
+                                        pl.lit(None).alias("comment")  # Default comment
+                                    ]))
+
+        # Read hg19 protein coding gene table
+        hg19_genes = (pl.read_csv(gene_coord, separator="\t")
+                        .select([ pl.col("hgnc_symbol").alias("gene_name"),
+                                pl.col("strand")])
+                        .unique()
+                    )
+        hg19_genes = dict(hg19_genes.select("gene_name", "strand").iter_rows())
 
 
-    fusions2export = fusions2export.with_columns( pl.col("gene1").map_elements(lambda g: hg19_genes.get(g), return_dtype=pl.String).alias("strand1"),
-                                                  pl.col("gene2").map_elements(lambda g: hg19_genes.get(g), return_dtype=pl.String).alias("strand2")
-    )
+        fusions2export = fusions2export.with_columns( pl.col("gene1").map_elements(lambda g: hg19_genes.get(g), return_dtype=pl.String).alias("strand1"),
+                                                    pl.col("gene2").map_elements(lambda g: hg19_genes.get(g), return_dtype=pl.String).alias("strand2")
+        )
 
-    # Create DataFrame and write to TSV
-    fusions2export.write_csv(output_file, separator="\t",)
-    print(fusions2export)
+        # Create DataFrame and write to TSV
+        fusions2export.write_csv(output_file, separator="\t",)
+        print(fusions2export)
 
 
 
