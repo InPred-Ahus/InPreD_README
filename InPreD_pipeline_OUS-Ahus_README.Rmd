@@ -1358,6 +1358,12 @@ The gene *strand* is provided in the resulting table because this image already 
     
     - Splice and fusion sample: this file contains the splice and fusion variants for a particular sample, this also contains the number of aligned and discordant reads supporting the fusion events: `${DURABLE}/TSO500_postprocessing/${RUN_ID}/${SAMPLE_ID}/${SAMPLE_ID}_fusion_and_splice_variant_candidates.tsv`
 
+
+```{r env_var_fusviz, echo=FALSE, eval = TRUE, comment=""}
+cat(glue('RUN_ID="{run.id}"'))
+```
+
+
 ```{bash, echo=TRUE, eval = FALSE}
 # Launch image from create_fusviz_input folder
 cd $DURABLE/software/fusviz/create_fusviz_input
@@ -1436,21 +1442,6 @@ insert.fig.toggle(
 )
 ```
 
-<br>
-
-  - Click On the *Linear* tab (left-side). Click on the *Upload a file* button, and add the `hg19.fasta.fai`, `hg19.fasta`, and `cytoBand.txt`, all of them available in the *fusviz* folder `$DURABLE/software/fusviz` (Figure 25).
-  
-  - Then click on the *Load gene track (offline)* button.
-
-```{r load_genetrack, echo=FALSE, results='asis'}
-insert.fig.toggle(
-  fig.id = "load_genetrack",
-  button.label = "Figure 25",
-  img.src = "fig/25_Load_genome.png",
-  fig.width = "100%",
-  fig.cap = "Load hg19 fasta, index and cytoBand files"
-)
-```
 
 <br>
   
