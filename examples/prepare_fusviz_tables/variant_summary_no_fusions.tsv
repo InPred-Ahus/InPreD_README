@@ -1,0 +1,9 @@
+# Field formats:					
+# - TMB: TMB (elligible_variants)					
+# - MSI: percentage_of_unstable_MSI_sites (unstable_MSI_site_count/usable_MSI_site_count)					
+# - gene_amplifications: gene (fold_change)					
+# - splice_variants: gene[affected_exon] (breakpoint_gene_1-breakpoint_gene_2) splice_supporting_reads/reference_reads					
+# - fusions: gene_1-gene_2 (breakpoint_gene_1-breakpoint_gene_2) fusion_supporting_reads/ref_reads_gene_1/ref_reads_gene_2					
+sample_id	TMB	MSI	gene_amplifications	splice_variants	fusions
+sample1					
+sample2					
