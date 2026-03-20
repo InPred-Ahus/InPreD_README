@@ -1368,23 +1368,21 @@ cat(glue('RUN_ID="{run.id}"'))
 # Launch image from create_fusviz_input folder
 cd $DURABLE/software/fusviz/create_fusviz_input
 
-# Fill in the RUN ID and SAMPLE_ID values to create the FusViz plot
-FVPLOT_RUN_ID=${RUN_ID}
-FVPLOT_SAMPLE_ID_DNA="IPA0511-D01-p01-A15"
+# Set this variables before launch the image
+TSOPPI_RESULTS="${DURABLE}/TSO500_postprocessing"
+FUSVIZ_TAB_RESULTS="~/fusviz/${RUN_ID}"
 
-FVPLOT_SAMPLE_ID_RNA="${FVPLOT_SAMPLE_ID_DNA/-D01-/-R03-}"
-FVPLOT_SAMPLE_ID_RNA="${FVPLOT_SAMPLE_ID_RNA/DNA/RNA}"
-TSOPPI_RESULTS="${DURABLE}/TSO500_postprocessing/${FVPLOT_RUN_ID}_TSOPPI_v0.3.2_main_2022_06_07"
+# Results are exported here, then moved to the actual working directory
+mkdir -p ${FUSVIZ_TAB_RESULTS}
 
-singularity run                                                               \
-  -B ${TSOPPI_RESULTS}:/summary                                               \
-  -B ${TSOPPI_RESULTS}/${FVPLOT_SAMPLE_ID_DNA}:/sample                        \
-  create_fusviz_input.sif                                                     \
-  -s /summary/${FVPLOT_RUN_ID}_variant_summary.tsv                            \
-  -m /sample/${FVPLOT_SAMPLE_ID_RNA}_fusion_and_splice_variant_candidates.tsv \
-  -o ~/${FVPLOT_SAMPLE_ID_DNA}_fusviz.txt ;                                   
+singularity run                               \
+  -B ${TSOPPI_RESULTS}:/TSO500_postprocessing \
+  tsoppi2fusviz.sif                           \
+  -t /TSO500_postprocessing                   \
+  -i ${RUN_ID}                                \
+  -o ${FUSVIZ_TAB_RESULTS}                    ;                                   
 
-mv  ~/${FVPLOT_SAMPLE_ID_DNA}_fusviz.txt .
+mv  ${FUSVIZ_TAB_RESULTS}/* .
 ```
 
 
