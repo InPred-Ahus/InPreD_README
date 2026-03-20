@@ -1,9 +1,0 @@
-# Field formats:					
-# - TMB: TMB (elligible_variants)					
-# - MSI: percentage_of_unstable_MSI_sites (unstable_MSI_site_count/usable_MSI_site_count)					
-# - gene_amplifications: gene (fold_change)					
-# - splice_variants: gene[affected_exon] (breakpoint_gene_1-breakpoint_gene_2) splice_supporting_reads/reference_reads					
-# - fusions: gene_1-gene_2 (breakpoint_gene_1-breakpoint_gene_2) fusion_supporting_reads/ref_reads_gene_1/ref_reads_gene_2					
-sample_id	TMB	MSI	gene_amplifications	splice_variants	fusions
-sample1	NA	NA	NA	NA	ATP1B1-NRG1 (chr1:169080734-chr8:32453344) 2152/3/896|NRG1/ATP1B1 (chr8:32474403-chr1:169080608) 34/1543/315
-sample2	NA	NA	NA	NA	ETV5-AE000661.37 (chr3:185775211-chr14:22927117) 120/5063/0
