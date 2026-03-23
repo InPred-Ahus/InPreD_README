@@ -1,0 +1,166 @@
+---
+title: "Notes about QC for small variants"
+author: "Jaime Abraham Castro-Mondragon"
+date: 'Last update: `r Sys.Date()`'
+params:
+    args: ''
+output:
+  html_document:
+    number_sections: true
+    theme: cosmo
+    toc: true
+    toc_depth: 4
+    toc_float:
+      collapsed: true
+    self_contained: true
+    code_folding: show
+  pdf_document:
+    toc: true
+    toc_depth: '4'
+---
+
+```{r setup, include=FALSE}
+library(emo)
+library(glue)
+library(broom)
+library(klippy)
+
+knitr::opts_chunk$set(echo = TRUE)
+
+```
+
+```{r klippy, echo=FALSE, include=TRUE}
+klippy::klippy(lang     = c('r', 'python', 'bash'),
+               position = c('top', 'right'),
+               color    = '#253494')
+```
+
+<br>
+
+## Introduction
+
+<br>
+
+After we run *LocalApp* and *TSOPPI* we have a list of small variants predicted
+for each sample in a given `$RUN_ID`. These results have to be manually inspected
+and curated to discard potential artifacts, variants in problematic regions (commonly
+referred to as *black listed*) and germ line variants.
+
+<br>
+
+Steps:
+
+- General QC
+- Check *exclude* category variants
+  - VAF
+  - TSO500 category
+  - Frequencies
+- Check *include* category variants
+  - VAF
+  - TSO500 category
+  - Frequencies
+- Concordance DNA-RNA
+- Gender
+- Tumor content
+
+## Prepare xlsx file
+
+- First we create a copy of the *.tsv* file in excel, save this copy as *.xlsx* format,
+all the updated should be done in this new file, and we never modify the *.tsv* file.
+
+- Delimited, tab, text
+
+- Excel Workbook
+  - `${sample_id}_small_variant_table.tsv` to `${sample_id}_small_variant_table_forQC.xlsx`
+
+
+- Open *IGV* and load the *.bam* files
+
+
+## QC
+
+### Evaluate the *exclude* category variants
+
+We check the variants th
+
+  - Variants that are not in the coding regions are automatically excluded
+  - Check *TSO500* column with variant categories
+    - Check also *Class_judgement*, *Depth*
+  - Variants in the category *BL* are automatically excluded
+  - Variants in the category *GL_DB* are automatically excluded: these variables
+  are annotated in verified databases, we don't need to verify it.
+
+
+### Evaluate the *include* category variants 
+
+- Examples:
+  - SNV (Single Nucleotide Variants)
+  - Deletions (1-15)
+  - Insertions (1-)
+  
+- We check the frequencies are very low in normal and hight in the sample.
+
+- Variants that are not in the coding regions and synonymous are automatically excluded
+
+- IGV:
+
+  - Be sure to activate the option: *View as pairs*
+  - On right click: *Sort alignment by* -> *Base*
+  - This allows to see all the nucleotides matching the coordinates of the variant
+  - The base we see are those mismatching the reference
+
+
+## VAF 
+
+- If the tumor content is high and the VAF of a variant is high, we cannot be sure
+if this is a germn line variant
+
+- Separation in VAF plot
+  - We expect a big separation when the tumor content is high
+  - Little separation is associated to low tumor content, because the sample comes
+    from normal cells and we should expect normal VAF of ~0.5
+
+
+## Concordance
+
+- File: `${sample_id}_sample_concordance.txt`
+
+Always verify the DNA-RNA reads concordance, if it is less than 80%, report it.
+
+However we always check the RNA quality data (metrics), it is likely that this low
+concordance value is due to one sample RNa or DNA of good quality and the other
+one with low quality.
+
+If we have both DNA and RNA with good quality and the concordance is low, then we
+have a real problem.
+
+
+## Gender prediction
+
+See copy number plot and *PRONTO metadata*, they have to agree.
+
+Otherwise, repor it.
+
+
+## Tumor content
+
+Plot vs PureCN
+
+The predicted number by the patologist should not vary much from the top *PureCN* solutions
+
+
+## Metrics summary plots
+
+- Check contaminated samples
+  - When the tumor content is high and many GL variants have low VAF (<=0.2) the
+  sample may be tagged as contaminated becuase the software may assume there are
+  is material from two different samples. Therefore this is not a true contamination
+  
+- Prioritize in coverage over actual numbers of reads
+  
+
+
+
+<!-- ```{r runID, echo=FALSE, eval = TRUE, comment=""} -->
+<!-- cat(run.id) -->
+<!-- ``` -->
