@@ -42,6 +42,8 @@ Create predisposition_tables folder	File_Manipulation
 Copy predisposition tables	File_Manipulation
 Convert tables: xlsx -> tsv 	Launch_Analysis
 Copy xlsx -> tsv (023) scripts and logs	File_Manipulation
+Create Intersection Report	Launch_Analysis
+Move Intersection html to RECENT_RUN folder	File_Manipulation
 Comment previous run in PRONTO master table	File_Manipulation
 Set 'N' in 3rd column in PRONTO master table	File_Manipulation
 Add current ID PRONTO metadata to PRONTO master table	File_Manipulation
