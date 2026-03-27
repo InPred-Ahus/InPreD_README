@@ -1008,6 +1008,33 @@ cp -a config.sh ${SCRIPTS_AND_LOGS_FOLDER}/023_config.sh
 
 <br>
 
+### Create Intersection reports
+
+<br>
+
+Run the following commands to generate an *HTML* document showing the biomarkers found
+in the small variant tables after QC.
+
+
+```{bash, echo=TRUE, eval = FALSE}
+# Launch image from create_fusviz_input folder
+cd $DURABLE/software/Ahus_toolkit/Intersection
+
+
+sudo singularity run                                   \
+-B /ess/p1150/data/durable/TSO500_postprocessing:/data \
+-B $PWD:/app                                           \
+BM_intersection.sif                                    \
+-j 1 --configfile config_sif.yaml                      \
+--config run_id=${RUN_ID} --forceall                   ;
+
+# Verify that the html report was created
+ls $DURABLE/software/Ahus_InPreD_toolkit/Intersection/results/${RUN_ID}/Biomarkers_found_report.html
+
+mv $DURABLE/software/Ahus_InPreD_toolkit/Intersection/results/${RUN_ID}/Biomarkers_found_report.html $DURABLE/software/Ahus_InPreD_toolkit/Intersection/results/${RUN_ID}/Biomarkers_found_report_${RUN_ID}.html
+```
+
+
 ### Generate reports
 
 <br>
