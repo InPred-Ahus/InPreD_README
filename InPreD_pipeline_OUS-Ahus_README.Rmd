@@ -1018,12 +1018,13 @@ in the small variant tables after QC.
 
 ```{bash, echo=TRUE, eval = FALSE}
 # Launch image from create_fusviz_input folder
-cd $DURABLE/software/Ahus_toolkit/Intersection
+cd $DURABLE/software/Ahus_InPreD_toolkit/Intersection
 
 
-sudo singularity run                                   \
+singularity run                                        \
 -B /ess/p1150/data/durable/TSO500_postprocessing:/data \
 -B $PWD:/app                                           \
+-B bm_table:/bm_table                                  \
 BM_intersection.sif                                    \
 -j 1 --configfile config_sif.yaml                      \
 --config run_id=${RUN_ID} --forceall                   ;
