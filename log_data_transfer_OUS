@@ -1,8 +1,8 @@
 Date  Description_issue
-260326  Two samples from the same patient, created conflict with Pronto, not related to UIO
-260318  No issues to report
-260312 
-260305
+260326  Two IPD samples were missing from the results. IPD samples are normally analysed by OUS but somtimes some of those samples are analysed by Ahus.
+260318  
+260312  
+260305  Problem with ID typo -> need more details
 260226
 260218
 260213
