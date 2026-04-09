@@ -2,7 +2,7 @@ Date  Description_issue
 260326  Two IPD samples were missing from the results. IPD samples are normally analysed by OUS but somtimes some of those samples are analysed by Ahus.
 260318  
 260312  
-260305  Problem with ID typo -> need more details
+260305  Problem with ID typo. Two samples had wrong IDs: one was IPAXXXX-D03-PXX-AXX but should have been IPAXXXX-D01-PXX-AXX and the other was IPAXXXX-DXX-d01-AXX but should have need IPAXXXX-DXX-d02-AXX
 260226
 260218
 260213
