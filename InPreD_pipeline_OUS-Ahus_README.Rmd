@@ -37,7 +37,7 @@ run.id.date     <- ""
 # Replace the old ID for the new one
 args   <-  params$args
 run.id <- args[1]
-# run.id <- "260213_A02134_0129_BHJNFNDRX7" 
+run.id <- "260213_A02134_0129_BHJNFNDRX7"
 #         "250606_AAAAAAAA_BBBB_CCCCCCCCCC"   # ID template
 
 # 260123_NB552811_0121_AHL7KWBGYX
@@ -1314,6 +1314,85 @@ function toggleFigure(id) {
 </script>
 ')
 ```
+
+## QC variant tables
+
+<br>
+
+### Check QC metrics
+
+<br>
+
+  Switch to the Windows machine (*Kontor Fullsjerm*, see Figure 3). We will do the QC in this machine.
+  Open the file "TSO500_run_metrics.pdf" located in: <code style="white-space: normal; word-break: break-all;">`r paste0("${DURABLE}/TSO500_postprocessing/", run.id, "_TSO500_TSOPPI_v0.3.2_main_2022_06_07/", run.id, "_metrics_plot")`</code>
+  
+```{r TSO500_run_metrics, echo=FALSE, results='asis'}
+insert.fig.toggle(
+  fig.id = "TSO500_run_metrics",
+  button.label = "Figure 22",
+  img.src = "fig/QC_variant_tables_figure1.png",
+  fig.width = "75%",
+  fig.cap = "Open TSO500_run_metrics.pdf to verify the QC metrics for the run"
+)
+```
+  
+- Check the entire QC metrics files and look of some samples or the entire run are overall bellow average in term of quality (use statistic from the previous runs to compare as well as the thresolds present in the figures). Pay a particular attention to: 
+  - **Median exon coverage**: should be at least 150bp
+  - **Contamination assesment**: should be outside the red area
+  - **Coverage mad**
+  - **MSI sites**
+  - **Mean family size**(how many time a DNA molecule has been sequenced)
+  - **Read enchrichement**: should be arround 70%
+  - **Chimeric reads**: should be less than 5%
+
+
+<br>
+
+### Start IGV
+
+<br>
+
+- Go to: `${DURABLE}/IGV/IGV_2.19.6` or `${DURABLE}/IGV/IGV_2.16.2`  and double click on the bat file with your name, e.g.: `igv_port_60161_Jean-Marc.bat`  
+```{r IGV_file_location, echo=FALSE, results='asis'}
+insert.fig.toggle(
+  fig.id = "IGV_file_location",
+  button.label = "Figure 23",
+  img.src = "fig/QC_variant_IGV_bat_file_figure2.png",
+  fig.width = "75%",
+  fig.cap = "Open the IGV bat file to start IGV"
+)
+```
+ **NOTE:** If you do not have a bat file at your name see the Q & A section.
+ 
+- Click "ok" if some errors appears and once IGV is open click on: *Genomes* &rarr; *Load Genome from File*   
+```{r IGV_reference_genome, echo=FALSE, results='asis'}
+insert.fig.toggle(
+  fig.id = "Load_reference_genome",
+  button.label = "Figure 24",
+  img.src = "fig/QC_variant_load_genome_figure3.png",
+  fig.width = "75%",
+  fig.cap = "Load the reference genome"
+)
+```
+
+
+
+
+
+- View as pair
+ - Sort alignement -> by base
+ - prefrence - alignement - show softclip based
+ - prefrence - alignement - show center line
+ - Always re initialise session when changing track or remove or adding track
+ 
+
+<br>
+
+### Small variant table
+
+<br>
+
+
 
 ## Email Drafts
 
