@@ -1348,7 +1348,7 @@ insert.fig.toggle(
 
 <br>
 
-### Start IGV
+### Start IGV and load data
 
 <br>
 
@@ -1362,9 +1362,9 @@ insert.fig.toggle(
   fig.cap = "Open the IGV bat file to start IGV"
 )
 ```
- **NOTE:** If you do not have a bat file at your name see the Q & A section.
+ **NOTE:** If you do not have a bat file at your name see the Q & A section *IGV setup*.
  
-- Click "ok" if some errors appears and once IGV is open click on: *Genomes* &rarr; *Load Genome from File*   
+- Click "ok" if some errors appears and once IGV is open click on: *Genomes* &rarr; *Load Genome from File* &rarr; select *hg19_TSO500_2.0.0.70.genome* 
 ```{r IGV_reference_genome, echo=FALSE, results='asis'}
 insert.fig.toggle(
   fig.id = "Load_reference_genome",
@@ -1374,10 +1374,27 @@ insert.fig.toggle(
   fig.cap = "Load the reference genome"
 )
 ```
+**NOTE:** The reference genome can take a bit of time to load.
 
+- Now that IGV is started go back to <code style="white-space: normal; word-break: break-all;">`r paste0("${DURABLE}/TSO500_postprocessing/", run.id, "_TSO500_TSOPPI_v0.3.2_main_2022_06_07/")`</code> 
+- Then enter in the folder of one of the samples (e.g.: IPA0000_D01-d01-A01) and go in the folder *IGV_links*.
+- Open the html file (the version *"interpretation_table_variants"*) with the same name used to open IGV, e.g.: IPA0000_D01-d01-A01_IGV_links_interpretation_table_variants.port_60161_Jean-Marc.html
+ - In the file first click on *Session initialization/restart*
+ - Then *Load stiched tumor DNA BAM file*
+ - Then *Load tumor RNA BAM file*
+```{r QC_variant_load_bam_files, echo=FALSE, results='asis'}
+insert.fig.toggle(
+  fig.id = "QC_variant_load_bam_files",
+  button.label = "Figure 25",
+  img.src = "fig/QC_variant_load_bam_files_figure4.png",
+  fig.width = "75%",
+  fig.cap = "Load the BAM files into IGV"
+)
+```
 
+- IGV is now set and the BAM files are loaded for this sample.
 
-
+**NOTE:** The first time you use IGV some setting need to be changed, see the Q & A section *IGV setup*.
 
 - View as pair
  - Sort alignement -> by base
@@ -1391,6 +1408,14 @@ insert.fig.toggle(
 ### Small variant table
 
 <br>
+
+- Open excel and open the file *IPA0000_D01-d01-A01_small_variant_table.tsv"* situated in in <code style="white-space: normal; word-break: break-all;">`r paste0("${DURABLE}/TSO500_postprocessing/", run.id, "_TSO500_TSOPPI_v0.3.2_main_2022_06_07/Sample_name")`</code> 
+
+
+
+
+
+
 
 
 
