@@ -20,7 +20,6 @@ output:
 ---
 
 ```{r setup, include=FALSE}
-library(emo)
 library(glue)
 library(broom)
 library(klippy)
@@ -690,7 +689,7 @@ bash 00_setup_folder_structure_for_new_run.sh ${RUN_ID}
 
 <br>
 
-`r emo::ji("hourglass_flowing_sand")` Running time: ~10 seconds
+Running time: ~10 seconds
 
   - We will generate a sample sheet with metadata for the current run ID.
 
@@ -826,7 +825,7 @@ chmod 755 $ALL_RUN_IDS
 
 <br>
 
-`r emo::ji("hourglass_flowing_sand")` Running time: ~30 minutes (but may vary up to 1 hour)
+Running time: ~30 minutes (but may vary up to 1 hour)
 
 ```{bash, echo=TRUE, eval = FALSE}
 bash 02_execute_tsoppi_and_archive_results.sh ${RUN_ID} \
@@ -908,7 +907,7 @@ printf "%s\n" "${SAMPLE_IDs[@]}"
 
 #### Launch *ICNVA* (025)
 
-`r emo::ji("hourglass_flowing_sand")` Running time: ~30 minutes
+Running time: ~30 minutes
 
 ```{bash, echo=TRUE, eval = FALSE}
 for SAMPLE_ID in ${SAMPLE_IDs[@]}
@@ -979,7 +978,7 @@ ls ${PRED_TABLES}
 
 Convert QC-ed small variables tables, from *xlsx* back to *tsv* format.
 
-`r emo::ji("hourglass_flowing_sand")` Running time: ~3 minutes
+Running time: ~3 minutes
 
 ```{bash, echo=TRUE, eval = FALSE}
 for SAMPLE_ID in ${SAMPLE_IDs[@]}
@@ -1099,7 +1098,7 @@ mv -i ${DURABLE}/software/PRONTO/PRONTO-1.2.0/In/InPreD_PRONTO_metadata.txt.new 
   
   - Launch the command to generate the *PRONTO* reports.
 
-`r emo::ji("hourglass_flowing_sand")` Running time: ~3-5 minutes per sample.
+Running time: ~3-5 minutes per sample.
 
 <br>
 
@@ -1109,7 +1108,7 @@ do
       echo "SAMPLE_ID=${SAMPLE_ID}"
 
       bash 03_generate_and_archive_pronto_report_collect_data_for_export.sh ${RUN_ID} ${SAMPLE_ID} ${SCRIPTS_AND_LOGS_FOLDER}/02_used_scripts/config_${RUN_ID}.sh \
-          > ${SCRIPTS_AND_LOGS_FOLDER}/03_generate_and_archive_pronto_v${PRONTO_VERSION}_report_collect_data_for_export_${SAMPLE_ID}_${RUN_ID}.stdout \
+          > ${SCRIPTS_AND_LOGS_FOLDER}/03_generate_and_archive_pronto_v${PRONTO_VERSION}_report_collect_data_for_export_${SAMPLE_ID}_${RUN_ID}.stdout             \
           2> ${SCRIPTS_AND_LOGS_FOLDER}/03_generate_and_archive_pronto_v${PRONTO_VERSION}_report_collect_data_for_export_${SAMPLE_ID}_${RUN_ID}.stderr 
 
 done
