@@ -1469,7 +1469,7 @@ insert.fig.toggle(
 
 **NOTE:** this is important to add exatly **\_forQC** at the end as the rest of the pipeline depends on it.
 
-- Now only keep columns *"Gene_symbol", "Genomic_location", "DNA_change", "Protein_change", "Coding_status", "Tier", "AF_tumor_DNA", "Depth_tumor_DNA", "Depth_tumor_RNA", "TSO500_recurrence", "TSO500_LocalApp_class", "Class_judgement", "Class_judgement_comments", "Mutation_hotspot", "CPSR_ACMG_class", "CPSR_ClinVar_class", "Run_QC"* and hide the others
+- Now only keep columns *"Gene_symbol", "Genomic_location", "DNA_change", "Protein_change", "Coding_status", "Tier", "AF_tumor_DNA", "Depth_tumor_DNA", "Depth_tumor_RNA", "TSO500_recurrence", "TSO500_LocalApp_class", "Class_judgement", "Class_judgement_comments", "Mutation_hotspot", "CPSR_ACMG_class", "CPSR_ClinVar_class", "Run_QC"* and hide the others (**Do not delete any column**)
 
 - The table is now ready for QC.
 
@@ -1499,6 +1499,9 @@ insert.fig.toggle(
 - For the **exclude** variants, while it is important to verify all, pay a particular attention to the **somatic** ones and why they have been excluded. Sometime a variant has beed excluded due to allele frequency but the tumor content is low and therefore the adjusted allele frequency would be higher than reported.
 - If a **exclude** variant is not correctly excluded, change the *Class_judgement* to **include** and write in the *Class_judgement_comments* column the reason for the inclusion. This variant will also need to be checked by IGV in the next step.
 - Once all the **exclude** variants have been verified move to the **include** variants
+
+**NOTE:** Check VAF for black listed variants if VAF is high (above 30%) they might be included.
+
 - For those copy the genomic location (column *Genomic_location*) and paste it in IGV in the search bar on the top and press enter to go to the location of the variant.
 ```{r QC_variant_IGV_search_bar_figure9, echo=FALSE, results='asis'}
 insert.fig.toggle(
@@ -1532,11 +1535,24 @@ insert.fig.toggle(
 - Repeat the same process for all the **include** variants (except the synonymous and non coding variants) and verify that they are all supported by the BAM files. 
 - For each suported variant write **OK** in both the *IGV_QC* and the *Run_QC* columns.
 - If a **include** variant is not suported by the BAM file it is important to change the *Class_judgement* to **exclude** and write in the *Reporting_judgement_comments* column the reason for the exclusion (e.g.: Alignement problem, etc...).
+- In multiple variants are on the same exon, and they are probably part of the same event, keep the one that makje the most sense and exclude the other and write a comment.
 - Once all the variants have been verified and the small variant table is ready for reporting, save the file and move to the next step.
 
+### Check concordance between DNA and RNA
+- Find the file *sample_concordance.tsv* in the same folder as previously (e.g.: *IPA0123_D01-d01-A01_sample_concordance.tsv"* located in in <code style="white-space: normal; word-break: break-all;">`r paste0("${DURABLE}/TSO500_postprocessing/", run.id, "_TSO500_TSOPPI_v0.3.2_main_2022_06_07/IPA0123/")`</code> 
+- Open the file with a text editor and check the column **Hom_concordance**. Concordance beterrn DNA and RNA should be **above 80%**.
 
+### Assess concordance of patient gender between pronto metadata and overview plot
+- Open the overview plot PDF for the sample being QC, e.g.: *IPA0123_D01-d01-A01_CNV_overview_plots.pdf"* located in in <code style="white-space: normal; word-break: break-all;">`r paste0("${DURABLE}/TSO500_postprocessing/", run.id, "_TSO500_TSOPPI_v0.3.2_main_2022_06_07/IPA0123/")`</code> 
+- Open the PRONTO_metadata file for this run: <code style="white-space: normal; word-break: break-all;">`r paste0("${DURABLE}/TSO500_pronto_metadata/PRONTO_metadata_", run.date, ".txt")`</code> in the column *Sex*.
+- Compare the gender for the same sample in both files and verify they are concordant.
 
+### Check concordance in tumor content between pureCN and cytology results
+- The tumor content estimated by cytology can be found in the pronto metadata file for this run: <code style="white-space: normal; word-break: break-all;">`r paste0("${DURABLE}/TSO500_pronto_metadata/PRONTO_metadata_", run.date, ".txt")`</code> in the column *Tumor_content_pathology*.
+- The tumor content estimated by cytology can also be found in the overview plot PDF for the sample being QC, e.g.: *IPA0123_D01-d01-A01_CNV_overview_plots.pdf"* located in in <code style="white-space: normal; word-break: break-all;">`r paste0("${DURABLE}/TSO500_postprocessing/", run.id, "_TSO500_TSOPPI_v0.3.2_main_2022_06_07/IPA0123/")`</code> in the title of plot [A2] *assumed tumor cell fraction*
+- The tumor content estimated by pureCN for the sample being QC, e.g.: *IPA0123_D01-d01-A01*, can be found in <code style="white-space: normal; word-break: break-all;">`r paste0("${DURABLE}/TSO500_icnva/", run.id, "_TSO500_TSOPPI_v0.3.2_main_2022_06_07/IPA0123_D01-d01-A01_icnva/PureCN_results_default/IPA0123_D01-d01-A01_solution_overview.tsv")`</code> in the column *purity*.
 
+- Once all is checked, the QC is done.
 
 
 ## Email Drafts
