@@ -2,8 +2,14 @@
 .Rhistory
 .RData
 .Ruserdata
-*_InPreD_pipeline_Checklist.html
 *.Rproj
-InPreD_README.html
+
 *.sif
 
+.DS_Store
+
+# Generated HTML files (outputs from Rmd knitting)
+*.html
+# But keep template HTML files that are inputs, not outputs
+!templates/*.html
+!checklist/**/*.html

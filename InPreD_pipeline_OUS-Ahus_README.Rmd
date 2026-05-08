@@ -24,6 +24,7 @@ library(emo)
 library(glue)
 library(broom)
 library(klippy)
+library(base64enc)
 
 knitr::opts_chunk$set(echo = TRUE)
 
@@ -1317,6 +1318,27 @@ function toggleFigure(id) {
 
 ## QC variant tables
 
+```{r embed_sop, echo=FALSE, results='asis'}
+pdf_data <- base64enc::base64encode("SOP/SOP_bioinf_QC_21.08.2024.pdf")
+cat(paste0(
+  '**NOTE:** *if you are new to QC first read the SOP document below or on hypatia.uio.no/Ih-med-klinmed-ahus-inpred/InPreD/TSO500_SOPs/Interpretation_and_QC/TSO500_QC_SOP.pdf*\n\n',
+  '<a id="sop-link1" href="#" download="SOP_bioinf_QC_21.08.2024.pdf">Download SOP PDF</a>\n\n',
+  '<embed id="sop-embed1" type="application/pdf" width="100%" height="650px" />\n\n',
+  '<script>\n',
+  '(function() {\n',
+  '  var b64 = "', pdf_data, '";\n',
+  '  var binary = atob(b64);\n',
+  '  var bytes = new Uint8Array(binary.length);\n',
+  '  for (var i = 0; i < binary.length; i++) { bytes[i] = binary.charCodeAt(i); }\n',
+  '  var blob = new Blob([bytes], {type: "application/pdf"});\n',
+  '  var blobUrl = URL.createObjectURL(blob);\n',
+  '  document.getElementById("sop-link1").href = blobUrl;\n',
+  '  document.getElementById("sop-embed1").src = blobUrl;\n',
+  '})();\n',
+  '</script>\n'
+))
+```
+
 <br>
 
 ### Check QC metrics
@@ -1339,8 +1361,8 @@ insert.fig.toggle(
 - Check the entire QC metrics files and look of some samples or the entire run are overall bellow average in term of quality (use statistic from the previous runs to compare as well as the thresolds present in the figures). Pay a particular attention to: 
   - **Median exon coverage**: should be at least 150bp
   - **Contamination assesment**: should be outside the red area
-  - **Coverage mad**
-  - **MSI sites**
+  - **Coverage mad**: should be below 0.22
+  - **MSI sites**: should be at least 40 sites
   - **Mean family size**(how many time a DNA molecule has been sequenced)
   - **Read enchrichement**: should be arround 70%
   - **Chimeric reads**: should be less than 5%
@@ -1377,8 +1399,8 @@ insert.fig.toggle(
 **NOTE:** The reference genome can take a bit of time to load.
 
 - Now that IGV is started go back to <code style="white-space: normal; word-break: break-all;">`r paste0("${DURABLE}/TSO500_postprocessing/", run.id, "_TSO500_TSOPPI_v0.3.2_main_2022_06_07/")`</code> 
-- Then enter in the folder of one of the samples (e.g.: IPA0000_D01-d01-A01) and go in the folder *IGV_links*.
-- Open the html file (the version *"interpretation_table_variants"*) with the same name used to open IGV, e.g.: IPA0000_D01-d01-A01_IGV_links_interpretation_table_variants.port_60161_Jean-Marc.html
+- Then enter in the folder of one of the samples (e.g.: IPA0123_D01-d01-A01) and go in the folder *IGV_links*.
+- Open the html file (the version *"interpretation_table_variants"*) with the same name used to open IGV, e.g.: IPA0123_D01-d01-A01_IGV_links_interpretation_table_variants.port_60161_Jean-Marc.html
  - In the file first click on *Session initialization/restart*
  - Then *Load stiched tumor DNA BAM file*
  - Then *Load tumor RNA BAM file*
@@ -1394,7 +1416,10 @@ insert.fig.toggle(
 
 - IGV is now set and the BAM files are loaded for this sample.
 
+**NOTE:** Always reinitialise the session when changing track.
+
 **NOTE:** The first time you use IGV some setting need to be changed, see the Q & A section *IGV setup*.
+
 
 - View as pair
  - Sort alignement -> by base
@@ -1405,14 +1430,109 @@ insert.fig.toggle(
 
 <br>
 
-### Small variant table
+### Prepare small variant table
 
 <br>
 
-- Open excel and open the file *IPA0000_D01-d01-A01_small_variant_table.tsv"* situated in in <code style="white-space: normal; word-break: break-all;">`r paste0("${DURABLE}/TSO500_postprocessing/", run.id, "_TSO500_TSOPPI_v0.3.2_main_2022_06_07/Sample_name")`</code> 
+- Open excel and open the small variant table (.tsv file)) e.g.:*IPA0123_D01-d01-A01_small_variant_table.tsv"* situated in in <code style="white-space: normal; word-break: break-all;">`r paste0("${DURABLE}/TSO500_postprocessing/", run.id, "_TSO500_TSOPPI_v0.3.2_main_2022_06_07/IPA0123")`</code> 
+- In the text import wizard from excel select *Delimited* and click on *Next*.
+```{r QC_variant_import_tsv_delimited, echo=FALSE, results='asis'}
+insert.fig.toggle(
+  fig.id = "QC_variant_import_tsv_delimited",
+  button.label = "Figure 26",
+  img.src = "fig/QC_variant_import_tsv_delimited_figure5.png",
+  fig.width = "75%",
+  fig.cap = "Select Delimited in the text import wizard from excel"
+)
+```
+- Then select *Tab* as delimiter and click on *Next*
+```{r QC_variant_import_tsv_tab_figure6, echo=FALSE, results='asis'}
+insert.fig.toggle(
+  fig.id = "QC_variant_import_tsv_tab_figure6",
+  button.label = "Figure 27",
+  img.src = "fig/QC_variant_import_tsv_tab_figure6.png",
+  fig.width = "75%",
+  fig.cap = "Select Tab as delimiter in the text import wizard from excel"
+)
+```
+- Then select *Text* as column data format and click on *Finish*.
+```{r QC_variant_import_tsv_text_figure7, echo=FALSE, results='asis'}
+insert.fig.toggle(
+  fig.id = "QC_variant_import_text_figure7",
+  button.label = "Figure 28",
+  img.src = "fig/QC_variant_import_text_figure7.png",
+  fig.width = "75%",
+  fig.cap = "Select Text as column data format in the text import wizard from excel"
+)
+```
+- Save the file as excel workbook *.xlsx* format and add **\_forQC** to the filename. 
+
+**NOTE:** this is important to add exatly **\_forQC** at the end as the rest of the pipeline depends on it.
+
+- Now only keep columns *"Gene_symbol", "Genomic_location", "DNA_change", "Protein_change", "Coding_status", "Tier", "AF_tumor_DNA", "Depth_tumor_DNA", "Depth_tumor_RNA", "TSO500_recurrence", "TSO500_LocalApp_class", "Class_judgement", "Class_judgement_comments", "Mutation_hotspot", "CPSR_ACMG_class", "CPSR_ClinVar_class", "Run_QC"* and hide the others
+
+- The table is now ready for QC.
+
+**NOTE:** This is the legacy method and an already made html file is also availiable to do the QC instead. To use it for QC see section XX.
 
 
+<br>
 
+### Do the QC
+
+<br>
+
+- Both Class_judgement and Class_judgement_comments columns are pre-filled by TSOPPI based on rules listed in the small variant table header. The pre-filling is intended to speed up the manual QC process by automating multiple well-defined quality checks, but variant reviewers should always check whether they agree with the auto-generated judgement information and conclusions. 
+- For both variants that have a Class_judgement **include** and **exclude** there is no need to QC synonymous and non coding variants, this information can be found in the column *Coding_status*.
+- Start the QC by first looking at **exclude** variants in the column Class_judgement. 
+```{r QC_variant_class_judgement_figure8, echo=FALSE, results='asis'}
+insert.fig.toggle(
+  fig.id = "QC_variant_class_judgement_figure8",
+  button.label = "Figure 28",
+  img.src = "fig/QC_variant_class_judgement_figure8.png",
+  fig.width = "75%",
+  fig.cap = "Location of the class judgement and class judgement comments columns in the small variant table"
+)
+```
+
+- To verify the **exclude** variants, look at the *Class_judgement_comments*, column to understand the reason for the exclusion (e.g.: Germline variant, blacklisted, etc...)
+- For the **exclude** variants, while it is important to verify all, pay a particular attention to the **somatic** ones and why they have been excluded. Sometime a variant has beed excluded due to allele frequency but the tumor content is low and therefore the adjusted allele frequency would be higher than reported.
+- If a **exclude** variant is not correctly excluded, change the *Class_judgement* to **include** and write in the *Class_judgement_comments* column the reason for the inclusion. This variant will also need to be checked by IGV in the next step.
+- Once all the **exclude** variants have been verified move to the **include** variants
+- For those copy the genomic location (column *Genomic_location*) and paste it in IGV in the search bar on the top and press enter to go to the location of the variant.
+```{r QC_variant_IGV_search_bar_figure9, echo=FALSE, results='asis'}
+insert.fig.toggle(
+  fig.id = "QC_variant_IGV_search_bar_figure9",
+  button.label = "Figure 29",
+  img.src = "fig/QC_variant_IGV_search_bar_figure9.png",
+  fig.width = "75%",
+  fig.cap = "Location of the IGV search bar for verifying variants in the BAM files"
+)
+```
+- Once at the correct location, right click and select *View as pairs* then right click again and select *Sort alignments by* &rarr; *base* to sort the reads by the base at the position of the variant.
+```{r QC_variant_IGV_sort_base_figure10, echo=FALSE, results='asis'}
+insert.fig.toggle(
+  fig.id = "QC_variant_IGV_sort_base_figure10",
+  button.label = "Figure 30",
+  img.src = "fig/QC_variant_IGV_sort_base_figure10.png",
+  fig.width = "75%",
+  fig.cap = "Sort the reads by base in IGV"
+)
+```
+ - Now check if the correct variant can be found, if the alignment is correct and if multiple reads support the variant.
+```{r QC_variant_IGV_variant_figure11, echo=FALSE, results='asis'}
+insert.fig.toggle(
+  fig.id = "QC_variant_IGV_variant_figure11",
+  button.label = "Figure 31",
+  img.src = "fig/QC_variant_IGV_variant_figure11.png",
+  fig.width = "75%",
+  fig.cap = "Verify the presence of the variant in IGV"
+)
+```
+- Repeat the same process for all the **include** variants (except the synonymous and non coding variants) and verify that they are all supported by the BAM files. 
+- For each suported variant write **OK** in both the *IGV_QC* and the *Run_QC* columns.
+- If a **include** variant is not suported by the BAM file it is important to change the *Class_judgement* to **exclude** and write in the *Reporting_judgement_comments* column the reason for the exclusion (e.g.: Alignement problem, etc...).
+- Once all the variants have been verified and the small variant table is ready for reporting, save the file and move to the next step.
 
 
 
