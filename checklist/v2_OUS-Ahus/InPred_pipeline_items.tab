@@ -1,6 +1,5 @@
 Item	Group
 Create SampleSheet (View UiO)	File_Manipulation
-Verify Barcode column (UP)	File_Manipulation
 Verify Tumor content (numeric or empty)	File_Manipulation
 Create PRONTO metadata (View UiO)	File_Manipulation
 Verify Batch column ('-')	File_Manipulation
@@ -36,12 +35,10 @@ Update ${SAMPLE_IDs} variable	Setup
 Verify ${SAMPLE_IDs} size and content	Setup
 Launch ICNVA	Launch_Analysis
 Copy ICNVA (025) scripts and logs	File_Manipulation
-Send TSOPPI + ICNVA email	Send_Email
 Remove the content of RECENT_RUN folder	File_Manipulation
-Create predisposition_tables folder	File_Manipulation
-Copy predisposition tables	File_Manipulation
-Convert tables: xlsx -> tsv 	Launch_Analysis
-Copy xlsx -> tsv (023) scripts and logs	File_Manipulation
+Generate QC html interactive reports	Launch_Analysis
+Manual QC of small variants	Manual_Analysis
+Add QC comments to _forQC.tsv files	File_Manipulation
 Create Intersection Report	Launch_Analysis
 Move Intersection html to RECENT_RUN folder	File_Manipulation
 Comment previous run in PRONTO master table	File_Manipulation

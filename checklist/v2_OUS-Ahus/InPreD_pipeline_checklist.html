@@ -76,11 +76,11 @@
 .checklist-item.Launch_Analysis:hover {
           background-color: #43a047;
         }
-.checklist-item.Important:hover {
-          background-color: #a50f15;
-        }
 .checklist-item.Send_Email:hover {
           background-color: #ffeda0;
+        }
+.checklist-item.Manual_Analysis:hover {
+          background-color: #a50f15;
         }
 .checklist-item.DEFAULT_CLASS:hover {
           background-color: #E6AB02;
@@ -170,11 +170,11 @@
 .color-box.Launch_Analysis {
           background-color: #43a047;
        }
-.color-box.Important {
-          background-color: #a50f15;
-       }
 .color-box.Send_Email {
           background-color: #ffeda0;
+       }
+.color-box.Manual_Analysis {
+          background-color: #a50f15;
        }
 .color-box.DEFAULT_CLASS {
           background-color: #E6AB02;
@@ -208,13 +208,13 @@
           background-color: #43A04740;
           border-left: 4px solid #43a047;
         }
-.checklist-item.Important {
-          background-color: #A50F1540;
-          border-left: 4px solid #a50f15;
-        }
 .checklist-item.Send_Email {
           background-color: #FFEDA040;
           border-left: 4px solid #ffeda0;
+        }
+.checklist-item.Manual_Analysis {
+          background-color: #A50F1540;
+          border-left: 4px solid #a50f15;
         }
 .checklist-item.DEFAULT_CLASS {
           background-color: #E6AB0240;
@@ -286,8 +286,8 @@
 <div class="legend-item"><span class="color-box Setup"></span> Setup</div>
 <div class="legend-item"><span class="color-box File_Manipulation"></span> File_Manipulation</div>
 <div class="legend-item"><span class="color-box Launch_Analysis"></span> Launch_Analysis</div>
-<div class="legend-item"><span class="color-box Important"></span> Important</div>
 <div class="legend-item"><span class="color-box Send_Email"></span> Send_Email</div>
+<div class="legend-item"><span class="color-box Manual_Analysis"></span> Manual_Analysis</div>
   
 <!--
   <div class="legend-item"><span class="color-box prepare_pipeline"></span> Prepare Pipeline</div>
@@ -297,8 +297,8 @@
   
   <div class="checklist-container">
 
-    <h1>InPreD README</h1>
-    <div class="subtitle"></div>
+    <h1>InPreD Pipeline Checklist</h1>
+    <div class="subtitle">Ahus</div>
     <button id="resetBtn" class="reset-btn" type="button">Reset all</button>
     <div class="checklist">
 
@@ -308,255 +308,243 @@
 </div>
 <div class="checklist-item File_Manipulation">
   <input type="checkbox" id="item2">
-  <label for="item2">2. Verify Barcode column (UP)</label>
+  <label for="item2">2. Verify Tumor content (numeric or empty)</label>
 </div>
 <div class="checklist-item File_Manipulation">
   <input type="checkbox" id="item3">
-  <label for="item3">3. Verify Tumor content (numeric or empty)</label>
+  <label for="item3">3. Create PRONTO metadata (View UiO)</label>
 </div>
 <div class="checklist-item File_Manipulation">
   <input type="checkbox" id="item4">
-  <label for="item4">4. Create PRONTO metadata (View UiO)</label>
+  <label for="item4">4. Verify Batch column ('-')</label>
 </div>
 <div class="checklist-item File_Manipulation">
   <input type="checkbox" id="item5">
-  <label for="item5">5. Verify Batch column ('-')</label>
+  <label for="item5">5. Encrypt PRONTO metadata</label>
 </div>
 <div class="checklist-item File_Manipulation">
   <input type="checkbox" id="item6">
-  <label for="item6">6. Encrypt PRONTO metadata</label>
+  <label for="item6">6. Import files in TSD Data Portal</label>
 </div>
 <div class="checklist-item File_Manipulation">
   <input type="checkbox" id="item7">
-  <label for="item7">7. Import files in TSD Data Portal</label>
+  <label for="item7">7. Decrypt PRONTO metadata</label>
 </div>
-<div class="checklist-item File_Manipulation">
+<div class="checklist-item Prepare_Pipeline">
   <input type="checkbox" id="item8">
-  <label for="item8">8. Decrypt PRONTO metadata</label>
+  <label for="item8">8. Verify disk space availability</label>
 </div>
 <div class="checklist-item Prepare_Pipeline">
   <input type="checkbox" id="item9">
-  <label for="item9">9. Verify disk space availability</label>
+  <label for="item9">9. Connect to hpc (Colossus) server</label>
 </div>
 <div class="checklist-item Prepare_Pipeline">
   <input type="checkbox" id="item10">
-  <label for="item10">10. Connect to hpc (Colossus) server</label>
+  <label for="item10">10. Pipeline run directory</label>
 </div>
 <div class="checklist-item Prepare_Pipeline">
   <input type="checkbox" id="item11">
-  <label for="item11">11. Pipeline run directory</label>
+  <label for="item11">11. Set up ${RUN_ID}</label>
 </div>
 <div class="checklist-item Prepare_Pipeline">
   <input type="checkbox" id="item12">
-  <label for="item12">12. Set up ${RUN_ID}</label>
+  <label for="item12">12. Set up ${RUN_DATA}</label>
 </div>
 <div class="checklist-item Prepare_Pipeline">
   <input type="checkbox" id="item13">
-  <label for="item13">13. Set up ${RUN_DATA}</label>
+  <label for="item13">13. Set up ${INPUT_DATA_TYPE}</label>
 </div>
 <div class="checklist-item Prepare_Pipeline">
   <input type="checkbox" id="item14">
-  <label for="item14">14. Set up ${INPUT_DATA_TYPE}</label>
+  <label for="item14">14. Set up ${DURABLE}</label>
 </div>
-<div class="checklist-item Prepare_Pipeline">
+<div class="checklist-item File_Manipulation">
   <input type="checkbox" id="item15">
-  <label for="item15">15. Set up ${DURABLE}</label>
+  <label for="item15">15. Move LocalApp results</label>
 </div>
 <div class="checklist-item File_Manipulation">
   <input type="checkbox" id="item16">
-  <label for="item16">16. Move LocalApp results</label>
+  <label for="item16">16. Rename LocalApp Samplesheet</label>
 </div>
 <div class="checklist-item File_Manipulation">
   <input type="checkbox" id="item17">
-  <label for="item17">17. Rename LocalApp Samplesheet</label>
+  <label for="item17">17. Create LocalApp RUN_ID link</label>
 </div>
 <div class="checklist-item File_Manipulation">
   <input type="checkbox" id="item18">
-  <label for="item18">18. Create LocalApp RUN_ID link</label>
+  <label for="item18">18. Move ShampleSheet</label>
 </div>
 <div class="checklist-item File_Manipulation">
   <input type="checkbox" id="item19">
-  <label for="item19">19. Move ShampleSheet</label>
+  <label for="item19">19. Move PRONTO metadata</label>
 </div>
-<div class="checklist-item File_Manipulation">
+<div class="checklist-item Setup">
   <input type="checkbox" id="item20">
-  <label for="item20">20. Move PRONTO metadata</label>
+  <label for="item20">20. config.sh : SEPARATOR</label>
 </div>
 <div class="checklist-item Setup">
   <input type="checkbox" id="item21">
-  <label for="item21">21. config.sh : SEPARATOR</label>
+  <label for="item21">21. config.sh : DECRYPT_UNPACK_CHECKSUM</label>
 </div>
 <div class="checklist-item Setup">
   <input type="checkbox" id="item22">
-  <label for="item22">22. config.sh : DECRYPT_UNPACK_CHECKSUM</label>
+  <label for="item22">22. config.sh : REMOVE_DECRYPTED_COMPRESSED_DATA</label>
 </div>
 <div class="checklist-item Setup">
   <input type="checkbox" id="item23">
-  <label for="item23">23. config.sh : REMOVE_DECRYPTED_COMPRESSED_DATA</label>
+  <label for="item23">23. config.sh : MAKE_TSOPPI_CONFIG</label>
 </div>
 <div class="checklist-item Setup">
   <input type="checkbox" id="item24">
-  <label for="item24">24. config.sh : MAKE_TSOPPI_CONFIG</label>
+  <label for="item24">24. config.sh : EXECUTE_TSOPPI_SCRIPTS</label>
 </div>
 <div class="checklist-item Setup">
   <input type="checkbox" id="item25">
-  <label for="item25">25. config.sh : EXECUTE_TSOPPI_SCRIPTS</label>
+  <label for="item25">25. Source config.sh</label>
 </div>
 <div class="checklist-item Setup">
   <input type="checkbox" id="item26">
-  <label for="item26">26. Source config.sh</label>
-</div>
-<div class="checklist-item Setup">
-  <input type="checkbox" id="item27">
-  <label for="item27">27. Prepare folder structure</label>
+  <label for="item26">26. Prepare folder structure</label>
 </div>
 <div class="checklist-item Launch_Analysis">
+  <input type="checkbox" id="item27">
+  <label for="item27">27. Generate sample sheet</label>
+</div>
+<div class="checklist-item File_Manipulation">
   <input type="checkbox" id="item28">
-  <label for="item28">28. Generate sample sheet</label>
+  <label for="item28">28. Copy Samplesheet (00) scripts and logs</label>
 </div>
 <div class="checklist-item File_Manipulation">
   <input type="checkbox" id="item29">
-  <label for="item29">29. Copy Samplesheet (00) scripts and logs</label>
-</div>
-<div class="checklist-item File_Manipulation">
-  <input type="checkbox" id="item30">
-  <label for="item30">30. Copy SampleSheet info TSOPPI</label>
+  <label for="item29">29. Copy SampleSheet info TSOPPI</label>
 </div>
 <div class="checklist-item Setup">
-  <input type="checkbox" id="item31">
-  <label for="item31">31. Update ${ALL_RUN_IDs} variable</label>
+  <input type="checkbox" id="item30">
+  <label for="item30">30. Update ${ALL_RUN_IDs} variable</label>
 </div>
 <div class="checklist-item Launch_Analysis">
-  <input type="checkbox" id="item32">
-  <label for="item32">32. Launch TSOPPI</label>
+  <input type="checkbox" id="item31">
+  <label for="item31">31. Launch TSOPPI</label>
 </div>
 <div class="checklist-item File_Manipulation">
+  <input type="checkbox" id="item32">
+  <label for="item32">32. Copy TSOPPI (02) scripts and logs</label>
+</div>
+<div class="checklist-item Setup">
   <input type="checkbox" id="item33">
-  <label for="item33">33. Copy TSOPPI (02) scripts and logs</label>
+  <label for="item33">33. Update ${SAMPLE_IDs} variable</label>
 </div>
 <div class="checklist-item Setup">
   <input type="checkbox" id="item34">
-  <label for="item34">34. Update ${SAMPLE_IDs} variable</label>
-</div>
-<div class="checklist-item Setup">
-  <input type="checkbox" id="item35">
-  <label for="item35">35. Verify ${SAMPLE_IDs} size and content</label>
+  <label for="item34">34. Verify ${SAMPLE_IDs} size and content</label>
 </div>
 <div class="checklist-item Launch_Analysis">
+  <input type="checkbox" id="item35">
+  <label for="item35">35. Launch ICNVA</label>
+</div>
+<div class="checklist-item File_Manipulation">
   <input type="checkbox" id="item36">
-  <label for="item36">36. Launch ICNVA</label>
+  <label for="item36">36. Copy ICNVA (025) scripts and logs</label>
 </div>
 <div class="checklist-item File_Manipulation">
   <input type="checkbox" id="item37">
-  <label for="item37">37. Copy ICNVA (025) scripts and logs</label>
+  <label for="item37">37. Remove the content of RECENT_RUN folder</label>
 </div>
-<div class="checklist-item Send_Email">
+<div class="checklist-item Launch_Analysis">
   <input type="checkbox" id="item38">
-  <label for="item38">38. Send TSOPPI + ICNVA email</label>
+  <label for="item38">38. Generate QC html interactive reports</label>
 </div>
-<div class="checklist-item File_Manipulation">
+<div class="checklist-item Manual_Analysis">
   <input type="checkbox" id="item39">
-  <label for="item39">39. Remove the content of RECENT_RUN folder</label>
+  <label for="item39">39. Manual QC of small variants</label>
 </div>
 <div class="checklist-item File_Manipulation">
   <input type="checkbox" id="item40">
-  <label for="item40">40. Create predisposition_tables folder</label>
-</div>
-<div class="checklist-item File_Manipulation">
-  <input type="checkbox" id="item41">
-  <label for="item41">41. Copy predisposition tables</label>
+  <label for="item40">40. Add QC comments to _forQC.tsv files</label>
 </div>
 <div class="checklist-item Launch_Analysis">
+  <input type="checkbox" id="item41">
+  <label for="item41">41. Create Intersection Report</label>
+</div>
+<div class="checklist-item File_Manipulation">
   <input type="checkbox" id="item42">
-  <label for="item42">42. Convert tables: xlsx -> tsv</label>
+  <label for="item42">42. Move Intersection html to RECENT_RUN folder</label>
 </div>
 <div class="checklist-item File_Manipulation">
   <input type="checkbox" id="item43">
-  <label for="item43">43. Copy xlsx -> tsv (023) scripts and logs</label>
+  <label for="item43">43. Comment previous run in PRONTO master table</label>
 </div>
-<div class="checklist-item Launch_Analysis">
+<div class="checklist-item File_Manipulation">
   <input type="checkbox" id="item44">
-  <label for="item44">44. Create Intersection Report</label>
+  <label for="item44">44. Set 'N' in 3rd column in PRONTO master table</label>
 </div>
 <div class="checklist-item File_Manipulation">
   <input type="checkbox" id="item45">
-  <label for="item45">45. Move Intersection html to RECENT_RUN folder</label>
+  <label for="item45">45. Add current ID PRONTO metadata to PRONTO master table</label>
 </div>
 <div class="checklist-item File_Manipulation">
   <input type="checkbox" id="item46">
-  <label for="item46">46. Comment previous run in PRONTO master table</label>
+  <label for="item46">46. Replace Æ/æ in new PRONTO table</label>
 </div>
 <div class="checklist-item File_Manipulation">
   <input type="checkbox" id="item47">
-  <label for="item47">47. Set 'N' in 3rd column in PRONTO master table</label>
+  <label for="item47">47. Replace Ø/ø in new PRONTO table</label>
 </div>
 <div class="checklist-item File_Manipulation">
   <input type="checkbox" id="item48">
-  <label for="item48">48. Add current ID PRONTO metadata to PRONTO master table</label>
+  <label for="item48">48. Replace Å/å in new PRONTO table</label>
 </div>
 <div class="checklist-item File_Manipulation">
   <input type="checkbox" id="item49">
-  <label for="item49">49. Replace Æ/æ in new PRONTO table</label>
+  <label for="item49">49. Rename PRONTO master table</label>
 </div>
-<div class="checklist-item File_Manipulation">
+<div class="checklist-item Launch_Analysis">
   <input type="checkbox" id="item50">
-  <label for="item50">50. Replace Ø/ø in new PRONTO table</label>
+  <label for="item50">50. Generate reports with PRONTO (03)</label>
 </div>
 <div class="checklist-item File_Manipulation">
   <input type="checkbox" id="item51">
-  <label for="item51">51. Replace Å/å in new PRONTO table</label>
+  <label for="item51">51. Copy PRONTO (03) scripts and logs</label>
+</div>
+<div class="checklist-item Setup">
+  <input type="checkbox" id="item52">
+  <label for="item52">52. Switch to Windows VM</label>
 </div>
 <div class="checklist-item File_Manipulation">
-  <input type="checkbox" id="item52">
-  <label for="item52">52. Rename PRONTO master table</label>
-</div>
-<div class="checklist-item Launch_Analysis">
   <input type="checkbox" id="item53">
-  <label for="item53">53. Generate reports with PRONTO (03)</label>
+  <label for="item53">53. Add_intersection_results</label>
 </div>
 <div class="checklist-item File_Manipulation">
   <input type="checkbox" id="item54">
-  <label for="item54">54. Copy PRONTO (03) scripts and logs</label>
+  <label for="item54">54. Add_Fusion_plots</label>
 </div>
-<div class="checklist-item Setup">
+<div class="checklist-item File_Manipulation">
   <input type="checkbox" id="item55">
-  <label for="item55">55. Switch to Windows VM</label>
+  <label for="item55">55. Encrypt RECENT_RUN folder</label>
 </div>
 <div class="checklist-item File_Manipulation">
   <input type="checkbox" id="item56">
-  <label for="item56">56. Add_intersection_results</label>
+  <label for="item56">56. Move RECENT_RUN.7z to file-export/ folder</label>
 </div>
-<div class="checklist-item File_Manipulation">
+<div class="checklist-item Setup">
   <input type="checkbox" id="item57">
-  <label for="item57">57. Add_Fusion_plots</label>
+  <label for="item57">57. Open the View UiO Portal</label>
 </div>
 <div class="checklist-item File_Manipulation">
   <input type="checkbox" id="item58">
-  <label for="item58">58. Encrypt RECENT_RUN folder</label>
+  <label for="item58">58. Download RECENT_RUN.7z from TSD Data Portal</label>
 </div>
 <div class="checklist-item File_Manipulation">
   <input type="checkbox" id="item59">
-  <label for="item59">59. Move RECENT_RUN.7z to file-export/ folder</label>
+  <label for="item59">59. Move RECENT_RUN.7z to InPreD folder</label>
 </div>
-<div class="checklist-item Setup">
+<div class="checklist-item File_Manipulation">
   <input type="checkbox" id="item60">
-  <label for="item60">60. Open the View UiO Portal</label>
-</div>
-<div class="checklist-item File_Manipulation">
-  <input type="checkbox" id="item61">
-  <label for="item61">61. Download RECENT_RUN.7z from TSD Data Portal</label>
-</div>
-<div class="checklist-item File_Manipulation">
-  <input type="checkbox" id="item62">
-  <label for="item62">62. Move RECENT_RUN.7z to InPreD folder</label>
-</div>
-<div class="checklist-item File_Manipulation">
-  <input type="checkbox" id="item63">
-  <label for="item63">63. Decrypt RECENT_RUN.7z file</label>
+  <label for="item60">60. Decrypt RECENT_RUN.7z file</label>
 </div>
 <div class="checklist-item Send_Email">
-  <input type="checkbox" id="item64">
-  <label for="item64">64. Send_Email to InPreD team</label>
+  <input type="checkbox" id="item61">
+  <label for="item61">61. Send_Email to InPreD team</label>
 </div>
 
 <!--
