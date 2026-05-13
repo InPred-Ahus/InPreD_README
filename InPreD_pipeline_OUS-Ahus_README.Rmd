@@ -972,13 +972,58 @@ ls ${PRED_TABLES}
 
 <br>
 
-> **⚠️ Important: wait the confirmation of the curators to proceed with the following sections.**
+  - *TSOPPI* creates a `$RUN_ID/{sample_ID}/{sample_ID}_small_variants_table.tsv` with all the predicted variants and many (>30) annotation fields.
+  - To ease the QC process, we create an interactive html document with only the relevant columns and information needed for QC (including: patient and predicted sex, DNA-RNA concordance, tumor content (pathology vs predicted)).
+
+> **⚠️ Important: to create the QC html file, you need to open a new terminal**
+
+  - Open a new terminal, you don't need to connect to *colossus*.
+  - Run the following command to create the html document, this will produce the following files (one per sample ID in a given \$RUN_ID): `$RUN_ID/{sample_ID}/{sample_ID}_QC_variants.html`
+  - Create the `$RUN_ID` variable
+  - Then run the container via the `run_QC_sif.sh` script.
+
+```{r env_var_QC, echo=FALSE, eval = TRUE, comment=""}
+cat(glue('RUN_ID="{run.id}"'))
+```
+
+```{bash, echo=TRUE, eval = FALSE}
+# Launch image from QC folder
+cd $DURABLE/software/Ahus_InPreD_toolkit/QC
+
+bash run_QC_sif.sh $RUN_ID
+```
 
 <br>
 
+  - The QC step is manually done, the estimated time is variable as it depends on the number of samples within a `$RUN_ID` and the number of mutations predicted in a given sample.
+  - When QC is ready for one sample, the curator will download a file named `$RUN_ID/{sample_ID}/{sample_ID}_QC.tsv`, it contains the following columns:
+    - QC status: *OK* or *.*
+    - Curator comments (if any)
+    - Selection criteria: *include* or *exclude*
+  - As *PRONTO* requires these columns in a specific file (namely `$RUN_ID/{sample_ID}/{sample_ID}_small_variants_table_forQC.tsv`), the QC process ends when we fill up this file wit the QC information.
+  - To avoid mistakes when doing manual copy-paste, we can run a script that takes the columns in the `*QC.tsv` (curator comments) and add them in the `*_small_variants_table_forQC.tsv`
+  - The script will print the number of succesfully processed files and the failures (if any).
+
+```{bash, echo=TRUE, eval = FALSE}
+# Launch image from QC folder
+cd $DURABLE/software/Ahus_InPreD_toolkit/QC
+
+bash update_for_QC.sh $RUN_ID
+```
+
+<br>
+
+#### Converting xlsx file (023)
+
+> **⚠️ Important: the next step (xlsx conversion) may not be required anymore since we are doing the QQ ourselves, and do not use a *xlsx* file to do so.**
+
+For the moment we leave this section in the README for legacy purposes, but
+we are not using it anymore since we (bioinformaticians) are doing the QC and
+we are doing without using *excel*.
+
 Convert QC-ed small variables tables, from *xlsx* back to *tsv* format.
 
-Running time: ~3 minutes
+Running time: ~1 minute
 
 ```{bash, echo=TRUE, eval = FALSE}
 for SAMPLE_ID in ${SAMPLE_IDs[@]}
