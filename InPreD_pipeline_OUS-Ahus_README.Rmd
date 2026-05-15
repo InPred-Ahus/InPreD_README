@@ -1459,7 +1459,7 @@ insert.fig.toggle(
 ```
 
 - Once a variant is checked click on **OK** in the IGV_QC column.
-- If a variant needs to be excluded click on **exclude** in the Class_judgement column and write the reason for the exclusion in the Class_judgement_comments column. **NOTE:** When leaving a comment in the *Class_judgement_comments* column, do not leave empty space as those are not supported by Pronto, replace each space by an underscore.
+- If a variant needs to be excluded click on **exclude** in the Class_judgement column and write the reason for the exclusion in the Class_judgement_comments column. **NOTE:** When leaving a comment in the *Class_judgement_comments* column, you can leave empty space and those will be replaced by underscore during export to tsv. Empty space are not supported by Pronto.
 ```{r QC_variant_html_include_exclude_figure14, echo=FALSE, results='asis'}
 insert.fig.toggle(
   fig.id = "QC_variant_html_include_exclude_figure14",
@@ -1469,7 +1469,7 @@ insert.fig.toggle(
   fig.cap = "Change from exlude to include or the opposite and write the reason for exclusion in the Class_judgement_comments column"
 )
 ```
-- When QC is finished and ready to be exported click on **Reset Order** first then on **Export Run QC to TSV**
+- When QC is finished and ready to be exported click on  **Export Run QC to TSV**.
 - The exported TSV file is now ready to be used for the next steps of the pipeline.
 
 
