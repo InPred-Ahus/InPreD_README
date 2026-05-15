@@ -23,6 +23,7 @@ output:
 library(glue)
 library(broom)
 library(klippy)
+library(base64enc)
 
 knitr::opts_chunk$set(echo = TRUE)
 
@@ -36,7 +37,7 @@ run.id.date     <- ""
 # Replace the old ID for the new one
 args   <-  params$args
 run.id <- args[1]
-# run.id <- "260213_A02134_0129_BHJNFNDRX7" 
+run.id <- "260213_A02134_0129_BHJNFNDRX7"
 #         "250606_AAAAAAAA_BBBB_CCCCCCCCCC"   # ID template
 
 # 260123_NB552811_0121_AHL7KWBGYX
@@ -1359,6 +1360,288 @@ function toggleFigure(id) {
 ')
 ```
 
+## QC variant tables
+
+```{r embed_sop, echo=FALSE, results='asis'}
+pdf_data <- base64enc::base64encode("SOP/SOP_bioinf_QC_21.08.2024.pdf")
+cat(paste0(
+  '**NOTE:** *if you are new to QC first read the SOP document below or on hypatia.uio.no/Ih-med-klinmed-ahus-inpred/InPreD/TSO500_SOPs/Interpretation_and_QC/TSO500_QC_SOP.pdf*\n\n',
+  '<a id="sop-link1" href="#" download="SOP_bioinf_QC_21.08.2024.pdf">Download SOP PDF</a>\n\n',
+  '<embed id="sop-embed1" type="application/pdf" width="100%" height="650px" />\n\n',
+  '<script>\n',
+  '(function() {\n',
+  '  var b64 = "', pdf_data, '";\n',
+  '  var binary = atob(b64);\n',
+  '  var bytes = new Uint8Array(binary.length);\n',
+  '  for (var i = 0; i < binary.length; i++) { bytes[i] = binary.charCodeAt(i); }\n',
+  '  var blob = new Blob([bytes], {type: "application/pdf"});\n',
+  '  var blobUrl = URL.createObjectURL(blob);\n',
+  '  document.getElementById("sop-link1").href = blobUrl;\n',
+  '  document.getElementById("sop-embed1").src = blobUrl;\n',
+  '})();\n',
+  '</script>\n'
+))
+```
+
+<br>
+
+### Check QC metrics
+
+<br>
+
+  Switch to the Windows machine (*Kontor Fullsjerm*, see Figure 3). We will do the QC in this machine.
+  Open the file "TSO500_run_metrics.pdf" located in: <code style="white-space: normal; word-break: break-all;">`r paste0("${DURABLE}/TSO500_postprocessing/", run.id, "_TSO500_TSOPPI_v0.3.2_main_2022_06_07/", run.id, "_metrics_plot")`</code>
+  
+```{r TSO500_run_metrics, echo=FALSE, results='asis'}
+insert.fig.toggle(
+  fig.id = "TSO500_run_metrics",
+  button.label = "Figure 22",
+  img.src = "fig/QC_variant_tables_figure1.png",
+  fig.width = "75%",
+  fig.cap = "Open TSO500_run_metrics.pdf to verify the QC metrics for the run"
+)
+```
+  
+- Check the entire QC metrics files and look of some samples or the entire run are overall bellow average in term of quality (use statistic from the previous runs to compare as well as the thresolds present in the figures). Pay a particular attention to: 
+  - **Median exon coverage**: should be at least 150bp
+  - **Contamination assesment**: should be outside the red area
+  - **Coverage mad**: should be below 0.22
+  - **MSI sites**: should be at least 40 sites
+  - **Mean family size**(how many time a DNA molecule has been sequenced)
+  - **Read enchrichement**: should be arround 70%
+  - **Chimeric reads**: should be less than 5%
+
+
+<br>
+
+### Start IGV and load data
+
+<br>
+
+- Go to: `${DURABLE}/IGV/IGV_2.19.6` or `${DURABLE}/IGV/IGV_2.16.2`  and double click on the bat file with your name, e.g.: `igv_port_60161_Jean-Marc.bat`  
+```{r IGV_file_location, echo=FALSE, results='asis'}
+insert.fig.toggle(
+  fig.id = "IGV_file_location",
+  button.label = "Figure 23",
+  img.src = "fig/QC_variant_IGV_bat_file_figure2.png",
+  fig.width = "75%",
+  fig.cap = "Open the IGV bat file to start IGV"
+)
+```
+ **NOTE:** If you do not have a bat file at your name see the Q & A [section 10.8.3](#igv-port) to create one.
+ 
+- Click "ok" if some errors appears and once IGV is open click on: *Genomes* &rarr; *Load Genome from File* &rarr; select *hg19_TSO500_2.0.0.70.genome* 
+```{r IGV_reference_genome, echo=FALSE, results='asis'}
+insert.fig.toggle(
+  fig.id = "Load_reference_genome",
+  button.label = "Figure 24",
+  img.src = "fig/QC_variant_load_genome_figure3.png",
+  fig.width = "75%",
+  fig.cap = "Load the reference genome"
+)
+```
+**NOTE:** The reference genome can take a bit of time to load.
+
+- Now that IGV is started go back to <code style="white-space: normal; word-break: break-all;">`r paste0("${DURABLE}/TSO500_postprocessing/", run.id, "_TSO500_TSOPPI_v0.3.2_main_2022_06_07/")`</code> 
+- Then enter in the folder of one of the samples (e.g.: IPA0123_D01-d01-A01) and go in the folder *IGV_links*.
+- Open the html file (the version *"interpretation_table_variants"*) with the same name used to open IGV, e.g.: IPA0123_D01-d01-A01_IGV_links_interpretation_table_variants.port_60161_Jean-Marc.html
+ - In the file first click on *Session initialization/restart*
+ - Then *Load stiched tumor DNA BAM file*
+ - Then *Load tumor RNA BAM file*
+```{r QC_variant_load_bam_files, echo=FALSE, results='asis'}
+insert.fig.toggle(
+  fig.id = "QC_variant_load_bam_files",
+  button.label = "Figure 25",
+  img.src = "fig/QC_variant_load_bam_files_figure4.png",
+  fig.width = "75%",
+  fig.cap = "Load the BAM files into IGV"
+)
+```
+
+- IGV is now set and the BAM files are loaded for this sample.
+
+**NOTE:** Always reinitialise the session when changing track.
+
+**NOTE:** The first time you use IGV some setting need to be changed, see the Q & A [section 10.8.4](#igv-settings)
+
+
+- View as pair
+ - Sort alignement -> by base
+ - prefrence - alignement - show softclip based
+ - prefrence - alignement - show center line
+ - Always re initialise session when changing track or remove or adding track
+ 
+
+
+<br>
+
+### QC using the html file
+
+<br>
+
+- Open the html file ending by **QC_variants.html** for the sample being QC eg: **IPA0123_D01-d01-A01_QC_variants.html**
+- On top of the file there is a table which summarise the concordance between DNA and RNA for the sample being QC, the patient gender between the metadata and pureCN and the tumor content estimated by cytology and the three first pureCN solutions (use solution 1).
+```{r QC_variant_html_table_top_figure12, echo=FALSE, results='asis'}
+insert.fig.toggle(
+  fig.id = "QC_variant_html_table_top_figure12",
+  button.label = "Figure 26",
+  img.src = "fig/QC_variant_html_table_top_figure12.png",
+  fig.width = "75%",
+  fig.cap = "Summary table showing the concordance between DNA and RNA, patient gender, and tumor content"
+)
+```
+
+- You can use the filter to only display the variant of interest, e.g.: only the **include** variants in the column *Class_judgement* or only the **coding** variants.
+```{r QC_variants_html_filter_figure13, echo=FALSE, results='asis'}
+insert.fig.toggle(
+  fig.id = "QC_variants_html_filter_figure13",
+  button.label = "Figure 27",
+  img.src = "fig/QC_variants_html_filter_figure13.png",
+  fig.width = "75%",
+  fig.cap = "Use the filter to only display the variants of interest"
+)
+```
+
+- Once a variant is checked click on **OK** in the IGV_QC column.
+- If a variant needs to be excluded click on **exclude** in the Class_judgement column and write the reason for the exclusion in the Class_judgement_comments column. **NOTE:** When leaving a comment in the *Class_judgement_comments* column, you can leave empty space and those will be replaced by underscore during export to tsv. Empty space are not supported by Pronto.
+```{r QC_variant_html_include_exclude_figure14, echo=FALSE, results='asis'}
+insert.fig.toggle(
+  fig.id = "QC_variant_html_include_exclude_figure14",
+  button.label = "Figure 28",
+  img.src = "fig/QC_variant_html_include_exclude_figure14.png",
+  fig.width = "75%",
+  fig.cap = "Change from exlude to include or the opposite and write the reason for exclusion in the Class_judgement_comments column"
+)
+```
+- When QC is finished and ready to be exported click on **Export Run QC to TSV**.
+- The exported TSV file is now ready to be used for the next steps of the pipeline.
+
+
+### Prepare small variant table (Legacy method)
+
+- Open excel and open the small variant table (.tsv file)) e.g.:*IPA0123_D01-d01-A01_small_variant_table.tsv"* situated in in <code style="white-space: normal; word-break: break-all;">`r paste0("${DURABLE}/TSO500_postprocessing/", run.id, "_TSO500_TSOPPI_v0.3.2_main_2022_06_07/IPA0123")`</code> 
+- In the text import wizard from excel select *Delimited* and click on *Next*.
+```{r QC_variant_import_tsv_delimited, echo=FALSE, results='asis'}
+insert.fig.toggle(
+  fig.id = "QC_variant_import_tsv_delimited",
+  button.label = "Figure 28",
+  img.src = "fig/QC_variant_import_tsv_delimited_figure5.png",
+  fig.width = "75%",
+  fig.cap = "Select Delimited in the text import wizard from excel"
+)
+```
+- Then select *Tab* as delimiter and click on *Next*
+```{r QC_variant_import_tsv_tab_figure6, echo=FALSE, results='asis'}
+insert.fig.toggle(
+  fig.id = "QC_variant_import_tsv_tab_figure6",
+  button.label = "Figure 29",
+  img.src = "fig/QC_variant_import_tsv_tab_figure6.png",
+  fig.width = "75%",
+  fig.cap = "Select Tab as delimiter in the text import wizard from excel"
+)
+```
+- Then select *Text* as column data format and click on *Finish*.
+```{r QC_variant_import_tsv_text_figure7, echo=FALSE, results='asis'}
+insert.fig.toggle(
+  fig.id = "QC_variant_import_text_figure7",
+  button.label = "Figure 30",
+  img.src = "fig/QC_variant_import_text_figure7.png",
+  fig.width = "75%",
+  fig.cap = "Select Text as column data format in the text import wizard from excel"
+)
+```
+- Save the file as excel workbook *.xlsx* format and add **\_forQC** to the filename. 
+
+**NOTE:** this is important to add exatly **\_forQC** at the end as the rest of the pipeline depends on it.
+
+- Now only keep columns *"Gene_symbol", "Genomic_location", "DNA_change", "Protein_change", "Coding_status", "Tier", "AF_tumor_DNA", "Depth_tumor_DNA", "Depth_tumor_RNA", "TSO500_recurrence", "TSO500_LocalApp_class", "Class_judgement", "Class_judgement_comments", "Mutation_hotspot", "CPSR_ACMG_class", "CPSR_ClinVar_class", "Run_QC"* and hide the others (**Do not delete any column**)
+
+- The table is now ready for QC.
+
+
+### Check concordance between DNA and RNA (Legacy method)
+- Find the file *sample_concordance.tsv* in the same folder as previously (e.g.: *IPA0123_D01-d01-A01_sample_concordance.tsv"* located in in <code style="white-space: normal; word-break: break-all;">`r paste0("${DURABLE}/TSO500_postprocessing/", run.id, "_TSO500_TSOPPI_v0.3.2_main_2022_06_07/IPA0123/")`</code> 
+- Open the file with a text editor and check the column **Hom_concordance**. Concordance beterrn DNA and RNA should be **above 80%**.
+
+### Assess concordance of patient gender between pronto metadata and overview plot (Legacy method)
+- Open the overview plot PDF for the sample being QC, e.g.: *IPA0123_D01-d01-A01_CNV_overview_plots.pdf"* located in in <code style="white-space: normal; word-break: break-all;">`r paste0("${DURABLE}/TSO500_postprocessing/", run.id, "_TSO500_TSOPPI_v0.3.2_main_2022_06_07/IPA0123/")`</code> 
+- Open the PRONTO_metadata file for this run: <code style="white-space: normal; word-break: break-all;">`r paste0("${DURABLE}/TSO500_pronto_metadata/PRONTO_metadata_", run.date, ".txt")`</code> in the column *Sex*.
+- Compare the gender for the same sample in both files and verify they are concordant.
+
+### Check concordance in tumor content between pureCN and cytology results (Legacy method)
+- The tumor content estimated by cytology can be found in the pronto metadata file for this run: <code style="white-space: normal; word-break: break-all;">`r paste0("${DURABLE}/TSO500_pronto_metadata/PRONTO_metadata_", run.date, ".txt")`</code> in the column *Tumor_content_pathology*.
+- The tumor content estimated by cytology can also be found in the overview plot PDF for the sample being QC, e.g.: *IPA0123_D01-d01-A01_CNV_overview_plots.pdf"* located in in <code style="white-space: normal; word-break: break-all;">`r paste0("${DURABLE}/TSO500_postprocessing/", run.id, "_TSO500_TSOPPI_v0.3.2_main_2022_06_07/IPA0123/")`</code> in the title of plot [A2] *assumed tumor cell fraction*
+- The tumor content estimated by pureCN for the sample being QC, e.g.: *IPA0123_D01-d01-A01*, can be found in <code style="white-space: normal; word-break: break-all;">`r paste0("${DURABLE}/TSO500_icnva/", run.id, "_TSO500_TSOPPI_v0.3.2_main_2022_06_07/IPA0123_D01-d01-A01_icnva/PureCN_results_default/IPA0123_D01-d01-A01_solution_overview.tsv")`</code> in the column *purity*.
+- Compare the tumor content estimated by cytology with the pureCN solution 1, there is no specific threshold for difference but large differences (eg: more than 20%) should be reported.
+
+
+**NOTE:** This is the legacy method and an already made html file is also availiable to do the QC instead. To use it for QC see section XX.
+
+
+<br>
+
+### Do the QC
+
+<br>
+
+- Both Class_judgement and Class_judgement_comments columns are pre-filled by TSOPPI based on rules listed in the small variant table header. The pre-filling is intended to speed up the manual QC process by automating multiple well-defined quality checks, but variant reviewers should always check whether they agree with the auto-generated judgement information and conclusions. 
+- For both variants that have a Class_judgement **include** and **exclude** there is no need to QC synonymous and non coding variants, this information can be found in the column *Coding_status*.
+- Start the QC by first looking at **exclude** variants in the column Class_judgement. 
+```{r QC_variant_class_judgement_figure8, echo=FALSE, results='asis'}
+insert.fig.toggle(
+  fig.id = "QC_variant_class_judgement_figure8",
+  button.label = "Figure 28",
+  img.src = "fig/QC_variant_class_judgement_figure8.png",
+  fig.width = "75%",
+  fig.cap = "Location of the class judgement and class judgement comments columns in the small variant table"
+)
+```
+
+- To verify the **exclude** variants, look at the *Class_judgement_comments*, column to understand the reason for the exclusion (e.g.: Germline variant, blacklisted, etc...)
+- For the **exclude** variants, while it is important to verify all, pay a particular attention to the **somatic** ones and why they have been excluded. Sometime a variant has beed excluded due to allele frequency but the tumor content is low and therefore the adjusted allele frequency would be higher than reported.
+- If a **exclude** variant is not correctly excluded, change the *Class_judgement* to **include** and write in the *Class_judgement_comments* column the reason for the inclusion. This variant will also need to be checked by IGV in the next step.
+- Once all the **exclude** variants have been verified move to the **include** variants
+
+**NOTE:** Check VAF for black listed variants if VAF is high (above 30%) they might be included.
+
+- For those copy the genomic location (column *Genomic_location*) and paste it in IGV in the search bar on the top and press enter to go to the location of the variant.
+```{r QC_variant_IGV_search_bar_figure9, echo=FALSE, results='asis'}
+insert.fig.toggle(
+  fig.id = "QC_variant_IGV_search_bar_figure9",
+  button.label = "Figure 29",
+  img.src = "fig/QC_variant_IGV_search_bar_figure9.png",
+  fig.width = "75%",
+  fig.cap = "Location of the IGV search bar for verifying variants in the BAM files"
+)
+```
+- Once at the correct location, right click and select *View as pairs* then right click again and select *Sort alignments by* &rarr; *base* to sort the reads by the base at the position of the variant.
+```{r QC_variant_IGV_sort_base_figure10, echo=FALSE, results='asis'}
+insert.fig.toggle(
+  fig.id = "QC_variant_IGV_sort_base_figure10",
+  button.label = "Figure 30",
+  img.src = "fig/QC_variant_IGV_sort_base_figure10.png",
+  fig.width = "75%",
+  fig.cap = "Sort the reads by base in IGV"
+)
+```
+ - Now check if the correct variant can be found, if the alignment is correct and if multiple reads support the variant.
+```{r QC_variant_IGV_variant_figure11, echo=FALSE, results='asis'}
+insert.fig.toggle(
+  fig.id = "QC_variant_IGV_variant_figure11",
+  button.label = "Figure 31",
+  img.src = "fig/QC_variant_IGV_variant_figure11.png",
+  fig.width = "75%",
+  fig.cap = "Verify the presence of the variant in IGV"
+)
+```
+- Repeat the same process for all the **include** variants (except the synonymous and non coding variants) and verify that they are all supported by the BAM files. 
+- For each suported variant write **OK** in both the *IGV_QC* and the *Run_QC* columns.
+- If a **include** variant is not suported by the BAM file it is important to change the *Class_judgement* to **exclude** and write in the *Reporting_judgement_comments* column the reason for the exclusion (e.g.: Alignement problem, etc...).
+- In multiple variants are on the same exon, and they are probably part of the same event, keep the one that makje the most sense and exclude the other and write a comment.
+- Once all the variants have been verified and the small variant table is ready for reporting, export the file by clicking on **Export Run QC to TSV** (or save the file if using legacy method) and move to the next step.
+
+**NOTE:** When leaving a comment in the *Class_judgement_comments* column, do not leave empty space as those are not suported by Pronto, replace each space by an underscore.
+
 ## Email Drafts
 
 <br>
@@ -2084,6 +2367,62 @@ done
 
 <br>
 
+#### I need to use IGV for QC but I do not have an IGV port. {#igv-port}
+
+<br>
+
+It is possible to add users so they can get their own IGV port and get an IGV link file created TSOPPI runs. 
+For the IGV link you will need to edit the`config.sh` file in: <code style="white-space: normal; word-break: break-all;">`/ess/p1150/data/durable/software/pipeline/v004_sequencing_at_OUS_WIP`</code> 
+First open `config.sh` with a text editor and find the following lines: TSOPPI_PORT_NUMBER_LABELS= "Name1 Name2 ect..." and add your name to this list.
+```{r QA_IGV_add_name_figure1, echo=FALSE, results='asis'}
+insert.fig.toggle(
+  fig.id = "QA_IGV_add_name_figure1",
+  button.label = "Figure 31",
+  img.src = "fig/QA_IGV_add_name_figure1.png",
+  fig.width = "100%",
+  fig.cap = "Edit config.sh file to add your name in the TSOPPI_PORT_NUMBER_LABELS variable"
+)
+```
+**NOTE:** do not delete any previous names from the config file as this will create problems for older files that have been created previously.
+
+To start IGV with your own port you will need to duplicate an other *bat* file from `${DURABLE}/IGV/IGV_2.19.6` or `${DURABLE}/IGV/IGV_2.16.2`
+Then rename the file duplicated file by changing the port number by the next port number avaliable and the name by your name. E.g.: If the last bat file is `igv_port_60161_Jean-Marc.bat` you can duplicate it and rename it to `igv_port_60162_YourName.bat`.
+```{r QA_IGV_rename_bat_figure2, echo=FALSE, results='asis'}
+insert.fig.toggle(
+  fig.id = "QA_IGV_rename_bat_figure2",
+  button.label = "Figure 32",
+  img.src = "fig/QA_IGV_rename_bat_figure2.png",
+  fig.width = "50%",
+  fig.cap = "Duplicate and rename the .bat file to start IGV with your own port"
+)
+```
+Then open the new renamed *bat* file with a text editor and change the port number in two places (Line 20 and 22, hilighted in red in the figure below) inside the file,  E.g.: if you have assigned the port 60162 to your name, change the port number in the *bat* file to 60162.
+```{r QA_IGV_change_port_number_figure3, echo=FALSE, results='asis'}
+insert.fig.toggle(
+  fig.id = "QA_IGV_change_port_number_figure3",
+  button.label = "Figure 33",
+  img.src = "fig/QA_IGV_change_port_number_figure3.png",
+  fig.width = "100%",
+  fig.cap = "Change the port number in the .bat file"
+)
+```
+
+#### I am using IGV for QC for the first time and want to configure it with the correct settings. {#igv-settings}
+ - First you want to see the softclip base: go to *Preferences* &rarr; *Alignments* &rarr; *Show soft-clip bases*
+ - Then you can display a line arround the base of interest: go to *Preferences* &rarr; *Alignments* &rarr; *Show center line*
+ - Adjusting downsampling: IGV is downsampling reads, this can be a problem with samples with low VAF where the number of mutations found can be variable. Increasing this number resolves the problem. 
+ To adjust the downsampling, find the *Downsampling* section in *Preferences* &rarr; *Alignments*. You can turn off downsampling all together by ticking off *Downsample reads*.
+ You can also keep downsampling but increase the number of reads per window (e.g.: from 100 to 1000). 
+```{r QA_IGV_setting_figure4, echo=FALSE, results='asis'}
+insert.fig.toggle(
+  fig.id = "QA_IGV_setting_figure4",
+  button.label = "Figure 34",
+  img.src = "fig/QA_IGV_setting_figure4.png",
+  fig.width = "100%",
+  fig.cap = "Edit IGV settings to show softclip bases, center line and adjust downsampling"
+)
+```
+
 ### Additional information on undescribed variables in the README: 
 
 <br>
@@ -2097,9 +2436,9 @@ INFO_FILE_NAME="SampleSheet_${{RUN_DATE}}_info.csv"
 INFO_FILE_NAME_TSOPPI="SampleSheet_${{RUN_DATE}}_info_TSOPPI.csv"
 PIPELINE_FOLDER = "${{DURABLE}}/software/pipeline/v003_upgrading_pronto_to_1.2.0"'), "\n")
 ```
+ 
 
 
-  
 <!-- 
 
 sudo apptainer build create_fusviz_input.sif Singularity
