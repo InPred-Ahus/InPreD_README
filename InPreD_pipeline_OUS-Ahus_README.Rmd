@@ -997,7 +997,9 @@ bash run_QC_sif.sh $RUN_ID
 <br>
 
   - The QC step is manually done, the estimated time is variable as it depends on the number of samples within a `$RUN_ID` and the number of mutations predicted in a given sample.
-  - When QC is ready for one sample, the curator will download a file named `$RUN_ID/{sample_ID}/{sample_ID}_QC.tsv`, it contains the following columns:
+  - To do the QC follow the instruction in [section 0.0.0](#QC-instructions)
+
+  - When QC is ready for one sample, the curator will download a file named `$RUN_ID/{sample_ID}/{sample_ID}_QC.tsv`, it contains the following columns: <a id="Export_tsv_QC"></a>
     - QC status: *OK* or *.*
     - Curator comments (if any)
     - Selection criteria: *include* or *exclude*
@@ -1428,7 +1430,7 @@ insert.fig.toggle(
   fig.cap = "Open the IGV bat file to start IGV"
 )
 ```
- **NOTE:** If you do not have a bat file at your name see the Q & A [section 10.8.3](#igv-port) to create one.
+ **NOTE:** If you do not have a bat file at your name see the Q & A [section 0.0.0](#igv-port) to create one.
  
 - Click "ok" if some errors appears and once IGV is open click on: *Genomes* &rarr; *Load Genome from File* &rarr; select *hg19_TSO500_2.0.0.70.genome* 
 ```{r IGV_reference_genome, echo=FALSE, results='asis'}
@@ -1475,7 +1477,7 @@ insert.fig.toggle(
 
 <br>
 
-### QC using the html file
+### QC using the html file {#QC-instructions}
 
 <br>
 
@@ -1514,8 +1516,9 @@ insert.fig.toggle(
 )
 ```
 - When QC is finished and ready to be exported click on **Export Run QC to TSV**.
-- The exported TSV file is now ready to be used for the next steps of the pipeline.
+- The exported TSV file is now ready to be used for the [next steps of the pipeline](#Export_tsv_QC).
 
+**NOTE:** See section [0.0.0](#QC-method) below for learning how to do the QC.
 
 ### Prepare small variant table (Legacy method)
 
@@ -1580,7 +1583,7 @@ insert.fig.toggle(
 
 <br>
 
-### Do the QC
+### Do the QC {#QC-method}
 
 <br>
 
@@ -1638,7 +1641,7 @@ insert.fig.toggle(
 - For each suported variant write **OK** in both the *IGV_QC* and the *Run_QC* columns.
 - If a **include** variant is not suported by the BAM file it is important to change the *Class_judgement* to **exclude** and write in the *Reporting_judgement_comments* column the reason for the exclusion (e.g.: Alignement problem, etc...).
 - In multiple variants are on the same exon, and they are probably part of the same event, keep the one that makje the most sense and exclude the other and write a comment.
-- Once all the variants have been verified and the small variant table is ready for reporting, export the file by clicking on **Export Run QC to TSV** (or save the file if using legacy method) and move to the next step.
+- Once all the variants have been verified and the small variant table is ready for reporting, export the file by clicking on **Export Run QC to TSV** (or save the file if using legacy method) and move to the [next steps of the pipeline.](#Export_tsv_QC)
 
 **NOTE:** When leaving a comment in the *Class_judgement_comments* column, do not leave empty space as those are not suported by Pronto, replace each space by an underscore.
 
@@ -2367,9 +2370,12 @@ done
 
 <br>
 
-#### I need to use IGV for QC but I do not have an IGV port. {#igv-port}
+### I am new to QC and want to use IGV on the TSD
 
 <br>
+
+#### I need to use IGV for QC but I do not have an IGV port. {#igv-port}
+
 
 It is possible to add users so they can get their own IGV port and get an IGV link file created TSOPPI runs. 
 For the IGV link you will need to edit the`config.sh` file in: <code style="white-space: normal; word-break: break-all;">`/ess/p1150/data/durable/software/pipeline/v004_sequencing_at_OUS_WIP`</code> 
@@ -2407,7 +2413,12 @@ insert.fig.toggle(
 )
 ```
 
+<br>
+
 #### I am using IGV for QC for the first time and want to configure it with the correct settings. {#igv-settings}
+
+<br>
+
  - First you want to see the softclip base: go to *Preferences* &rarr; *Alignments* &rarr; *Show soft-clip bases*
  - Then you can display a line arround the base of interest: go to *Preferences* &rarr; *Alignments* &rarr; *Show center line*
  - Adjusting downsampling: IGV is downsampling reads, this can be a problem with samples with low VAF where the number of mutations found can be variable. Increasing this number resolves the problem. 
@@ -2422,6 +2433,9 @@ insert.fig.toggle(
   fig.cap = "Edit IGV settings to show softclip bases, center line and adjust downsampling"
 )
 ```
+
+
+<br>
 
 ### Additional information on undescribed variables in the README: 
 
@@ -2446,3 +2460,23 @@ sudo apptainer build create_fusviz_input.sif Singularity
 singularity run create_fusviz_input.sif -s ../../examples/prepare_fusviz_tables/variant_summary.tsv -m ../../examples/prepare_fusviz_tables/sample1_fusion_and_splice_variant_candidates.tsv -o TEST.txt 
 
 -->
+
+
+```{r fix_section_refs, echo=FALSE, results='asis'}
+writeLines(r"(
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  document.querySelectorAll('a[href^="#"]').forEach(function(link) {
+    var id = link.getAttribute("href").slice(1);
+    var target = document.getElementById(id);
+    if (target) {
+      var numSpan = target.querySelector(".header-section-number");
+      if (numSpan) {
+        link.textContent = link.textContent.replace(/\d+(\.\d+)+/, numSpan.textContent.trim());
+      }
+    }
+  });
+});
+</script>
+)")
+```
