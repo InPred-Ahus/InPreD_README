@@ -1469,7 +1469,7 @@ insert.fig.toggle(
   fig.cap = "Change from exlude to include or the opposite and write the reason for exclusion in the Class_judgement_comments column"
 )
 ```
-- When QC is finished and ready to be exported click on  **Export Run QC to TSV**.
+- When QC is finished and ready to be exported click on **Export Run QC to TSV**.
 - The exported TSV file is now ready to be used for the next steps of the pipeline.
 
 
