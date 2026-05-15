@@ -37,7 +37,7 @@ run.id.date     <- ""
 # Replace the old ID for the new one
 args   <-  params$args
 run.id <- args[1]
-run.id <- "260213_A02134_0129_BHJNFNDRX7"
+#run.id <- "260213_A02134_0129_BHJNFNDRX7"
 #         "250606_AAAAAAAA_BBBB_CCCCCCCCCC"   # ID template
 
 # 260123_NB552811_0121_AHL7KWBGYX
