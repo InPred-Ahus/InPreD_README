@@ -873,7 +873,7 @@ SAMPLE_IDs=( "SAMPLE1" "SAMPLE_2" ... "SAMPLE_3" )
 
 <br>
 
-  - **NOTE**: originally this step was done manually, now we added the code below to do it automatically.
+  - **NOTE**: originally this step was done manually, now we added the code below to do it automatically. <a id="ARRAY_STRING"></a>
 
 ```{bash, echo=TRUE, eval = FALSE}
 # Get sorted sample IDs from SampleSheet
@@ -882,7 +882,7 @@ DNA_TUMOUR_SAMPLE_IDS=$(cut -d';' -f1 ${SAMPLESHEETS_FOLDER}/${INFO_FILE_NAME} |
 
 # Build array declaration string
 ARRAY_STRING="SAMPLE_IDs=("
-while IFS= read -r id; do
+while IFS= read -r id; doß
     ARRAY_STRING+=" \"$id\""
 done <<< "$DNA_TUMOUR_SAMPLE_IDS"
 ARRAY_STRING+=" )"
@@ -1578,7 +1578,7 @@ insert.fig.toggle(
 - Compare the tumor content estimated by cytology with the pureCN solution 1, there is no specific threshold for difference but large differences (eg: more than 20%) should be reported.
 
 
-**NOTE:** This is the legacy method and an already made html file is also availiable to do the QC instead. To use it for QC see section XX.
+**NOTE:** This is the legacy method and an already made html file is also availiable to do the QC instead. To use the html file for QC see section [0.0.0 QC using the html file](#QC-instructions).
 
 
 <br>
@@ -2480,3 +2480,63 @@ document.addEventListener("DOMContentLoaded", function() {
 </script>
 )")
 ```
+
+### How can I run TSOPPI, ICNVA and PRONTO without Colossus?
+- If Colossus is down and you need to run *TSOPPI* and *ICNVA* you can do it by running the following command in the terminal. **Warning:** This method might not work for all the samples as **TSOPPI** and **ICNVA** might need more memory than what is avliable on the TSD linux machine.
+- Open a new terminal, ssh to the hpc and go to:
+```{bash, echo=TRUE, eval = FALSE}
+cd /ess/p1150/data/durable/software/Ahus_InPreD_toolkit/Run_pipeline_locally
+```
+- For TSOPPI first generate the TSOPPI config file by running the following command:
+```{bash, echo=TRUE, eval = FALSE}
+python scripts/generate_config_file.py -r ${RUN_ID} -i ${DURABLE}/TSO500_SampleSheets/SampleSheet_${RUN_DATE}_info.csv -s ";" -c 1 -t 2 -u 3 -q 3 > config_${RUN_ID}.sh
+```
+
+- Then execute the script execute_TSOPPI_TEMPORARY to get all the commands needed to run TSOPPI for each samples
+
+```{bash, echo=TRUE, eval = FALSE}
+bash scripts/get_commands_execute_TSOPPI_locally.sh ./config.sh ${RUN_ID} config_${RUN_ID}.sh
+```
+
+- Then run each command one by one for each sample, e.g.:
+<code style="white-space: normal; word-break: break-all;">`r paste0("/ess/p1150/data/durable/software/pipeline/v004_sequencing_at_OUS_WIP/scripts/TSOPPI_one_patient.sbatch ./config.sh 250606_AAAAAAAA_BBBB_CCCCCCCCCC IPA0123_D01-d01-A01 /ess/p1150/data/durable/TSO500_analyses/250606_AAAAAAAA_BBBB_CCCCCCCCCC_TSO500_LocalApp_analysis_fromRAW 0.5 3")`</code>
+
+- The same process can be applied to run ICNVA, first get the commands by running for each sample:
+```{bash, echo=TRUE, eval = FALSE}
+bash scripts/get_commands_execute_icnva_locally.sh ./config.sh ${RUN_ID} ${SAMPLE_ID}
+```
+**NOTE:** The sample ID need to be manually changed in the command above for each sample, eg: `IPA0123_D01-d01-A01`
+
+- Then the command to run ICNVA will be writen at the end of the output message, e.g.:
+<code style="white-space: normal; word-break: break-all;">`r paste0("/ess/p1150/data/durable/software/pipeline/v004_sequencing_at_OUS_WIP/scripts/icnva.sbatch config.sh 250606_AAAAAAAA_BBBB_CCCCCCCCCC IPA0123_D01-d01-A01")`</code>
+
+
+**NOTE:** ICNVA uses a lot of ressources and there is an important risk that the process will fail.
+
+- Finally run PRONTO using the same command as usual but pointing to a modified script.
+```{bash, echo=TRUE, eval = FALSE}
+for SAMPLE_ID in ${SAMPLE_IDs[@]}
+do
+      echo "SAMPLE_ID=${SAMPLE_ID}"
+
+      bash scripts/03_generate_and_archive_pronto_report_collect_data_for_export_locally.sh ${RUN_ID} ${SAMPLE_ID} ${SCRIPTS_AND_LOGS_FOLDER}/02_used_scripts/config_${RUN_ID}.sh \
+          > ${SCRIPTS_AND_LOGS_FOLDER}/03_generate_and_archive_pronto_v${PRONTO_VERSION}_report_collect_data_for_export_${SAMPLE_ID}_${RUN_ID}.stdout             \
+          2> ${SCRIPTS_AND_LOGS_FOLDER}/03_generate_and_archive_pronto_v${PRONTO_VERSION}_report_collect_data_for_export_${SAMPLE_ID}_${RUN_ID}.stderr 
+
+done
+```
+**NOTE:** If you want to run PRONTO for multiple samples you will need to recreate the ["$ARRAY_STRING" array.](#ARRAY_STRING)
+
+
+### How can I automatically create this README file on the TSD for each run?
+- To generate this README file on the TSD for a specific run first go to the folder:
+```{bash, echo=TRUE, eval = FALSE}
+cd  /ess/p1150/data/durable/software/Ahus_InPreD_README/
+```
+- Then start the singularity container that generate the README file by running the following command, where you have to replace the RUN_ID e.g.: `${RUN_ID}` by the correct run ID. 
+```{bash, echo=TRUE, eval = FALSE}
+singularity run --bind $(pwd)/InPreD_README-main:/app inpred_readme.sif InPreD_pipeline_OUS-Ahus_README.Rmd ${RUN_ID}
+```
+- The new README file will be generated in: <code style="white-space: normal; word-break: break-all;">`/ess/p1150/data/durable/software/Ahus_InPreD_README/InPreD_README-main`</code>
+
+**NOTE:**  If the Ahus_README github repository has been updated and a new version of the README is availiable you can upload the new version of the file to the TSD and move it to <code style="white-space: normal; word-break: break-all;">`/ess/p1150/data/durable/software/Ahus_InPreD_README/`</code>  
