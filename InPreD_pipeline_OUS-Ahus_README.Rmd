@@ -882,7 +882,7 @@ DNA_TUMOUR_SAMPLE_IDS=$(cut -d';' -f1 ${SAMPLESHEETS_FOLDER}/${INFO_FILE_NAME} |
 
 # Build array declaration string
 ARRAY_STRING="SAMPLE_IDs=("
-while IFS= read -r id; doß
+while IFS= read -r id; do
     ARRAY_STRING+=" \"$id\""
 done <<< "$DNA_TUMOUR_SAMPLE_IDS"
 ARRAY_STRING+=" )"
