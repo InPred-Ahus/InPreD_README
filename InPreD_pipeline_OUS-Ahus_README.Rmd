@@ -1012,6 +1012,9 @@ bash run_QC_sif.sh $RUN_ID
 cd $DURABLE/software/Ahus_InPreD_toolkit/QC
 
 bash update_for_QC.sh $RUN_ID
+
+# Return to the pipeline folder
+cd  /ess/p1150/data/durable/software/pipeline/v004_sequencing_at_OUS_WIP
 ```
 
 <br>
