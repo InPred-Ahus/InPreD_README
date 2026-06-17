@@ -16,6 +16,8 @@ Set up ${DURABLE}	Prepare_Pipeline
 Move LocalApp results	File_Manipulation
 Rename LocalApp Samplesheet	File_Manipulation
 Create LocalApp RUN_ID link	File_Manipulation
+Create TSO500_sequences folder	File_Manipulation
+Create XML decoy file	File_Manipulation
 Move ShampleSheet	File_Manipulation
 Move PRONTO metadata	File_Manipulation
 config.sh : SEPARATOR	Setup

@@ -599,6 +599,23 @@ ln -s ${DURABLE}/TSO500_analyses/${RUN_ID}_TSO500_LocalApp_analysis_fromRAW ${DU
 
 <br>
 
+### Create decoy XML sequencing file
+
+<br>
+
+We need to set up a decoy XML file in *TSO500_sequences* folder, it will be used
+later by *TSOPPI* to display the sequencing metrics plots. 
+The decoy XML file is a copy of the original XML file, but with all fields set to 0.
+
+```{bash, echo=TRUE, eval = FALSE}
+# Create the $RUN_ID folder in TSO500_sequences and copy the decoy XML file
+mkdir -p ${DURABLE}/TSO500_sequences/${RUN_ID} ;
+
+cp ${DURABLE}/TSO500_sequences/decoy_RunCompletionStatus.xml ${DURABLE}/TSO500_sequences/${RUN_ID}/RunCompletionStatus.xml ;
+```
+
+<br>
+
 ### Prepare metadata
 
 <br>
