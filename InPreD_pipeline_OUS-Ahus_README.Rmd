@@ -1806,7 +1806,7 @@ insert.fig.toggle(
 <br>
 
   - On the home page, scroll down after the Welcome and Example modules section.
-  - Select the genome *hg19 (offline)* and upload your text files with the SV details (Figure 24). See question 3 to know how to get the SV tables.
+  - Select the genome *hg19 (offline)* and upload your text files with the SV details (Figure 24). See question 3 to know how to get the SV tables. If an error occur when loading the text file see the Q & A [section 0.0.0](#Error_FuSViz) for troubleshooting.
   
 ```{r load_SV, echo=FALSE, results='asis'}
 insert.fig.toggle(
@@ -2546,6 +2546,44 @@ do
 done
 ```
 **NOTE:** If you want to run PRONTO for multiple samples you will need to recreate the ["$ARRAY_STRING" array.](#ARRAY_STRING)
+
+### I get an error message when I upload the RNA-seq data into FuSViz. {#Error_FuSViz}
+- If you get an error mentioning incorect header or empty value for RNA SV, you need to modify the input table generated during the create fusviz input step. 
+```{r QA_fusviz_error_figure1, echo=FALSE, results='asis'}
+insert.fig.toggle(
+  fig.id = "QA_fusviz_error_figure1",
+  button.label = "Figure 35",
+  img.src = "fig/QA_fusviz_error_figure1.png",
+  fig.width = "100%",
+  fig.cap = "Error displayed by FuSviz when loading the input table generated during the create fusviz input step."
+)
+```
+- This error occurs because the coordinates are associated to two different genes and we need to check manually which gene is the correct one. We will also need to find the strand of the gene. For example in the picture below we can see that for the first fusion two genes are recorded from gene1 and gene2. By comparison the second fusion only has one gene and also has the strand recorded.
+```{r QA_fusviz_error_figure2, echo=FALSE, results='asis'}
+insert.fig.toggle(
+  fig.id = "QA_fusviz_error_figure2",
+  button.label = "Figure 36",
+  img.src = "fig/QA_fusviz_error_figure2.png",
+  fig.width = "100%",
+  fig.cap = "FuSViz input table showing the two different cases of fusions with two genes and no strand information and fusions with one gene and strand information."
+)
+```
+
+- To fix this error we will first need to find the which gene to keep and then manually edit the input table. To find the correct gene to use we can use the UCSC genome browser: https://genome.ucsc.edu/
+- Click on *Genomes* then select *Human GRCh37/hg19*. Now in the search bar you can paste the chromosome and coordinates, e.g.: in our case for gene1 "chr3:185823732".
+- The result of the search will look like the picture below. We can see that ETV5 is the gene present so we will keep this one. You should also zoom out to verify that there are no other gene transcripts overlapping.
+```{r QA_fusviz_error_figure3, echo=FALSE, results='asis'}
+insert.fig.toggle(
+  fig.id = "QA_fusviz_error_figure3",
+  button.label = "Figure 37",
+  img.src = "fig/QA_fusviz_error_figure3.png",
+  fig.width = "100%",
+  fig.cap = "Search result in the UCSC genome browser for the coordinates of gene1 of the first fusion."
+)
+```
+- On the picture we can also see that the strand is negative and it should be also recorded in the input table.
+- Then you can do the same for gene2 and find the correct gene and strand information.
+- Finally you need to check the *span*. In this case the span is missing and need to be replaced by 0. Also be careful when editing that the tabs are correct and that after strand2 two tabs are present.
 
 
 ### How can I automatically create this README file on the TSD for each run?
