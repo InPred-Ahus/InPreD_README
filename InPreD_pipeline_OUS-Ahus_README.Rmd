@@ -2289,13 +2289,13 @@ we usually use for other runs.
 In a nutshell, we have to launch *PRONTO* with the current run *TSOPPI* results
 (containing both DNA and RNA analysis) but using the information of the previous (DNA) run.
 
-For this example we will use the notation **RNA_RUN** for the current run and **DNA_RUN**
-a previous run where the DNA data was sequenced and analyzed.
+For this example we will use the notation **RNA_RUN** for the current run and
+**DNA_RUN** for the previous run where the DNA data was sequenced and analyzed.
 
-1. Updated the `SAMPLE_IDs` variable ONLY for those samples containing both DNA and RNA
-in the same run and launch *PRONTO* as usual.
+1. Update the `SAMPLE_IDs` variable ONLY for those samples containing both DNA
+and RNA in the same run and launch *PRONTO* as usual.
 
-2. Updated the `SAMPLE_IDs` variable ONLY for those samples containing RNA in the 
+2. Update the `SAMPLE_IDs` variable ONLY for those samples containing RNA in the 
 current `${RUN_ID}` and DNA in a previous sequencing run.
 
 ```{bash, echo=TRUE, eval = FALSE}
@@ -2336,7 +2336,7 @@ insert.fig.toggle(
 
 <br>
 
-5. Rename the *TOSPPI* results folders of the samples to be updated from the DNA_RUN
+5. Rename the *TSOPPI* results folders of the samples to be updated from the DNA_RUN
 by adding the prefix *ORIGINAL_*. We keep this renamed folders as a backup.
 
 <br>
@@ -2501,13 +2501,25 @@ document.addEventListener("DOMContentLoaded", function() {
 )")
 ```
 
+<br>
+
 ### How can I run TSOPPI, ICNVA and PRONTO without Colossus?
-- If Colossus is down and you need to run *TSOPPI* and *ICNVA* you can do it by running the following command in the terminal. **Warning:** This method might not work for all the samples as **TSOPPI** and **ICNVA** might need more memory than what is avliable on the TSD linux machine.
+
+<br>
+
+- If Colossus is down and you need to run *TSOPPI* and *ICNVA* you can do it by
+running the following commands in the terminal.
+
+**Warning:** This method might not work for all the samples as **TSOPPI** and
+**ICNVA** might need more memory than what is available on the TSD linux machine.
+
+
 - Open a new terminal, ssh to the hpc and go to:
 ```{bash, echo=TRUE, eval = FALSE}
 cd /ess/p1150/data/durable/software/Ahus_InPreD_toolkit/Run_pipeline_locally
 ```
-- For TSOPPI first generate the TSOPPI config file by running the following command:
+
+- For *TSOPPI*, first generate the *TSOPPI* config file by running the following command:
 ```{bash, echo=TRUE, eval = FALSE}
 python scripts/generate_config_file.py -r ${RUN_ID} -i ${DURABLE}/TSO500_SampleSheets/SampleSheet_${RUN_DATE}_info.csv -s ";" -c 1 -t 2 -u 3 -q 3 > config_${RUN_ID}.sh
 ```
@@ -2547,8 +2559,19 @@ done
 ```
 **NOTE:** If you want to run PRONTO for multiple samples you will need to recreate the ["$ARRAY_STRING" array.](#ARRAY_STRING)
 
+<br>
+
+<br>
+
 ### I get an error message when I upload the RNA-seq data into FuSViz. {#Error_FuSViz}
-- If you get an error mentioning incorect header or empty value for RNA SV, you need to modify the input table generated during the create fusviz input step. 
+
+<br>
+
+If you get an error mentioning incorrect header or empty value for RNA SV, you need
+to modify the input table generated during the create fusviz input step. 
+
+<br>
+
 ```{r QA_fusviz_error_figure1, echo=FALSE, results='asis'}
 insert.fig.toggle(
   fig.id = "QA_fusviz_error_figure1",
@@ -2558,7 +2581,17 @@ insert.fig.toggle(
   fig.cap = "Error displayed by FuSviz when loading the input table generated during the create fusviz input step."
 )
 ```
-- This error occurs because the coordinates are associated to two different genes and we need to check manually which gene is the correct one. We will also need to find the strand of the gene. For example in the picture below we can see that for the first fusion two genes are recorded from gene1 and gene2. By comparison the second fusion only has one gene and also has the strand recorded.
+
+<br>
+
+This error occurs because the coordinates are associated to two different genes
+and we need to check manually which gene is the correct one. We will also need to
+find the strand of the gene. For example in the picture below we can see that for
+the first fusion two genes are recorded from gene1 and gene2. By comparison the
+second fusion only has one gene and also has the strand recorded.
+
+<br>
+
 ```{r QA_fusviz_error_figure2, echo=FALSE, results='asis'}
 insert.fig.toggle(
   fig.id = "QA_fusviz_error_figure2",
@@ -2569,9 +2602,22 @@ insert.fig.toggle(
 )
 ```
 
-- To fix this error we will first need to find the which gene to keep and then manually edit the input table. To find the correct gene to use we can use the UCSC genome browser: https://genome.ucsc.edu/
-- Click on *Genomes* then select *Human GRCh37/hg19*. Now in the search bar you can paste the chromosome and coordinates, e.g.: in our case for gene1 "chr3:185823732".
-- The result of the search will look like the picture below. We can see that ETV5 is the gene present so we will keep this one. You should also zoom out to verify that there are no other gene transcripts overlapping.
+To fix this error we will first need to find  which gene to keep and then manually
+edit the input table. To find the correct gene we can use the (UCSC genome browser)[https://genome.ucsc.edu/]
+
+<br>
+
+- Click on *Genomes* then select *Human GRCh37/hg19*. Now in the search bar you
+can paste the chromosome and coordinates, e.g.: in our case for gene1 "chr3:185823732".
+
+<br>
+
+- The result of the search will look like the picture below. We can see that ETV5
+is the gene overlapping that coordinate so we will keep this one. You should also
+zoom out to verify that there are no other gene transcripts overlapping.
+
+<br>
+
 ```{r QA_fusviz_error_figure3, echo=FALSE, results='asis'}
 insert.fig.toggle(
   fig.id = "QA_fusviz_error_figure3",
@@ -2581,10 +2627,23 @@ insert.fig.toggle(
   fig.cap = "Search result in the UCSC genome browser for the coordinates of gene1 of the first fusion."
 )
 ```
-- On the picture we can also see that the strand is negative and it should be also recorded in the input table.
-- Then you can do the same for gene2 and find the correct gene and strand information.
-- Finally you need to check the *span*. In this case the span is missing and need to be replaced by 0. Also be careful when editing that the tabs are correct and that after strand2 two tabs are present.
 
+<br>
+
+- In the picture we can also see that the strand is negative and it should be also
+recorded in the input table.
+
+<br>
+
+- Then you can do the same for gene2 and find the correct gene and strand information.
+
+<br>
+
+- Finally you need to check the *span*. In this case the span is missing and it is
+replaced by 0. Also be careful when editing that the tabs are correct and that after
+the *strand2* column two tabs are present.
+
+<br>
 
 ### How can I automatically create this README file on the TSD for each run?
 - To generate this README file on the TSD for a specific run first go to the folder:

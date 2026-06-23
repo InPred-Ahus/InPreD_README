@@ -2189,13 +2189,13 @@ we usually use for other runs.
 In a nutshell, we have to launch *PRONTO* with the current run *TSOPPI* results
 (containing both DNA and RNA analysis) but using the information of the previous (DNA) run.
 
-For this example we will use the notation **RNA_RUN** for the current run and **DNA_RUN**
-a previous run where the DNA data was sequenced and analyzed.
+For this example we will use the notation **RNA_RUN** for the current run and
+**DNA_RUN** for a previous run where the DNA data was sequenced and analyzed.
 
-1. Updated the `SAMPLE_IDs` variable ONLY for those samples containing both DNA and RNA
+1. Update the `SAMPLE_IDs` variable ONLY for those samples containing both DNA and RNA
 in the same run and launch *PRONTO* as usual.
 
-2. Updated the `SAMPLE_IDs` variable ONLY for those samples containing RNA in the 
+2. Update the `SAMPLE_IDs` variable ONLY for those samples containing RNA in the 
 current `${RUN_ID}` and DNA in a previous sequencing run.
 
 ```{bash, echo=TRUE, eval = FALSE}
@@ -2236,7 +2236,7 @@ insert.fig.toggle(
 
 <br>
 
-5. Rename the *TOSPPI* results folders of the samples to be updated from the DNA_RUN
+5. Rename the *TSOPPI* results folders of the samples to be updated from the DNA_RUN
 by adding the prefix *ORIGINAL_*. We keep this renamed folders as a backup.
 
 <br>
