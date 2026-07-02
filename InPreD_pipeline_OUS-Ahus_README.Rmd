@@ -1192,6 +1192,39 @@ cp -a 03_generate_and_archive_pronto_report_collect_data_for_export.sh ${SCRIPTS
 cp -a config.sh ${SCRIPTS_AND_LOGS_FOLDER}/03_config.sh
 ```
 
+
+<br>
+
+#### TEMPORARY section generate reports with PRONTO V2 for testing
+
+<br>
+
+First source the PRONTO v2 config file:
+```{bash, echo=TRUE, eval = FALSE}
+source config_PRONTO_v2.sh ${RUN_ID}
+```
+
+Then copy the pronto metadata to the PRONTO V2 folder:
+```{bash, echo=TRUE, eval = FALSE}
+cp -i ${DURABLE}/software/PRONTO/PRONTO-1.2.0/In/InPreD_PRONTO_metadata.txt ${DURABLE}/software/PRONTO/PRONTO-2.1.2/In/InPreD_PRONTO_metadata.txt
+```
+
+Then launch pronto V2:
+
+```{bash, echo=TRUE, eval = FALSE}
+for SAMPLE_ID in ${SAMPLE_IDs[@]}
+do
+      echo "SAMPLE_ID=${SAMPLE_ID}"
+
+      bash 03_generate_and_archive_pronto_report_collect_data_for_export_PRONTO_v2.sh ${RUN_ID} ${SAMPLE_ID} ${SCRIPTS_AND_LOGS_FOLDER}/02_used_scripts/config_${RUN_ID}.sh \
+          > ${EXPORT_ARCHIVE_FOLDER}/Logs_outputs/03_generate_and_archive_pronto_v${PRONTO_VERSION}_report_collect_data_for_export_${SAMPLE_ID}_${RUN_ID}.stdout             \
+          2> ${EXPORT_ARCHIVE_FOLDER}/Logs_outputs/03_generate_and_archive_pronto_v${PRONTO_VERSION}_report_collect_data_for_export_${SAMPLE_ID}_${RUN_ID}.stderr 
+
+done
+```
+
+
+
 <br>
   
 ## Transfer Reports (in TSD) to InPreD/MMOX folder 
