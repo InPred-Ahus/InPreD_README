@@ -2678,6 +2678,10 @@ the *strand2* column two tabs are present.
 
 <br>
 
+**NOTE:** Sometimes a gene name displayed in FuSViz is not matching any names found in the UCSC genome browser. In this case you can use the GeneCards database (https://www.genecards.org/) to find all synonyms of the gene and find the correct one.
+
+<br>
+
 ### How can I automatically create this README file on the TSD for each run?
 - To generate this README file on the TSD for a specific run first go to the folder:
 ```{bash, echo=TRUE, eval = FALSE}
