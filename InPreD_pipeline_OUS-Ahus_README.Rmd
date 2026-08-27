@@ -869,7 +869,7 @@ cp -a config.sh ${SCRIPTS_AND_LOGS_FOLDER}/02_config.sh
 
 [*ICNVA*](https://tsoppi.readthedocs.io/en/latest/ICNVA.html) runs two types of analysis on each input sample:
 
-  - Allele-specific copy number analysis performed by *PureCN* (LoH assessment.)
+  - Allele-specific copy number analysis performed by *PureCN* (LoH assessment).
   - Normalized read coverage (NRC) profile plotting for selected genes (identify/confirm intra-genic duplications/losses).
 
   - An in-house set of controls is utilized during both analyses.
@@ -954,10 +954,6 @@ cp -a config.sh ${SCRIPTS_AND_LOGS_FOLDER}/025_config.sh
 
 <br>
 
-> **⚠️ Important: Send an email to the local InPreD team** to tell them that *TSOPPI* and *ICNVA* analyses are ready and they can proceed with QC. You can find a draft in the *Email Drafts* section below in this document.
-
-<br>
-
   
 ### Prepare predisposition tables
 
@@ -1011,6 +1007,63 @@ cd $DURABLE/software/Ahus_InPreD_toolkit/QC
 bash run_QC_sif.sh $RUN_ID
 ```
 
+  - Now we create a copy of all the files needed to be loaded in the *IGV* session: genome, annotations, manifest, BAM files, indexes and cytobands.
+
+```{bash, echo=TRUE, eval = FALSE}
+# Temporary file to save genomic files to load in IGV
+IGV_FILES=${DURABLE}/TSO500_postprocessing/${RUN_ID}_TSOPPI_v0.3.2_main_2022_06_07/IGV
+mkdir -p ${IGV_FILES}
+
+# Create a copy of all the needed files to load in the IGV session
+FUSVIZ_DIR=${DURABLE}/software/fusviz
+cp ${FUSVIZ_DIR}/cytoBand.txt ${IGV_FILES}/cytoBand.txt      # Cytobands
+cp ${FUSVIZ_DIR}/hg19.fasta ${IGV_FILES}/hg19.fasta          # Human genome sequence
+cp ${FUSVIZ_DIR}/hg19.fasta.fai ${IGV_FILES}/hg19.fasta.fai  # Index
+
+
+IGV_DIR=${DURABLE}/IGV/
+IGV_REF_DIR=${IGV_DIR}/referece_data_TSO500_ruo_v.2.0.0.70
+cp ${IGV_REF_DIR}/pepe_blacklist.bed.gz ${IGV_FILES}/pepe_blacklist.bed.gz                # BL regions
+cp ${IGV_REF_DIR}/pepe_blacklist_sorted.bed.gz.tbi ${IGV_FILES}/pepe_blacklist.bed.gz.tbi # Index
+
+cp ${IGV_REF_DIR}/TST500C_manifest_sorted.bed.gz ${IGV_FILES}/TST500C_manifest_sorted.bed.gz         # TSO500 regions
+cp ${IGV_REF_DIR}/TST500C_manifest_sorted.bed.gz.tbi ${IGV_FILES}/TST500C_manifest_sorted.bed.gz.tbi # Index
+
+cp ${IGV_REF_DIR}/hg19_ncbiRefSeq.txt ${IGV_FILES}/hg19_ncbiRefSeq.txt # Annotations
+
+LOCALAPP_FOLDER=${DURABLE}/TSO500_analyses/${RUN_ID}_TSO500_LocalApp_analysis_fromRAW/Logs_Intermediates
+LOCALAPP_DNA_FOLDER=${LOCALAPP_FOLDER}/StitchedRealigned
+LOCALAPP_RNA_FOLDER=${LOCALAPP_FOLDER}/RnaMarkDuplicates
+
+TUMOUR_SAMPLE_IDS=$(cut -d';' -f1 ${SAMPLESHEETS_FOLDER}/${INFO_FILE_NAME} | awk -F'-' '$2 ~ /D0[[:digit:]]+/' | sort)
+
+# Build array declaration string
+SAMPLES_ARRAY_STRING="SAMPLE_IDs=("
+while IFS= read -r id; do
+    SAMPLES_ARRAY_STRING+=" \"$id\""
+done <<< "$TUMOUR_SAMPLE_IDS"
+SAMPLES_ARRAY_STRING+=" )"
+
+# Evaluate the string to create the array variable
+eval "$SAMPLES_ARRAY_STRING"
+
+for SAMPLE_ID in ${SAMPLE_IDs[@]}
+do
+      SAMPLE_FOLDER=${IGV_FILES}/${SAMPLE_ID} ;
+      mkdir -p ${SAMPLE_FOLDER}
+      
+      echo "; Copying DNA BAM file + index : ${SAMPLE_ID}"
+      cp ${LOCALAPP_DNA_FOLDER}/${SAMPLE_ID}/${SAMPLE_ID}.bam ${SAMPLE_FOLDER}/${SAMPLE_ID}.bam         # DNA BAM
+      cp ${LOCALAPP_DNA_FOLDER}/${SAMPLE_ID}/${SAMPLE_ID}.bam.bai ${SAMPLE_FOLDER}/${SAMPLE_ID}.bam.bai # Index
+      
+      SAMPLE_ID_RNA="${SAMPLE_ID//-D01-/-R03-}"
+      echo "; Copying RNA BAM file + index : ${SAMPLE_ID}"
+      cp ${LOCALAPP_RNA_FOLDER}/${SAMPLE_ID_RNA}/${SAMPLE_ID_RNA}.bam ${SAMPLE_FOLDER}/${SAMPLE_ID_RNA}.bam         # RNA BAM
+      cp ${LOCALAPP_RNA_FOLDER}/${SAMPLE_ID_RNA}/${SAMPLE_ID_RNA}.bam.bai ${SAMPLE_FOLDER}/${SAMPLE_ID_RNA}.bam.bai # Index
+      
+done
+```
+
 <br>
 
   - The QC step is manually done, the estimated time is variable as it depends on the number of samples within a `$RUN_ID` and the number of mutations predicted in a given sample.
@@ -1022,7 +1075,7 @@ bash run_QC_sif.sh $RUN_ID
     - Selection criteria: *include* or *exclude*
   - As *PRONTO* requires these columns in a specific file (namely `$RUN_ID/{sample_ID}/{sample_ID}_small_variants_table_forQC.tsv`), the QC process ends when we fill up this file wit the QC information.
   - To avoid mistakes when doing manual copy-paste, we can run a script that takes the columns in the `*QC.tsv` (curator comments) and add them in the `*_small_variants_table_forQC.tsv`
-  - The script will print the number of succesfully processed files and the failures (if any).
+  - The script will print the number of successfully processed files and the failures (if any).
 
 ```{bash, echo=TRUE, eval = FALSE}
 # Launch image from QC folder
@@ -1032,45 +1085,9 @@ bash update_for_QC.sh $RUN_ID
 
 # Return to the pipeline folder
 cd  /ess/p1150/data/durable/software/pipeline/v004_sequencing_at_OUS_WIP
-```
 
-<br>
-
-#### Converting xlsx file (023)
-
-> **⚠️ Important: the next step (xlsx conversion) may not be required anymore since we are doing the QQ ourselves, and do not use a *xlsx* file to do so.**
-
-For the moment we leave this section in the README for legacy purposes, but
-we are not using it anymore since we (bioinformaticians) are doing the QC and
-we are doing without using *excel*.
-
-Convert QC-ed small variables tables, from *xlsx* back to *tsv* format.
-
-Running time: ~1 minute
-
-```{bash, echo=TRUE, eval = FALSE}
-for SAMPLE_ID in ${SAMPLE_IDs[@]}
-do
-      echo "SAMPLE_ID=${SAMPLE_ID}"
-      echo "RUN_ID=${RUN_ID}"
-      
-      bash 023c_convert_variant_table_forQC_xlsx_to_tsv.sh \
-          config.sh                 \
-          ${RUN_ID}                 \
-          ${SAMPLE_ID}              \
-          > ${SCRIPTS_AND_LOGS_FOLDER}/023c_convert_variant_table_forQC_xlsx_to_tsv_${SAMPLE_ID}_${RUN_ID}.stdout \
-          2> ${SCRIPTS_AND_LOGS_FOLDER}/023c_convert_variant_table_forQC_xlsx_to_tsv_${SAMPLE_ID}_${RUN_ID}.stderr &
-done
-```
-
-<br>
-
-  - Once this analysis is done, copy the logs and scripts for this sequencing run in
-the `${SCRIPTS_AND_LOGS_FOLDER}` folder.
-
-```{bash, echo=TRUE, eval = FALSE}
-cp -a 023c_convert_variant_table_forQC_xlsx_to_tsv.sh ${SCRIPTS_AND_LOGS_FOLDER}
-cp -a config.sh ${SCRIPTS_AND_LOGS_FOLDER}/023_config.sh
+# Remove copy of genomic files
+rm -rf ${IGV_FILES}
 ```
 
 <br>
@@ -1526,8 +1543,6 @@ insert.fig.toggle(
  - prefrence - alignement - show center line
  - Always re initialise session when changing track or remove or adding track
  
-
-
 <br>
 
 ### QC using the html file {#QC-instructions}
@@ -1536,6 +1551,7 @@ insert.fig.toggle(
 
 - Open the html file ending by **QC_variants.html** for the sample being QC eg: **IPA0123_D01-d01-A01_QC_variants.html**
 - On top of the file there is a table which summarise the concordance between DNA and RNA for the sample being QC, the patient gender between the metadata and pureCN and the tumor content estimated by cytology and the three first pureCN solutions (use solution 1).
+
 ```{r QC_variant_html_table_top_figure12, echo=FALSE, results='asis'}
 insert.fig.toggle(
   fig.id = "QC_variant_html_table_top_figure12",
@@ -1547,6 +1563,7 @@ insert.fig.toggle(
 ```
 
 - You can use the filter to only display the variant of interest, e.g.: only the **include** variants in the column *Class_judgement* or only the **coding** variants.
+
 ```{r QC_variants_html_filter_figure13, echo=FALSE, results='asis'}
 insert.fig.toggle(
   fig.id = "QC_variants_html_filter_figure13",
@@ -1559,6 +1576,7 @@ insert.fig.toggle(
 
 - Once a variant is checked click on **OK** in the IGV_QC column.
 - If a variant needs to be excluded click on **exclude** in the Class_judgement column and write the reason for the exclusion in the Class_judgement_comments column. **NOTE:** When leaving a comment in the *Class_judgement_comments* column, you can leave empty space and those will be replaced by underscore during export to tsv. Empty space are not supported by Pronto.
+
 ```{r QC_variant_html_include_exclude_figure14, echo=FALSE, results='asis'}
 insert.fig.toggle(
   fig.id = "QC_variant_html_include_exclude_figure14",
@@ -1568,6 +1586,7 @@ insert.fig.toggle(
   fig.cap = "Change from exlude to include or the opposite and write the reason for exclusion in the Class_judgement_comments column"
 )
 ```
+
 - When QC is finished and ready to be exported click on **Export Run QC to TSV**.
 - The exported TSV file is now ready to be used for the [next steps of the pipeline](#Export_tsv_QC).
 
@@ -1577,6 +1596,7 @@ insert.fig.toggle(
 
 - Open excel and open the small variant table (.tsv file)) e.g.:*IPA0123_D01-d01-A01_small_variant_table.tsv"* situated in in <code style="white-space: normal; word-break: break-all;">`r paste0("${DURABLE}/TSO500_postprocessing/", run.id, "_TSO500_TSOPPI_v0.3.2_main_2022_06_07/IPA0123")`</code> 
 - In the text import wizard from excel select *Delimited* and click on *Next*.
+
 ```{r QC_variant_import_tsv_delimited, echo=FALSE, results='asis'}
 insert.fig.toggle(
   fig.id = "QC_variant_import_tsv_delimited",
