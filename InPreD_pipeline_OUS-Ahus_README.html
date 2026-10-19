@@ -1747,7 +1747,7 @@ border-radius: 0px;
 <h1 class="title toc-ignore">InPreD_README</h1>
 <h4 class="author">Jaime Abraham Castro-Mondragon &amp; Jean-Marc
 Costanzi</h4>
-<h4 class="date">Last update: 2026-08-27</h4>
+<h4 class="date">Last update: 2026-10-19</h4>
 
 </div>
 
@@ -2488,7 +2488,7 @@ analysis</h3>
 runs two types of analysis on each input sample:</p>
 <ul>
 <li><p>Allele-specific copy number analysis performed by <em>PureCN</em>
-(LoH assessment.)</p></li>
+(LoH assessment).</p></li>
 <li><p>Normalized read coverage (NRC) profile plotting for selected
 genes (identify/confirm intra-genic duplications/losses).</p></li>
 <li><p>An in-house set of controls is utilized during both
@@ -2621,6 +2621,63 @@ script.</li>
 cd $DURABLE/software/Ahus_InPreD_toolkit/QC
 
 bash run_QC_sif.sh $RUN_ID</code></pre>
+<ul>
+<li>Now we create a copy of all the files needed to be loaded in the
+<em>IGV</em> session: genome, annotations, manifest, BAM files, indexes
+and cytobands.</li>
+</ul>
+<pre class="bash"><code># Temporary file to save genomic files to load in IGV
+IGV_FILES=${DURABLE}/TSO500_postprocessing/${RUN_ID}_TSOPPI_v0.3.2_main_2022_06_07/IGV
+mkdir -p ${IGV_FILES}
+
+# Create a copy of all the needed files to load in the IGV session
+FUSVIZ_DIR=${DURABLE}/software/fusviz
+cp ${FUSVIZ_DIR}/cytoBand.txt ${IGV_FILES}/cytoBand.txt      # Cytobands
+cp ${FUSVIZ_DIR}/hg19.fasta ${IGV_FILES}/hg19.fasta          # Human genome sequence
+cp ${FUSVIZ_DIR}/hg19.fasta.fai ${IGV_FILES}/hg19.fasta.fai  # Index
+
+
+IGV_DIR=${DURABLE}/IGV/
+IGV_REF_DIR=${IGV_DIR}/referece_data_TSO500_ruo_v.2.0.0.70
+cp ${IGV_REF_DIR}/pepe_blacklist.bed.gz ${IGV_FILES}/pepe_blacklist.bed.gz                # BL regions
+cp ${IGV_REF_DIR}/pepe_blacklist_sorted.bed.gz.tbi ${IGV_FILES}/pepe_blacklist.bed.gz.tbi # Index
+
+cp ${IGV_REF_DIR}/TST500C_manifest_sorted.bed.gz ${IGV_FILES}/TST500C_manifest_sorted.bed.gz         # TSO500 regions
+cp ${IGV_REF_DIR}/TST500C_manifest_sorted.bed.gz.tbi ${IGV_FILES}/TST500C_manifest_sorted.bed.gz.tbi # Index
+
+cp ${IGV_REF_DIR}/hg19_ncbiRefSeq.txt ${IGV_FILES}/hg19_ncbiRefSeq.txt # Annotations
+
+LOCALAPP_FOLDER=${DURABLE}/TSO500_analyses/${RUN_ID}_TSO500_LocalApp_analysis_fromRAW/Logs_Intermediates
+LOCALAPP_DNA_FOLDER=${LOCALAPP_FOLDER}/StitchedRealigned
+LOCALAPP_RNA_FOLDER=${LOCALAPP_FOLDER}/RnaMarkDuplicates
+
+TUMOUR_SAMPLE_IDS=$(cut -d&#39;;&#39; -f1 ${SAMPLESHEETS_FOLDER}/${INFO_FILE_NAME} | awk -F&#39;-&#39; &#39;$2 ~ /D0[[:digit:]]+/&#39; | sort)
+
+# Build array declaration string
+SAMPLES_ARRAY_STRING=&quot;SAMPLE_IDs=(&quot;
+while IFS= read -r id; do
+    SAMPLES_ARRAY_STRING+=&quot; \&quot;$id\&quot;&quot;
+done &lt;&lt;&lt; &quot;$TUMOUR_SAMPLE_IDS&quot;
+SAMPLES_ARRAY_STRING+=&quot; )&quot;
+
+# Evaluate the string to create the array variable
+eval &quot;$SAMPLES_ARRAY_STRING&quot;
+
+for SAMPLE_ID in ${SAMPLE_IDs[@]}
+do
+      SAMPLE_FOLDER=${IGV_FILES}/${SAMPLE_ID} ;
+      mkdir -p ${SAMPLE_FOLDER}
+      
+      echo &quot;; Copying DNA BAM file + index : ${SAMPLE_ID}&quot;
+      cp ${LOCALAPP_DNA_FOLDER}/${SAMPLE_ID}/${SAMPLE_ID}.bam ${SAMPLE_FOLDER}/${SAMPLE_ID}.bam         # DNA BAM
+      cp ${LOCALAPP_DNA_FOLDER}/${SAMPLE_ID}/${SAMPLE_ID}.bam.bai ${SAMPLE_FOLDER}/${SAMPLE_ID}.bam.bai # Index
+      
+      SAMPLE_ID_RNA=&quot;${SAMPLE_ID//-D01-/-R03-}&quot;
+      echo &quot;; Copying RNA BAM file + index : ${SAMPLE_ID}&quot;
+      cp ${LOCALAPP_RNA_FOLDER}/${SAMPLE_ID_RNA}/${SAMPLE_ID_RNA}.bam ${SAMPLE_FOLDER}/${SAMPLE_ID_RNA}.bam         # RNA BAM
+      cp ${LOCALAPP_RNA_FOLDER}/${SAMPLE_ID_RNA}/${SAMPLE_ID_RNA}.bam.bai ${SAMPLE_FOLDER}/${SAMPLE_ID_RNA}.bam.bai # Index
+      
+done</code></pre>
 <p><br></p>
 <ul>
 <li><p>The QC step is manually done, the estimated time is variable as
@@ -2644,7 +2701,7 @@ information.</p></li>
 script that takes the columns in the <code>*QC.tsv</code> (curator
 comments) and add them in the
 <code>*_small_variants_table_forQC.tsv</code></p></li>
-<li><p>The script will print the number of succesfully processed files
+<li><p>The script will print the number of successfully processed files
 and the failures (if any).</p></li>
 </ul>
 <pre class="bash"><code># Launch image from QC folder
@@ -2653,7 +2710,10 @@ cd $DURABLE/software/Ahus_InPreD_toolkit/QC
 bash update_for_QC.sh $RUN_ID
 
 # Return to the pipeline folder
-cd  /ess/p1150/data/durable/software/pipeline/v004_sequencing_at_OUS_WIP</code></pre>
+cd  /ess/p1150/data/durable/software/pipeline/v004_sequencing_at_OUS_WIP
+
+# Remove copy of genomic files
+rm -rf ${IGV_FILES}</code></pre>
 <p><br></p>
 </div>
 <div id="create-intersection-reports" class="section level3" number="5.6">
@@ -2662,9 +2722,8 @@ reports</h3>
 <p><br></p>
 <p>Run the following commands to generate an <em>HTML</em> document
 showing the biomarkers found in the small variant tables after QC.</p>
-<pre class="bash"><code># Launch image from create_fusviz_input folder
+<pre class="bash"><code># Launch image Intersection folder
 cd $DURABLE/software/Ahus_InPreD_toolkit/Intersection
-
 
 singularity run                                        \
 -B /ess/p1150/data/durable/TSO500_postprocessing:/data \
@@ -3527,13 +3586,14 @@ of aligned and discordant reads supporting the fusion events:
 <code>${DURABLE}/TSO500_postprocessing/${RUN_ID}/${SAMPLE_ID}/${SAMPLE_ID}_fusion_and_splice_variant_candidates.tsv</code></p></li>
 </ul></li>
 </ul>
-<pre><code>RUN_ID=&quot;&quot;</code></pre>
+<pre><code>RUN_ID=&quot;&quot;
+DURABLE=&quot;/tsd/p1150/data/durable&quot; </code></pre>
 <pre class="bash"><code># Launch image from create_fusviz_input folder
 cd $DURABLE/software/fusviz/create_fusviz_input
 
 # Set this variables before launch the image
 TSOPPI_RESULTS=&quot;${DURABLE}/TSO500_postprocessing&quot;
-FUSVIZ_TAB_RESULTS=&quot;~/fusviz/${RUN_ID}&quot;
+FUSVIZ_TAB_RESULTS=&quot;${HOME}/fusviz/${RUN_ID}&quot;
 
 # Results are exported here, then moved to the actual working directory
 mkdir -p ${FUSVIZ_TAB_RESULTS}

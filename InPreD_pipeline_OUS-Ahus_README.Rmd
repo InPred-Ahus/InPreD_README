@@ -1101,9 +1101,8 @@ in the small variant tables after QC.
 
 
 ```{bash, echo=TRUE, eval = FALSE}
-# Launch image from create_fusviz_input folder
+# Launch image Intersection folder
 cd $DURABLE/software/Ahus_InPreD_toolkit/Intersection
-
 
 singularity run                                        \
 -B /ess/p1150/data/durable/TSO500_postprocessing:/data \
@@ -1775,7 +1774,8 @@ Jaime & Jean-Marc
   
 We have created a ready-to-use *image* to generate the input required by *FusViz* from the mutations detected in the pipeline. In a nutshell: it verifies the directionality of the fusion by detecting the upstream gene, then search the genes strands and report the aligned and discordant reads supporting the fusion event.
 
-The gene *strand* is provided in the resulting table because this image already contains a file with the gene strand of each human gene (genome version: hg19).
+The gene *strand* is provided in the resulting table because this image already
+contains a file with the gene strand of each human gene (genome version: hg19).
 
 <br>
 
@@ -1791,7 +1791,8 @@ The gene *strand* is provided in the resulting table because this image already 
 
 
 ```{r env_var_fusviz, echo=FALSE, eval = TRUE, comment=""}
-cat(glue('RUN_ID="{run.id}"'))
+cat(glue('RUN_ID="{run.id}"
+DURABLE="/tsd/p1150/data/durable"'), "\n")
 ```
 
 
@@ -1801,7 +1802,7 @@ cd $DURABLE/software/fusviz/create_fusviz_input
 
 # Set this variables before launch the image
 TSOPPI_RESULTS="${DURABLE}/TSO500_postprocessing"
-FUSVIZ_TAB_RESULTS="~/fusviz/${RUN_ID}"
+FUSVIZ_TAB_RESULTS="${HOME}/fusviz/${RUN_ID}"
 
 # Results are exported here, then moved to the actual working directory
 mkdir -p ${FUSVIZ_TAB_RESULTS}
