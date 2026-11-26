@@ -2715,3 +2715,27 @@ singularity run --bind $(pwd)/InPreD_README-main:/app inpred_readme.sif InPreD_p
 - The new README file will be generated in: <code style="white-space: normal; word-break: break-all;">`/ess/p1150/data/durable/software/Ahus_InPreD_README/InPreD_README-main`</code>
 
 **NOTE:**  If the Ahus_README github repository has been updated and a new version of the README is availiable you can upload the new version of the file to the TSD and move it to <code style="white-space: normal; word-break: break-all;">`/ess/p1150/data/durable/software/Ahus_InPreD_README/`</code>  
+
+
+### How can I test a new version of PRONTO for validation before production
+- You first need to download the updated repository from github
+- If needed you can build a tar image that can be then used to create a sif file with apptainer directy on the TSD use the following command locally:
+```{bash, echo=TRUE, eval = FALSE}
+docker buildx build   --platform linux/amd64   --provenance=false   --output type=docker,dest=./pronto_v3.1.3.tar   -t pronto:3.1.3 .
+```
+- Upload the new PRONTO repository (respecting naming convention) and the tar image to the TSD.
+- On the TSD you can create a new singularity image with the following command:
+```{bash, echo=TRUE, eval = FALSE}
+apptainer build PRONTO_v3.1.3.sif docker-archive://pronto_v3.1.3.tar
+```
+**NOTE:**  The naming convention of the sif need to be respected for the sif to work.
+- For testing only, the following files needs to be updated:
+
+- For production the steps are as follow:
+  - Update the version number in config.sh
+  - Copy the metadata file to the new PRONTO version folder 
+  - Adatpt the configure_PRONTO.ini, edit inpred_node and data_path (you might need to edit more parameters in the future)
+  - For version 3.1.3 we also added the follow line to the generate_report_PRONTO.sbatch file to use the template from the folder instead of the one in the container:
+    ```{bash, echo=TRUE, eval = FALSE}
+    -B ${PRONTO_FOLDER}/In/Template:/pronto/In/Template \
+    ```
