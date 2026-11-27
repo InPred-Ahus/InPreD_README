@@ -1209,37 +1209,6 @@ cp -a config.sh ${SCRIPTS_AND_LOGS_FOLDER}/03_config.sh
 ```
 
 
-<br>
-
-#### TEMPORARY section generate reports with PRONTO V2 for testing
-
-<br>
-
-First source the PRONTO v2 config file:
-```{bash, echo=TRUE, eval = FALSE}
-source config_PRONTO_v2.sh ${RUN_ID}
-```
-
-Then copy the pronto metadata to the PRONTO V2 folder:
-```{bash, echo=TRUE, eval = FALSE}
-cp -i ${DURABLE}/software/PRONTO/PRONTO-1.2.0/In/InPreD_PRONTO_metadata.txt ${DURABLE}/software/PRONTO/PRONTO-2.1.2/In/InPreD_PRONTO_metadata.txt
-```
-
-Then launch pronto V2:
-
-```{bash, echo=TRUE, eval = FALSE}
-for SAMPLE_ID in ${SAMPLE_IDs[@]}
-do
-      echo "SAMPLE_ID=${SAMPLE_ID}"
-
-      bash 03_generate_and_archive_pronto_report_collect_data_for_export_PRONTO_v2.sh ${RUN_ID} ${SAMPLE_ID} ${SCRIPTS_AND_LOGS_FOLDER}/02_used_scripts/config_${RUN_ID}.sh \
-          > ${EXPORT_ARCHIVE_FOLDER}/Logs_outputs/03_generate_and_archive_pronto_v${PRONTO_VERSION}_report_collect_data_for_export_${SAMPLE_ID}_${RUN_ID}.stdout             \
-          2> ${EXPORT_ARCHIVE_FOLDER}/Logs_outputs/03_generate_and_archive_pronto_v${PRONTO_VERSION}_report_collect_data_for_export_${SAMPLE_ID}_${RUN_ID}.stderr 
-
-done
-```
-
-
 
 <br>
   
@@ -2718,6 +2687,7 @@ singularity run --bind $(pwd)/InPreD_README-main:/app inpred_readme.sif InPreD_p
 
 
 ### How can I test a new version of PRONTO for validation before production
+
 - You first need to download the updated repository from github
 - If needed you can build a tar image that can be then used to create a sif file with apptainer directy on the TSD use the following command locally:
 ```{bash, echo=TRUE, eval = FALSE}
@@ -2729,13 +2699,61 @@ docker buildx build   --platform linux/amd64   --provenance=false   --output typ
 apptainer build PRONTO_v3.1.3.sif docker-archive://pronto_v3.1.3.tar
 ```
 **NOTE:**  The naming convention of the sif need to be respected for the sif to work.
-- For testing only, the following files needs to be updated:
-
-- For production the steps are as follow:
-  - Update the version number in config.sh
+  
+#### For testing only:
   - Copy the metadata file to the new PRONTO version folder 
-  - Adatpt the configure_PRONTO.ini, edit inpred_node and data_path (you might need to edit more parameters in the future)
-  - For version 3.1.3 we also added the follow line to the generate_report_PRONTO.sbatch file to use the template from the folder instead of the one in the container:
+  - Adatpt the `configure_PRONTO.ini`, edit inpred_node and data_path (you might need to edit more parameters in the future)
+  - Find the testing scripts in the folder: <code style="white-space: normal; word-break: break-all;">`/ess/p1150/data/durable/software/Ahus_InPreD_toolkit/Test_new_PRONTO_version`</code>
+    - copy `config_PRONTO_v2.sh` and `03_generate_and_archive_pronto_report_collect_data_for_export_PRONTO_v2.sh` to <code style="white-space: normal; word-break: break-all;">`/ess/p1150/data/durable/software/pipeline/v004_sequencing_at_OUS_WIP`</code>
+    - copy `generate_report_PRONTO_v2.sbatch` to <code style="white-space: normal; word-break: break-all;">`/ess/p1150/data/durable/software/pipeline/v004_sequencing_at_OUS_WIP/scripts`</code>
+- Those scripts will need to be updated:
+  - `config_PRONTO_v2.sh` : update the PRONTO version number and the path test folder output: 
+  ```{bash, echo=TRUE, eval = FALSE}
+  REPORTS_ARCHIVE_FOLDER="${TSO500_ARCHIVE_FOLDER}/TS0500_MTB_report/MTB_report_PRONTO_V2"
+  EXPORT_ARCHIVE_FOLDER="${TSD_PREFIX}/TS0500_export_for_interpretation/Test_PRONTO_V2"
+  ```
+  - `03_generate_and_archive_pronto_report_collect_data_for_export_PRONTO_v2.sh`: update the config file source and the path test folder output:
+  ```{bash, echo=TRUE, eval = FALSE}
+  source config_PRONTO_v2.sh ${RUN_ID})
+  ${SCRIPTS_FOLDER}/generate_report_PRONTO_v2.sbatch
+  ```
+  - `generate_report_PRONTO_v2.sbatch` : update the config file source:
+    ```{bash, echo=TRUE, eval = FALSE}
+  source config_PRONTO_v2.sh ${RUN_ID})
+  ```
+  - Then you can run the new version of PRONTO in parralele with the old version for testing and validation using the following command:
+
+  TEMPORARY section generate reports with PRONTO V2 for testing
+  First source the PRONTO v2 config file:
+  ```{bash, echo=TRUE, eval = FALSE}
+  source config_PRONTO_v2.sh ${RUN_ID}
+  ```
+
+  Then copy the pronto metadata to the PRONTO V2 folder:
+  ```{bash, echo=TRUE, eval = FALSE}
+  cp -i ${DURABLE}/software/PRONTO/PRONTO-1.2.0/In/InPreD_PRONTO_metadata.txt ${DURABLE}/software/PRONTO/PRONTO-2.1.2/In/InPreD_PRONTO_metadata.txt
+  ```
+
+  Then launch pronto V2:
+
+  ```{bash, echo=TRUE, eval = FALSE}
+  for SAMPLE_ID in ${SAMPLE_IDs[@]}
+  do
+        echo "SAMPLE_ID=${SAMPLE_ID}"
+
+        bash 03_generate_and_archive_pronto_report_collect_data_for_export_PRONTO_v2.sh ${RUN_ID} ${SAMPLE_ID} ${SCRIPTS_AND_LOGS_FOLDER}/02_used_scripts/config_${RUN_ID}.sh \
+            > ${EXPORT_ARCHIVE_FOLDER}/Logs_outputs/03_generate_and_archive_pronto_v${PRONTO_VERSION}_report_collect_data_for_export_${SAMPLE_ID}_${RUN_ID}.stdout             \
+            2> ${EXPORT_ARCHIVE_FOLDER}/Logs_outputs/03_generate_and_archive_pronto_v${PRONTO_VERSION}_report_collect_data_for_export_${SAMPLE_ID}_${RUN_ID}.stderr 
+
+  done
+  ```
+
+
+#### For production:
+  - Update the version number in `config.sh`
+  - Copy the metadata file to the new PRONTO version folder 
+  - Adatpt the `configure_PRONTO.ini`, edit `inpred_node` and `data_path` (you might need to edit more parameters in the future)
+  - For version 3.1.3 we also added the follow line to the `generate_report_PRONTO.sbatch` file to use the template from the folder instead of the one in the container:
     ```{bash, echo=TRUE, eval = FALSE}
     -B ${PRONTO_FOLDER}/In/Template:/pronto/In/Template \
     ```
