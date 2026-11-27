@@ -2718,8 +2718,8 @@ apptainer build PRONTO_v3.1.3.sif docker-archive://pronto_v3.1.3.tar
   ${SCRIPTS_FOLDER}/generate_report_PRONTO_v2.sbatch
   ```
   - `generate_report_PRONTO_v2.sbatch` : update the config file source:
-    ```{bash, echo=TRUE, eval = FALSE}
-  source config_PRONTO_v2.sh ${RUN_ID})
+  ```{bash, echo=TRUE, eval = FALSE}
+  source config_PRONTO_v2.sh ${RUN_ID}
   ```
   - Then you can run the new version of PRONTO in parralele with the old version for testing and validation using the following command:
 
